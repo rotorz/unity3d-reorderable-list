@@ -475,7 +475,7 @@ public static class ReorderableListGUI {
 					if (allowReordering)
 						GUI.DrawTexture(handlePosition, ReorderableListResources.texGrabHandle);
 
-					if (i != 0 && i != _anchorIndex && i != _anchorIndex + 1)
+					if (i != 0 && (!trackingControl || (i != _anchorIndex && i != _anchorIndex + 1)))
 						GUI.DrawTexture(new Rect(itemPosition.x, itemPosition.y - 1, itemPosition.width, 1), ReorderableListResources.texItemSplitter);
 					break;
 
