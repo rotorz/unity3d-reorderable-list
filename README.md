@@ -10,8 +10,8 @@ the LICENSE file.
 Installing scripts
 ------------------
 
-By default these scripts must be placed directly into your "Assets" folder
-since image resources are looked up from that path.
+Scripts must be placed within an "Editor" folder somewhere within your "Assets"
+folder.
 
 Usage Example
 -------------

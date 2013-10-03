@@ -170,25 +170,8 @@ public static class ReorderableListGUI {
 	public static GUIStyle AddButtonStyle { get; private set; }
 	public static GUIStyle RemoveButtonStyle { get; private set; }
 
-	private static Texture2D GrabHandleTexture { get; set; }
-	private static Texture2D ItemSplitterTexture { get; set; }
-
 	private static GUIContent RemoveButtonNormalContent { get; set; }
 	private static GUIContent RemoveButtonActiveContent { get; set; }
-
-	private static Texture2D LoadResource(string name) {
-		string skinFolder = EditorGUIUtility.isProSkin ? "Dark" : "Light";
-		return AssetDatabase.LoadAssetAtPath("Assets/Editor/Resources/" + skinFolder + "/" + name + ".png", typeof(Texture2D)) as Texture2D;
-	}
-
-	private static Texture2D CreatePixelTexture(string name, Color color) {
-		var tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-		tex.name = name;
-		tex.hideFlags = HideFlags.HideAndDontSave;
-		tex.SetPixel(0, 0, color);
-		tex.Apply();
-		return tex;
-	}
 
 	private static void InitStyles() {
 		TitleStyle = new GUIStyle();
@@ -196,7 +179,7 @@ public static class ReorderableListGUI {
 		TitleStyle.margin = new RectOffset(5, 5, 5, 0);
 		TitleStyle.padding = new RectOffset(5, 5, 0, 0);
 		TitleStyle.alignment = TextAnchor.MiddleLeft;
-		TitleStyle.normal.background = LoadResource("title_background");
+		TitleStyle.normal.background = ReorderableListResources.texTitleBackground;
 		TitleStyle.normal.textColor = EditorGUIUtility.isProSkin
 			? new Color(0.8f, 0.8f, 0.8f)
 			: new Color(0.2f, 0.2f, 0.2f);
@@ -205,26 +188,22 @@ public static class ReorderableListGUI {
 		ContainerStyle.border = new RectOffset(2, 2, 1, 2);
 		ContainerStyle.margin = new RectOffset(5, 5, 5, 5);
 		ContainerStyle.padding = new RectOffset(1, 1, 1, 2);
-		ContainerStyle.normal.background = LoadResource("container_background");
+		ContainerStyle.normal.background = ReorderableListResources.texContainerBackground;
 
 		AddButtonStyle = new GUIStyle();
 		AddButtonStyle.fixedWidth = 30;
 		AddButtonStyle.fixedHeight = 16;
-		AddButtonStyle.normal.background = LoadResource("add_button");
-		AddButtonStyle.active.background = LoadResource("add_button_active");
-
-		ItemSplitterTexture = CreatePixelTexture("Item Splitter (List GUI)", new Color(1f, 1f, 1f, 0.15f));
+		AddButtonStyle.normal.background = ReorderableListResources.texAddButton;
+		AddButtonStyle.active.background = ReorderableListResources.texAddButtonActive;
 
 		RemoveButtonStyle = new GUIStyle();
 		RemoveButtonStyle.fixedWidth = 27;
-		RemoveButtonStyle.active.background = CreatePixelTexture("Dark Pixel (List GUI)", new Color32(18, 18, 18, 255));
+		RemoveButtonStyle.active.background = ReorderableListResources.CreatePixelTexture("Dark Pixel (List GUI)", new Color32(18, 18, 18, 255));
 		RemoveButtonStyle.imagePosition = ImagePosition.ImageOnly;
 		RemoveButtonStyle.alignment = TextAnchor.MiddleCenter;
 
-		RemoveButtonNormalContent = new GUIContent(LoadResource("remove_button"));
-		RemoveButtonActiveContent = new GUIContent(LoadResource("remove_button_active"));
-
-		GrabHandleTexture = LoadResource("grab_handle");
+		RemoveButtonNormalContent = new GUIContent(ReorderableListResources.texRemoveButton);
+		RemoveButtonActiveContent = new GUIContent(ReorderableListResources.texRemoveButtonActive);
 	}
 
 	#endregion
@@ -494,10 +473,10 @@ public static class ReorderableListGUI {
 					}
 
 					if (allowReordering)
-						GUI.DrawTexture(handlePosition, GrabHandleTexture);
+						GUI.DrawTexture(handlePosition, ReorderableListResources.texGrabHandle);
 
 					if (i != 0 && i != _anchorIndex && i != _anchorIndex + 1)
-						GUI.DrawTexture(new Rect(itemPosition.x, itemPosition.y - 1, itemPosition.width, 1), ItemSplitterTexture);
+						GUI.DrawTexture(new Rect(itemPosition.x, itemPosition.y - 1, itemPosition.width, 1), ReorderableListResources.texItemSplitter);
 					break;
 
 				case EventType.MouseDown:
