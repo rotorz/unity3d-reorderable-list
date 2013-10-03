@@ -244,17 +244,32 @@ public static class ReorderableListGUI {
 	private static int _targetIndex = -1;
 
 	/// <summary>
+	/// Unique ID of list control which should be automatically focused. A value
+	/// of zero indicates that no control is to be focused.
+	/// </summary>
+	private static int _autoFocusControlID = 0;
+	/// <summary>
+	/// Zero-based index of item which should be focused.
+	/// </summary>
+	private static int _autoFocusIndex;
+
+	/// <summary>
 	/// Draw add item button.
 	/// </summary>
 	/// <param name="position">Position of button.</param>
+	/// <param name="controlID">Unique ID of list control.</param>
 	/// <param name="list">The list which can be reordered.</param>
 	/// <typeparam name="T">Type of list item.</typeparam>
-	private static void DoAddButton<T>(Rect position, List<T> list) {
+	private static void DoAddButton<T>(Rect position, int controlID, List<T> list) {
 		if (GUI.Button(position, GUIContent.none, AddButtonStyle)) {
 			// Append item to list.
 			GUIUtility.keyboardControl = 0;
 			list.Add(default(T));
 			GUI.changed = true;
+
+			// Attempt to automatically focus list control.
+			_autoFocusControlID = controlID;
+			_autoFocusIndex = list.Count - 1;
 		}
 	}
 
@@ -367,12 +382,11 @@ public static class ReorderableListGUI {
 		}
 	}
 
-	private static Rect DoListField<T>(List<T> list, DrawItem<T> drawItem, float itemHeight, ReorderableListFlag flags) {
+	private static Rect DoListField<T>(int controlID, List<T> list, DrawItem<T> drawItem, float itemHeight, ReorderableListFlag flags) {
 		bool allowReordering = (flags & ReorderableListFlag.DisableReordering) == 0;
 		bool includeRemoveButtons = (flags & ReorderableListFlag.HideRemoveButtons) == 0;
 
 		RectOffset containerMargin = ContainerStyle.margin;
-		int controlID = GUIUtility.GetControlID(FocusType.Passive);
 		bool trackingControl = IsTrackingControl(controlID);
 
 		float itemOffset = itemHeight + 3;
@@ -499,6 +513,9 @@ public static class ReorderableListGUI {
 					break;
 			}
 
+			if (_autoFocusControlID == controlID && _autoFocusIndex == i)
+				GUI.SetNextControlName("AutoFocus_" + controlID);
+
 			// Draw the actual list item!
 			list[i] = drawItem(itemContentPosition, list[i]);
 
@@ -518,7 +535,20 @@ public static class ReorderableListGUI {
 			handleResponsePosition.y += itemOffset;
 			removeButtonPosition.y += itemOffset;
 		}
-		
+
+		// Automatically focus control!
+		if (_autoFocusControlID == controlID) {
+			_autoFocusControlID = 0;
+#if (UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2)
+			GUI.FocusControl("AutoFocus_" + controlID);
+#else
+			EditorGUI.FocusTextInControl("AutoFocus_" + controlID);
+#endif
+		}
+
+		// Fake control to catch input focus if auto focus was not possible.
+		GUIUtility.GetControlID(FocusType.Keyboard);
+
 		// Update position of drag rectangle.
 		switch (eventType) {
 			case EventType.Repaint:
@@ -559,9 +589,11 @@ public static class ReorderableListGUI {
 	}
 
 	private static void DoListField<T>(List<T> list, DrawItem<T> drawItem, DrawEmpty drawEmpty, float itemHeight, ReorderableListFlag flags) {
+		int controlID = GUIUtility.GetControlID(FocusType.Passive);
+
 		Rect containerPosition;
 		if (list.Count > 0)
-			containerPosition = DoListField(list, drawItem ?? DrawDefaultField, itemHeight, flags);
+			containerPosition = DoListField(controlID, list, drawItem ?? DrawDefaultField, itemHeight, flags);
 		else
 			containerPosition = DoEmptyList(list, drawEmpty, flags);
 
@@ -571,7 +603,7 @@ public static class ReorderableListGUI {
 			addButtonRect.x = containerPosition.xMax - addButtonRect.width;
 			addButtonRect.y -= ContainerStyle.margin.bottom + 1;
 
-			DoAddButton(addButtonRect, list);
+			DoAddButton(addButtonRect, controlID, list);
 		}
 	}
 
