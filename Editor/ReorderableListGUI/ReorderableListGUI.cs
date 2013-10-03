@@ -16,15 +16,23 @@ public enum ReorderableListFlag {
 	/// <summary>
 	/// Hide grab handles and disable reordering of list items.
 	/// </summary>
-	DisableReordering = 1,
+	DisableReordering		= 0x01,
 	/// <summary>
 	/// Hide add button at base of control.
 	/// </summary>
-	HideAddButton = 2,
+	HideAddButton			= 0x02,
 	/// <summary>
 	/// Hide remove buttons from list items.
 	/// </summary>
-	HideRemoveButtons = 4,
+	HideRemoveButtons		= 0x04,
+	/// <summary>
+	/// Do not display context menu upon right-clicking grab handle.
+	/// </summary>
+	DisableContextMenu		= 0x08,
+	/// <summary>
+	/// Hide "Duplicate" option from context menu.
+	/// </summary>
+	DisableDuplicateCommand	= 0x10,
 }
 
 /// <summary>
@@ -231,10 +239,6 @@ public static class ReorderableListGUI {
 	private static Rect dragHighlighter;
 
 	/// <summary>
-	/// Mouse button which was used when beginning to drag item.
-	/// </summary>
-	private static int _anchorMouseButton;
-	/// <summary>
 	/// Zero-based index of anchored list item.
 	/// </summary>
 	private static int _anchorIndex = -1;
@@ -264,6 +268,118 @@ public static class ReorderableListGUI {
 	public static int CurrentItemIndex {
 		get { return _currentItemIndex; }
 	}
+
+	#region Context Menu
+
+	private static readonly GUIContent MenuItem_MoveToTop = new GUIContent("Move to Top");
+	private static readonly GUIContent MenuItem_MoveToBottom = new GUIContent("Move to Bottom");
+	private static readonly GUIContent MenuItem_InsertAbove = new GUIContent("Insert Above");
+	private static readonly GUIContent MenuItem_InsertBelow = new GUIContent("Insert Below");
+	private static readonly GUIContent MenuItem_Duplicate = new GUIContent("Duplicate");
+	private static readonly GUIContent MenuItem_Remove = new GUIContent("Remove");
+	private static readonly GUIContent MenuItem_ClearAll = new GUIContent("Clear All");
+
+	private static int _commandControlID;
+	private static int _commandItemIndex;
+	private static string _commandName;
+
+	private static void DoContextMenu(int controlID, int itemIndex, int itemCount, ReorderableListFlag flags) {
+		GenericMenu menu = new GenericMenu();
+
+		_commandControlID = controlID;
+		_commandItemIndex = itemIndex;
+
+		// Event handler for context menu click.
+		GenericMenu.MenuFunction2 menuFunction = (object userData) => {
+			var commandContent = userData as GUIContent;
+			if (commandContent == null || string.IsNullOrEmpty(commandContent.text))
+				return;
+
+			_commandName = commandContent.text;
+
+			var e = EditorGUIUtility.CommandEvent("ReorderableListContextCommand");
+			EditorWindow.focusedWindow.SendEvent(e);
+		};
+
+		if ((flags & ReorderableListFlag.DisableReordering) == 0) {
+			if (itemIndex > 0)
+				menu.AddItem(MenuItem_MoveToTop, false, menuFunction, MenuItem_MoveToTop);
+			else
+				menu.AddDisabledItem(MenuItem_MoveToTop);
+
+			if (itemIndex + 1 < itemCount)
+				menu.AddItem(MenuItem_MoveToBottom, false, menuFunction, MenuItem_MoveToBottom);
+			else
+				menu.AddDisabledItem(MenuItem_MoveToBottom);
+
+			if ((flags & ReorderableListFlag.HideAddButton) == 0) {
+				menu.AddSeparator("");
+
+				menu.AddItem(MenuItem_InsertAbove, false, menuFunction, MenuItem_InsertAbove);
+				menu.AddItem(MenuItem_InsertBelow, false, menuFunction, MenuItem_InsertBelow);
+
+				if ((flags & ReorderableListFlag.DisableDuplicateCommand) == 0)
+					menu.AddItem(MenuItem_Duplicate, false, menuFunction, MenuItem_Duplicate);
+			}
+		}
+
+		if ((flags & ReorderableListFlag.HideRemoveButtons) == 0) {
+			if (menu.GetItemCount() > 0)
+				menu.AddSeparator("");
+
+			menu.AddItem(MenuItem_Remove, false, menuFunction, MenuItem_Remove);
+			menu.AddSeparator("");
+			menu.AddItem(MenuItem_ClearAll, false, menuFunction, MenuItem_ClearAll);
+		}
+
+		menu.ShowAsContext();
+	}
+
+	private static void HandleContextMenuCommand<T>(List<T> list) {
+		T temp;
+
+		int itemIndex = _commandItemIndex;
+
+		// Clear connection with list control.
+		_commandControlID = 0;
+		_commandItemIndex = 0;
+
+		switch (_commandName) {
+			case "Move to Top":
+				temp = list[itemIndex];
+				list.RemoveAt(itemIndex);
+				list.Insert(0, temp);
+				break;
+			case "Move to Bottom":
+				temp = list[itemIndex];
+				list.RemoveAt(itemIndex);
+				list.Insert(list.Count, temp);
+				break;
+			case "Insert Above":
+				list.Insert(itemIndex, default(T));
+				break;
+			case "Insert Below":
+				list.Insert(itemIndex + 1, default(T));
+				break;
+			case "Duplicate":
+				list.Insert(itemIndex + 1, list[itemIndex]);
+				break;
+			case "Remove":
+				list.RemoveAt(itemIndex);
+				break;
+			case "Clear All":
+				list.Clear();
+				break;
+
+			default:
+				Debug.LogWarning("Unknown context command.");
+				return;
+		}
+
+		GUI.changed = true;
+	}
+
+	#endregion
 
 	/// <summary>
 	/// Draw add item button.
@@ -344,7 +460,6 @@ public static class ReorderableListGUI {
 	private static void BeginTrackingReorderDrag(int controlID, int itemIndex) {
 		GUIUtility.hotControl = controlID;
 		GUIUtility.keyboardControl = 0;
-		_anchorMouseButton = Event.current.button;
 		_anchorIndex = itemIndex;
 		_targetIndex = itemIndex;
 	}
@@ -427,7 +542,7 @@ public static class ReorderableListGUI {
 			case EventType.MouseDrag:
 				if (trackingControl) {
 					// Cancel drag when other mouse button is pressed.
-					if (Event.current.button != _anchorMouseButton)
+					if (Event.current.button != 0)
 						StopTrackingReorderDrag();
 
 					// Reset target index and adjust when looping through list items.
@@ -460,6 +575,13 @@ public static class ReorderableListGUI {
 				}
 				break;
 
+			case EventType.ExecuteCommand:
+				if (_commandControlID == controlID) {
+					HandleContextMenuCommand(list);
+					Event.current.Use();
+				}
+				break;
+
 			case EventType.Repaint:
 				// Draw caption area of list.
 				ContainerStyle.Draw(containerRect, GUIContent.none, false, false, false, false);
@@ -484,7 +606,9 @@ public static class ReorderableListGUI {
 			itemContentPosition.width -= RemoveButtonStyle.fixedWidth;
 			removeButtonPosition = new Rect(itemContentPosition.xMax, itemContentPosition.y, RemoveButtonStyle.fixedWidth, itemHeight);
 		}
-		
+
+		bool canDragItem = (allowReordering && GUI.enabled);
+
 		for (int i = 0; i < list.Count; ++i) {
 			EditorGUIUtility.AddCursorRect(handleResponsePosition, MouseCursor.MoveArrow);
 
@@ -506,13 +630,24 @@ public static class ReorderableListGUI {
 					break;
 
 				case EventType.MouseDown:
-					if (allowReordering && GUI.enabled && handleResponsePosition.Contains(mousePosition)) {
-						BeginTrackingReorderDrag(controlID, i);
+					if (canDragItem && handleResponsePosition.Contains(mousePosition)) {
+						if (Event.current.button == 0) {
+							BeginTrackingReorderDrag(controlID, i);
 
-						// Is target index below anchor?
-						if (mousePosition.y > itemPosition.yMax - halfItemOffset)
-							_targetIndex = i + 1;
+							// Is target index below anchor?
+							if (mousePosition.y > itemPosition.yMax - halfItemOffset)
+								_targetIndex = i + 1;
+						}
+						else {
+							GUIUtility.keyboardControl = 0;
+						}
+						Event.current.Use();
+					}
+					break;
 
+				case EventType.ContextClick:
+					if (handleResponsePosition.Contains(mousePosition) && (flags & ReorderableListFlag.DisableContextMenu) == 0) {
+						DoContextMenu(controlID, i, list.Count, flags);
 						Event.current.Use();
 					}
 					break;
