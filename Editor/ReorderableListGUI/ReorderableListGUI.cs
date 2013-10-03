@@ -254,6 +254,18 @@ public static class ReorderableListGUI {
 	private static int _autoFocusIndex;
 
 	/// <summary>
+	/// Zero-based index of list item which is currently being drawn.
+	/// </summary>
+	private static int _currentItemIndex;
+	/// <summary>
+	/// Gets zero-based index of list item which is currently being drawn;
+	/// or a value of -1 if no item is currently being drawn.
+	/// </summary>
+	public static int CurrentItemIndex {
+		get { return _currentItemIndex; }
+	}
+
+	/// <summary>
 	/// Draw add item button.
 	/// </summary>
 	/// <param name="position">Position of button.</param>
@@ -517,6 +529,7 @@ public static class ReorderableListGUI {
 				GUI.SetNextControlName("AutoFocus_" + controlID);
 
 			// Draw the actual list item!
+			_currentItemIndex = i;
 			list[i] = drawItem(itemContentPosition, list[i]);
 
 			if (includeRemoveButtons)
@@ -535,6 +548,8 @@ public static class ReorderableListGUI {
 			handleResponsePosition.y += itemOffset;
 			removeButtonPosition.y += itemOffset;
 		}
+
+		_currentItemIndex = -1;
 
 		// Automatically focus control!
 		if (_autoFocusControlID == controlID) {
