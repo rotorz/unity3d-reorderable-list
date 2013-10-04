@@ -399,19 +399,13 @@ namespace Rotorz.ReorderableList {
 			bool allowReordering = (flags & ReorderableListFlags.DisableReordering) == 0;
 			bool includeRemoveButtons = (flags & ReorderableListFlags.HideRemoveButtons) == 0;
 
-			RectOffset containerMargin = containerStyle.margin;
 			bool trackingControl = IsTrackingControl(controlID);
 
 			float itemOffset = itemHeight + 4;
 			float halfItemOffset = Mathf.Ceil(itemOffset / 2f);
 
-			float totalHeight = 2 + itemOffset * list.Count + containerMargin.top + containerStyle.padding.top + containerStyle.padding.bottom;
-			Rect containerRect = GUILayoutUtility.GetRect(0, totalHeight);
-
-			containerRect.x += containerMargin.left;
-			containerRect.y += containerMargin.top;
-			containerRect.width -= containerMargin.left + containerMargin.right;
-			containerRect.height -= containerMargin.top + containerMargin.bottom;
+			float totalHeight = 2 + itemOffset * list.Count;
+			Rect containerRect = GUILayoutUtility.GetRect(GUIContent.none, containerStyle, GUILayout.Height(totalHeight));
 
 			// Position of first item in list.
 			float firstItemY = containerRect.y + containerStyle.padding.top;
