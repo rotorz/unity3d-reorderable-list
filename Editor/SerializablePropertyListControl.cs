@@ -198,7 +198,6 @@ namespace Rotorz.ReorderableList {
 		/// Draw list field control.
 		/// </summary>
 		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		public void Draw(SerializedProperty arrayProperty) {
 			Draw(arrayProperty, null);
 		}

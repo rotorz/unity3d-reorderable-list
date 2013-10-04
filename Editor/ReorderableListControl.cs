@@ -24,16 +24,16 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Implementation of reorderable list data for generic lists.
 		/// </summary>
-		public sealed class GenericReorderableListData<T> : IReorderableListData {
+		private sealed class GenericReorderableListData<T> : IReorderableListData {
 
 			public List<T> list;
 			public ReorderableListControl.ItemDrawer<T> itemDrawer;
 
 			/// <summary>
-			/// Initializes a new instance of <see cref="GenericReorderableListData"/>.
+			/// Initializes a new instance of <see cref="GenericReorderableListData{T}"/>.
 			/// </summary>
 			/// <param name="list">The list which can be reordered.</param>
-			/// <param name="drawItem">Callback to draw list item.</param>
+			/// <param name="itemDrawer">Callback to draw list item.</param>
 			public GenericReorderableListData(List<T> list, ReorderableListControl.ItemDrawer<T> itemDrawer) {
 				this.list = list;
 				this.itemDrawer = itemDrawer ?? ReorderableListGUI.DefaultItemDrawer;
@@ -103,13 +103,10 @@ namespace Rotorz.ReorderableList {
 		/// using System.Collections.Generic;
 		/// 
 		/// public class ExampleWindow : EditorWindow {
-		///     private List<string> _list;
+		///     public List<string> wishlist = new List<string>();
 		/// 
-		///     private void OnEnable() {
-		///         _list = new List<string>();
-		///     }
 		///     private void OnGUI() {
-		///         ReorderableListGUI.ListField(_list, DrawListItem);
+		///         ReorderableListGUI.ListField(wishlist, DrawListItem);
 		///     }
 		/// 
 		///     private string DrawListItem(Rect position, string value) {
@@ -124,13 +121,10 @@ namespace Rotorz.ReorderableList {
 		/// import System.Collections.Generic;
 		/// 
 		/// class ExampleWindow extends EditorWindow {
-		///     private var _list:List.<String>;
+		///     var wishlist:List.<String>;
 		/// 
-		///     function OnEnable() {
-		///         _list = new List.<String>();
-		///     }
 		///     function OnGUI() {
-		///         ReorderableListGUI.ListField(_list, DrawListItem);
+		///         ReorderableListGUI.ListField(wishlist, DrawListItem);
 		///     }
 		/// 
 		///     function DrawListItem(position:Rect, value:String):String {
@@ -283,7 +277,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets or sets style used to draw background of list control.
 		/// </summary>
-		/// <seealso cref="defaultContainerStyle"/>
+		/// <seealso cref="ReorderableListGUI.containerStyle"/>
 		public GUIStyle containerStyle {
 			get { return _containerStyle; }
 			set { _containerStyle = value; }
@@ -291,7 +285,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets or sets style used to draw add button.
 		/// </summary>
-		/// <seealso cref="defaultAddButtonStyle"/>
+		/// <seealso cref="ReorderableListGUI.addButtonStyle"/>
 		public GUIStyle addButtonStyle {
 			get { return _addButtonStyle; }
 			set { _addButtonStyle = value; }
@@ -299,7 +293,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets or sets style used to draw remove button.
 		/// </summary>
-		/// <seealso cref="defaultRemoveButtonStyle"/>
+		/// <seealso cref="ReorderableListGUI.removeButtonStyle"/>
 		public GUIStyle removeButtonStyle {
 			get { return _removeButtonStyle; }
 			set { _removeButtonStyle = value; }
@@ -704,6 +698,12 @@ namespace Rotorz.ReorderableList {
 			return r;
 		}
 
+		/// <summary>
+		/// Draw list field and handle other GUI events.
+		/// </summary>
+		/// <param name="list">Abstracted representation of list.</param>
+		/// <param name="drawEmpty">Delegate for drawing empty list.</param>
+		/// <param name="itemHeight">Height of each item in pixels.</param>
 		protected void DoListField(IReorderableListData list, DrawEmpty drawEmpty, float itemHeight) {
 			int controlID = GUIUtility.GetControlID(FocusType.Passive);
 

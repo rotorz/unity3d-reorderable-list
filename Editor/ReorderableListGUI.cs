@@ -170,7 +170,7 @@ namespace Rotorz.ReorderableList {
 		/// ReorderableListGUI.ListField(list, DynamicListGU.TextFieldItemDrawer);
 		/// ]]></code>
 		/// </example>
-		/// <param name="caption">Caption for list control.</para>
+		/// <param name="caption">Caption for list control.</param>
 		public static void Title(GUIContent caption) {
 			Rect position = GUILayoutUtility.GetRect(caption, titleStyle);
 			if (Event.current.type == EventType.Repaint) {
@@ -195,7 +195,7 @@ namespace Rotorz.ReorderableList {
 		/// ReorderableListGUI.ListField(list, DynamicListGU.TextFieldItemDrawer);
 		/// ]]></code>
 		/// </example>
-		/// <param name="caption">Caption for list control.</para>
+		/// <param name="caption">Caption for list control.</param>
 		public static void Title(string caption) {
 			s_Temp.text = caption;
 			Title(s_Temp);
