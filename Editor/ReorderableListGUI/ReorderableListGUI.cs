@@ -204,6 +204,19 @@ public static class ReorderableListGUI {
 	/// <param name="list">The list which can be reordered.</param>
 	/// <param name="drawItem">Callback to draw list item.</param>
 	/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
+	/// <param name="flags">Optional flags to pass into list field.</param>
+	/// <typeparam name="T">Type of list item.</typeparam>
+	public static void ListField<T>(List<T> list, ReorderableListControl.DrawItem<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
+		defaultListControl.flags = flags;
+		defaultListControl.Draw(list, drawItem, drawEmpty, DefaultItemHeight);
+	}
+
+	/// <summary>
+	/// Draw list field control.
+	/// </summary>
+	/// <param name="list">The list which can be reordered.</param>
+	/// <param name="drawItem">Callback to draw list item.</param>
+	/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 	/// <param name="itemHeight">Height of a single list item.</param>
 	/// <typeparam name="T">Type of list item.</typeparam>
 	public static void ListField<T>(List<T> list, ReorderableListControl.DrawItem<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight) {
