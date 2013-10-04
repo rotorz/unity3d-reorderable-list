@@ -628,7 +628,7 @@ namespace Rotorz.ReorderableList {
 							break;
 
 						case EventType.ContextClick:
-							if (canDragItem && itemPosition.Contains(mousePosition)) {
+							if (itemPosition.Contains(mousePosition)) {
 								ShowContextMenu(controlID, i, list);
 								Event.current.Use();
 							}
