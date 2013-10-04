@@ -30,6 +30,14 @@ namespace Rotorz.ReorderableList {
 		/// </remarks>
 		public static int indexOfChangedItem { get; internal set; }
 
+		/// <summary>
+		/// Gets zero-based index of list item which is currently being drawn;
+		/// or a value of -1 if no item is currently being drawn.
+		/// </summary>
+		public static int currentItemIndex {
+			get { return ReorderableListControl.currentItemIndex; }
+		}
+
 		#region Basic Item Drawers
 
 		/// <summary>

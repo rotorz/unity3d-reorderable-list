@@ -185,7 +185,10 @@ namespace Rotorz.ReorderableList {
 		/// Gets zero-based index of list item which is currently being drawn;
 		/// or a value of -1 if no item is currently being drawn.
 		/// </summary>
-		public static int currentItemIndex {
+		/// <remarks>
+		/// <para>Use <see cref="ReorderableListGUI.currentItemIndex"/> instead.</para>
+		/// </remarks>
+		internal static int currentItemIndex {
 			get { return s_CurrentItemIndex; }
 		}
 
@@ -597,7 +600,7 @@ namespace Rotorz.ReorderableList {
 #if (UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2)
 				GUI.FocusControl("AutoFocus_" + controlID);
 #else
-			EditorGUI.FocusTextInControl("AutoFocus_" + controlID);
+				EditorGUI.FocusTextInControl("AutoFocus_" + controlID);
 #endif
 			}
 
