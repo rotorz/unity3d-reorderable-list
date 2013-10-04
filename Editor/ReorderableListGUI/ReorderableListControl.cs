@@ -528,11 +528,13 @@ namespace Rotorz.ReorderableList {
 								// Is target index below anchor?
 								if (mousePosition.y > itemPosition.yMax - halfItemOffset)
 									s_TargetIndex = i + 1;
+
+								Event.current.Use();
 							}
 							else {
 								GUIUtility.keyboardControl = 0;
+								EditorWindow.focusedWindow.Repaint();
 							}
-							Event.current.Use();
 						}
 						else if (removeButtonPosition.Contains(mousePosition)) {
 							GUIUtility.keyboardControl = 0;
