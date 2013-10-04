@@ -660,27 +660,12 @@ namespace Rotorz.ReorderableList {
 			GUIUtility.GetControlID(FocusType.Keyboard);
 
 			// Update position of drag rectangle.
-			switch (eventType) {
-				case EventType.Repaint:
-					// Highlight drag rectangle?
-					// Note: Draw on top of other controls!
-					if (IsTrackingControl(controlID)) {
-						GUI.color = EditorGUIUtility.isProSkin
-							? new Color(0.75f, 0.75f, 0.75f)
-							: new Color(0.12f, 0.12f, 0.12f);
-						GUI.DrawTexture(s_DragHighlighter, EditorGUIUtility.whiteTexture);
-						GUI.color = restoreColor;
-					}
-					break;
-
-				case EventType.MouseDown:
-				case EventType.MouseDrag:
-					if (IsTrackingControl(controlID)) {
-						s_DragHighlighter = containerRect;
-						s_DragHighlighter.y = firstItemY + s_TargetIndex * itemOffset - 3;
-						s_DragHighlighter.height = 4;
-					}
-					break;
+			if (eventType == EventType.MouseDown || eventType == EventType.MouseDrag) {
+				if (IsTrackingControl(controlID)) {
+					s_DragHighlighter = containerRect;
+					s_DragHighlighter.y = firstItemY + s_TargetIndex * itemOffset - 3;
+					s_DragHighlighter.height = 4;
+				}
 			}
 
 			return containerRect;
@@ -725,6 +710,19 @@ namespace Rotorz.ReorderableList {
 				addButtonRect.y -= containerStyle.margin.bottom + 1;
 
 				DoAddButton(addButtonRect, controlID, list);
+			}
+			
+			// Highight drag rectangle?
+			if (Event.current.type == EventType.Repaint) {
+				// Note: Draw on top of other controls!
+				if (IsTrackingControl(controlID)) {
+					Color restoreColor = GUI.color;
+					GUI.color = EditorGUIUtility.isProSkin
+						? new Color(0.75f, 0.75f, 0.75f)
+						: new Color(0.12f, 0.12f, 0.12f);
+					GUI.DrawTexture(s_DragHighlighter, EditorGUIUtility.whiteTexture);
+					GUI.color = restoreColor;
+				}
 			}
 		}
 
