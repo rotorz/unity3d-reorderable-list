@@ -16,10 +16,8 @@ public class ReorderableListDemo : EditorWindow {
 		GetWindow<ReorderableListDemo>("List Demo");
 	}
 
-	private List<string> shoppingList;
-	private List<string> purchaseList;
-	
-	#region Messages
+	public List<string> shoppingList;
+	public List<string> purchaseList;
 	
 	private void OnEnable() {
 		shoppingList = new List<string>();
@@ -80,7 +78,5 @@ public class ReorderableListDemo : EditorWindow {
 	private void DrawEmpty() {
 		GUILayout.Label("No items in list.", EditorStyles.miniLabel);
 	}
-	
-	#endregion
 	
 }

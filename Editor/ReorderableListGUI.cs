@@ -84,10 +84,15 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets the default list control implementation.
 		/// </summary>
-		public static ReorderableListControl defaultListControl { get; private set; }
+		private static ReorderableListControl defaultListControl { get; set; }
+		/// <summary>
+		/// Gets the list control for serializable property arrays.
+		/// </summary>
+		private static SerializablePropertyListControl serializablePropertyListControl { get; set; }
 
 		static ReorderableListGUI() {
 			defaultListControl = new ReorderableListControl();
+			serializablePropertyListControl = new SerializablePropertyListControl();
 
 			indexOfChangedItem = -1;
 
@@ -205,7 +210,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="itemHeight">Height of a single list item.</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListField<T>(List<T> list, ReorderableListControl.DrawItem<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight, ReorderableListFlags flags) {
+		public static void ListField<T>(List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight, ReorderableListFlags flags) {
 			defaultListControl.flags = flags;
 			defaultListControl.Draw(list, drawItem, drawEmpty, itemHeight);
 		}
@@ -218,7 +223,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListField<T>(List<T> list, ReorderableListControl.DrawItem<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
+		public static void ListField<T>(List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
 			defaultListControl.flags = flags;
 			defaultListControl.Draw(list, drawItem, drawEmpty, DefaultItemHeight);
 		}
@@ -231,7 +236,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="itemHeight">Height of a single list item.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListField<T>(List<T> list, ReorderableListControl.DrawItem<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight) {
+		public static void ListField<T>(List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight) {
 			defaultListControl.flags = 0;
 			defaultListControl.Draw(list, drawItem, drawEmpty, itemHeight);
 		}
@@ -243,7 +248,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawItem">Callback to draw list item.</param>
 		/// <param name="itemHeight">Height of a single list item.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListField<T>(List<T> list, ReorderableListControl.DrawItem<T> drawItem, float itemHeight) {
+		public static void ListField<T>(List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, float itemHeight) {
 			defaultListControl.flags = 0;
 			defaultListControl.Draw(list, drawItem, null, itemHeight);
 		}
@@ -254,7 +259,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="list">The list which can be reordered.</param>
 		/// <param name="drawItem">Callback to draw list item.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListField<T>(List<T> list, ReorderableListControl.DrawItem<T> drawItem) {
+		public static void ListField<T>(List<T> list, ReorderableListControl.ItemDrawer<T> drawItem) {
 			defaultListControl.flags = 0;
 			defaultListControl.Draw(list, drawItem, null, DefaultItemHeight);
 		}
@@ -266,9 +271,46 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawItem">Callback to draw list item.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListField<T>(List<T> list, ReorderableListControl.DrawItem<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty) {
+		public static void ListField<T>(List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty) {
 			defaultListControl.flags = 0;
 			defaultListControl.Draw(list, drawItem, drawEmpty, DefaultItemHeight);
+		}
+
+		/// <summary>
+		/// Draw list field control for serializable property array.
+		/// </summary>
+		/// <param name="arrayProperty">Serializable property.</param>
+		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
+		/// <param name="flags">Optional flags to pass into list field.</param>
+		public static void ListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
+			serializablePropertyListControl.flags = flags;
+			serializablePropertyListControl.Draw(arrayProperty, drawEmpty);
+		}
+
+		/// <summary>
+		/// Draw list field control for serializable property array.
+		/// </summary>
+		/// <param name="arrayProperty">Serializable property.</param>
+		public static void ListField(SerializedProperty arrayProperty) {
+			ListField(arrayProperty, null, 0);
+		}
+
+		/// <summary>
+		/// Draw list field control for serializable property array.
+		/// </summary>
+		/// <param name="arrayProperty">Serializable property.</param>
+		/// <param name="flags">Optional flags to pass into list field.</param>
+		public static void ListField(SerializedProperty arrayProperty, ReorderableListFlags flags) {
+			ListField(arrayProperty, null, flags);
+		}
+
+		/// <summary>
+		/// Draw list field control for serializable property array.
+		/// </summary>
+		/// <param name="arrayProperty">Serializable property.</param>
+		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
+		public static void ListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty) {
+			ListField(arrayProperty, drawEmpty, 0);
 		}
 
 	}

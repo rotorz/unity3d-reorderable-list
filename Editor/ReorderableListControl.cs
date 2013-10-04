@@ -19,6 +19,74 @@ namespace Rotorz.ReorderableList {
 	[Serializable]
 	public class ReorderableListControl {
 
+		#region SerializedProperty Abstraction
+
+		/// <summary>
+		/// Implementation of reorderable list data for generic lists.
+		/// </summary>
+		public sealed class GenericReorderableListData<T> : IReorderableListData {
+
+			public List<T> list;
+			public ReorderableListControl.ItemDrawer<T> itemDrawer;
+
+			/// <summary>
+			/// Initializes a new instance of <see cref="GenericReorderableListData"/>.
+			/// </summary>
+			/// <param name="list">The list which can be reordered.</param>
+			/// <param name="drawItem">Callback to draw list item.</param>
+			public GenericReorderableListData(List<T> list, ReorderableListControl.ItemDrawer<T> itemDrawer) {
+				this.list = list;
+				this.itemDrawer = itemDrawer ?? ReorderableListGUI.DefaultItemDrawer;
+			}
+
+			#region IReorderableListData - Implementation
+
+			/// <inheritdoc/>
+			public int Count {
+				get { return list.Count; }
+			}
+
+			/// <inheritdoc/>
+			public void AddNew() {
+				list.Add(default(T));
+			}
+			/// <inheritdoc/>
+			public void Insert(int index) {
+				list.Insert(index, default(T));
+			}
+			/// <inheritdoc/>
+			public void Duplicate(int index) {
+				list.Insert(index + 1, list[index]);
+			}
+			/// <inheritdoc/>
+			public void Remove(int index) {
+				list.RemoveAt(index);
+			}
+			/// <inheritdoc/>
+			public void Move(int sourceIndex, int destIndex) {
+				if (destIndex > sourceIndex)
+					--destIndex;
+
+				T item = list[sourceIndex];
+				list.RemoveAt(sourceIndex);
+				list.Insert(destIndex, item);
+			}
+			/// <inheritdoc/>
+			public void Clear() {
+				list.Clear();
+			}
+
+			/// <inheritdoc/>
+			public void DrawItem(Rect position, int index) {
+				list[index] = itemDrawer(position, list[index]);
+			}
+
+			#endregion
+
+		}
+
+		#endregion
+
 		/// <summary>
 		/// Invoked to draw list item.
 		/// </summary>
@@ -80,7 +148,7 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// The modified value.
 		/// </returns>
-		public delegate T DrawItem<T>(Rect position, T item);
+		public delegate T ItemDrawer<T>(Rect position, T item);
 
 		/// <summary>
 		/// Invoked to draw content for empty list.
@@ -269,12 +337,11 @@ namespace Rotorz.ReorderableList {
 		/// <param name="position">Position of button.</param>
 		/// <param name="controlID">Unique ID of list control.</param>
 		/// <param name="list">The list which can be reordered.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		private void DoAddButton<T>(Rect position, int controlID, List<T> list) {
+		private void DoAddButton(Rect position, int controlID, IReorderableListData list) {
 			if (GUI.Button(position, GUIContent.none, addButtonStyle)) {
 				// Append item to list.
 				GUIUtility.keyboardControl = 0;
-				list.Add(default(T));
+				list.AddNew();
 
 				GUI.changed = true;
 				ReorderableListGUI.indexOfChangedItem = -1;
@@ -374,19 +441,12 @@ namespace Rotorz.ReorderableList {
 		/// Accept reordering.
 		/// </summary>
 		/// <param name="list">The list which can be reordered.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		private static void AcceptReorderDrag<T>(List<T> list) {
+		private static void AcceptReorderDrag(IReorderableListData list) {
 			try {
 				// Reorder list as needed!
 				s_TargetIndex = Mathf.Clamp(s_TargetIndex, 0, list.Count + 1);
 				if (s_TargetIndex != s_AnchorIndex && s_TargetIndex != s_AnchorIndex + 1) {
-					if (s_TargetIndex > s_AnchorIndex)
-						--s_TargetIndex;
-
-					T temp = list[s_AnchorIndex];
-					list.RemoveAt(s_AnchorIndex);
-					list.Insert(s_TargetIndex, temp);
-
+					list.Move(s_AnchorIndex, s_TargetIndex);
 					GUI.changed = true;
 				}
 			}
@@ -395,7 +455,7 @@ namespace Rotorz.ReorderableList {
 			}
 		}
 
-		private Rect DoListField<T>(int controlID, List<T> list, DrawItem<T> drawItem, float itemHeight) {
+		private Rect DoListField(int controlID, IReorderableListData list, float itemHeight) {
 			bool allowReordering = (flags & ReorderableListFlags.DisableReordering) == 0;
 			bool includeRemoveButtons = (flags & ReorderableListFlags.HideRemoveButtons) == 0;
 
@@ -533,20 +593,6 @@ namespace Rotorz.ReorderableList {
 								EditorWindow.focusedWindow.Repaint();
 							}
 						}
-						else if (removeButtonPosition.Contains(mousePosition)) {
-							GUIUtility.keyboardControl = 0;
-							EditorWindow.focusedWindow.Repaint();
-						}
-						break;
-
-					case EventType.ContextClick:
-						if ((flags & ReorderableListFlags.DisableContextMenu) == 0)
-							if (canDragItem && handleResponsePosition.Contains(mousePosition)
-								|| removeButtonPosition.Contains(mousePosition)
-							) {
-								ShowContextMenu(controlID, i, list);
-								Event.current.Use();
-							}
 						break;
 
 					case EventType.MouseDrag:
@@ -564,7 +610,7 @@ namespace Rotorz.ReorderableList {
 
 				// Draw the actual list item!
 				s_CurrentItemIndex = i;
-				list[i] = drawItem(itemContentPosition, list[i]);
+				list.DrawItem(itemContentPosition, i);
 
 				if (EditorGUI.EndChangeCheck())
 					ReorderableListGUI.indexOfChangedItem = i;
@@ -572,13 +618,29 @@ namespace Rotorz.ReorderableList {
 				if (includeRemoveButtons)
 					if (DoRemoveButton(removeButtonPosition, trackingControl && s_AnchorIndex == i)) {
 						// Remove last entry in list.
-						if (list.Count > 0) {
-							list.RemoveAt(i);
+						list.Remove(i);
 
-							GUI.changed = true;
-							ReorderableListGUI.indexOfChangedItem = -1;
-						}
+						GUI.changed = true;
+						ReorderableListGUI.indexOfChangedItem = -1;
 					}
+
+				// Check for context click?
+				if (itemPosition.Contains(mousePosition)) {
+					switch (Event.current.type) {
+						case EventType.MouseDown:
+							// Remove input focus from control before attempting a context click or drag.
+							GUIUtility.keyboardControl = 0;
+							Event.current.Use();
+							break;
+
+						case EventType.ContextClick:
+							if (canDragItem && itemPosition.Contains(mousePosition)) {
+								ShowContextMenu(controlID, i, list);
+								Event.current.Use();
+							}
+							break;
+					}
+				}
 
 				// Offset position rectangles for next item.
 				itemPosition.y += itemOffset;
@@ -630,7 +692,7 @@ namespace Rotorz.ReorderableList {
 			return containerRect;
 		}
 
-		private Rect DoEmptyList<T>(List<T> list, DrawEmpty drawEmpty) {
+		private Rect DoEmptyList(DrawEmpty drawEmpty) {
 			Rect r = EditorGUILayout.BeginVertical(containerStyle);
 			{
 				if (drawEmpty != null)
@@ -642,7 +704,7 @@ namespace Rotorz.ReorderableList {
 			return r;
 		}
 
-		private void DoListField<T>(List<T> list, DrawItem<T> drawItem, DrawEmpty drawEmpty, float itemHeight) {
+		protected void DoListField(IReorderableListData list, DrawEmpty drawEmpty, float itemHeight) {
 			int controlID = GUIUtility.GetControlID(FocusType.Passive);
 
 			// Correct if for some reason one or more styles are missing!
@@ -652,9 +714,9 @@ namespace Rotorz.ReorderableList {
 
 			Rect containerPosition;
 			if (list.Count > 0)
-				containerPosition = DoListField(controlID, list, drawItem ?? ReorderableListGUI.DefaultItemDrawer, itemHeight);
+				containerPosition = DoListField(controlID, list, itemHeight);
 			else
-				containerPosition = DoEmptyList(list, drawEmpty);
+				containerPosition = DoEmptyList(drawEmpty);
 
 			if ((flags & ReorderableListFlags.HideAddButton) == 0) {
 				Rect addButtonRect = GUILayoutUtility.GetRect(0, addButtonStyle.fixedHeight);
@@ -678,8 +740,8 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="itemHeight">Height of a single list item.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public void Draw<T>(List<T> list, DrawItem<T> drawItem, DrawEmpty drawEmpty, float itemHeight) {
-			DoListField(list, drawItem, drawEmpty, itemHeight);
+		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem, DrawEmpty drawEmpty, float itemHeight) {
+			DoListField(new GenericReorderableListData<T>(list, drawItem), drawEmpty, itemHeight);
 		}
 
 		/// <summary>
@@ -689,8 +751,8 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawItem">Callback to draw list item.</param>
 		/// <param name="itemHeight">Height of a single list item.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public void Draw<T>(List<T> list, DrawItem<T> drawItem, float itemHeight) {
-			DoListField(list, drawItem, null, itemHeight);
+		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem, float itemHeight) {
+			DoListField(new GenericReorderableListData<T>(list, drawItem), null, itemHeight);
 		}
 
 		/// <summary>
@@ -699,8 +761,8 @@ namespace Rotorz.ReorderableList {
 		/// <param name="list">The list which can be reordered.</param>
 		/// <param name="drawItem">Callback to draw list item.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public void Draw<T>(List<T> list, DrawItem<T> drawItem) {
-			DoListField(list, drawItem, null, ReorderableListGUI.DefaultItemHeight);
+		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem) {
+			DoListField(new GenericReorderableListData<T>(list, drawItem), null, ReorderableListGUI.DefaultItemHeight);
 		}
 
 		/// <summary>
@@ -710,8 +772,8 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawItem">Callback to draw list item.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public void Draw<T>(List<T> list, DrawItem<T> drawItem, DrawEmpty drawEmpty) {
-			DoListField(list, drawItem, drawEmpty, ReorderableListGUI.DefaultItemHeight);
+		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem, DrawEmpty drawEmpty) {
+			DoListField(new GenericReorderableListData<T>(list, drawItem), drawEmpty, ReorderableListGUI.DefaultItemHeight);
 		}
 
 		#endregion
@@ -754,7 +816,7 @@ namespace Rotorz.ReorderableList {
 		// Command name is assigned by default context menu handler.
 		private static string s_contextCommandName;
 
-		private void ShowContextMenu<T>(int controlID, int itemIndex, List<T> list) {
+		private void ShowContextMenu(int controlID, int itemIndex, IReorderableListData list) {
 			GenericMenu menu = new GenericMenu();
 
 			s_contextControlID = controlID;
@@ -772,13 +834,13 @@ namespace Rotorz.ReorderableList {
 		/// <example>
 		/// <para>Can be used when adding custom items to the context menu:</para>
 		/// <code language="csharp"><![CDATA[
-		/// protected override void AddItemsToMenu<T>(GenericMenu menu, int itemIndex, List<T> list) {
+		/// protected override void AddItemsToMenu(GenericMenu menu, int itemIndex, IReorderableListData list) {
 		///     var specialCommand = new GUIContent("Special Command");
 		///     menu.AddItem(specialCommand, false, defaultContextHandler, specialCommand);
 		/// }
 		/// ]]></code>
 		/// <code language="unityscript"><![CDATA[
-		/// function AddItemsToMenu.<T>(menu:GenericMenu, itemIndex:int, list:List.<T>) {
+		/// function AddItemsToMenu(menu:GenericMenu, itemIndex:int, list:IReorderableListData) {
 		///     var specialCommand = new GUIContent('Special Command');
 		///     menu.AddItem(specialCommand, false, defaultContextHandler, specialCommand);
 		/// }
@@ -804,8 +866,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="menu">Menu which can be populated.</param>
 		/// <param name="itemIndex">Zero-based index of item which was right-clicked.</param>
 		/// <param name="list">The list which can be reordered.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		protected virtual void AddItemsToMenu<T>(GenericMenu menu, int itemIndex, List<T> list) {
+		protected virtual void AddItemsToMenu(GenericMenu menu, int itemIndex, IReorderableListData list) {
 			if ((flags & ReorderableListFlags.DisableReordering) == 0) {
 				if (itemIndex > 0)
 					menu.AddItem(commandMoveToTop, false, defaultContextHandler, commandMoveToTop);
@@ -884,32 +945,25 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// A value of <c>true</c> if command was known; otherwise <c>false</c>.
 		/// </returns>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		protected virtual bool HandleCommand<T>(string commandName, int itemIndex, List<T> list) {
-			T temp;
-
+		protected virtual bool HandleCommand(string commandName, int itemIndex, IReorderableListData list) {
 			switch (commandName) {
 				case "Move to Top":
-					temp = list[itemIndex];
-					list.RemoveAt(itemIndex);
-					list.Insert(0, temp);
+					list.Move(itemIndex, 0);
 					break;
 				case "Move to Bottom":
-					temp = list[itemIndex];
-					list.RemoveAt(itemIndex);
-					list.Insert(list.Count, temp);
+					list.Move(itemIndex, list.Count);
 					break;
 				case "Insert Above":
-					list.Insert(itemIndex, default(T));
+					list.Insert(itemIndex);
 					break;
 				case "Insert Below":
-					list.Insert(itemIndex + 1, default(T));
+					list.Insert(itemIndex + 1);
 					break;
 				case "Duplicate":
-					list.Insert(itemIndex + 1, list[itemIndex]);
+					list.Duplicate(itemIndex);
 					break;
 				case "Remove":
-					list.RemoveAt(itemIndex);
+					list.Remove(itemIndex);
 					break;
 				case "Clear All":
 					list.Clear();
@@ -937,8 +991,7 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// A value of <c>true</c> if command was known; otherwise <c>false</c>.
 		/// </returns>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		public bool DoCommand<T>(string commandName, int itemIndex, List<T> list) {
+		public bool DoCommand(string commandName, int itemIndex, IReorderableListData list) {
 			if (!HandleCommand(s_contextCommandName, itemIndex, list)) {
 				Debug.LogWarning("Unknown context command.");
 				return false;
@@ -958,8 +1011,7 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// A value of <c>true</c> if command was known; otherwise <c>false</c>.
 		/// </returns>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		public bool DoCommand<T>(GUIContent command, int itemIndex, List<T> list) {
+		public bool DoCommand<T>(GUIContent command, int itemIndex, IReorderableListData list) {
 			return DoCommand(command.text, itemIndex, list);
 		}
 
