@@ -7,6 +7,8 @@ using UnityEditor;
 
 using System.Collections.Generic;
 
+using Rotorz.ReorderableList;
+
 public class ReorderableListDemo : EditorWindow {
 
 	[MenuItem("Window/List Demo")]
