@@ -40,8 +40,7 @@ public class ReorderableListTest : EditorWindow {
 		{
 			ReorderableListGUI.Title("Test List #1");
 			ReorderableListGUI.ListField(_list, CustomListFieldItem, DrawEmpty, 42);
-			ReorderableListGUI.ListField(_list2, CustomListFieldItem, DrawEmpty, 22, ReorderableListFlag.HideAddButton | ReorderableListFlag.DisableReordering);
-			ReorderableListGUI.ListField(_list2, CustomListFieldItem, DrawEmpty, 22);
+			ReorderableListGUI.ListField(_list2, CustomListFieldItem, DrawEmpty, 22, ReorderableListFlags.HideAddButton | ReorderableListFlags.DisableReordering);
 		}
 		GUILayout.EndScrollView();
 	}
