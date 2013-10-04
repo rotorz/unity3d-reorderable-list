@@ -15,9 +15,9 @@ public class ReorderableListDemo : EditorWindow {
 	}
 
 	private List<string> shoppingList;
-	private List<string> pruchaseList;
+	private List<string> purchaseList;
 	
-	#region Message
+	#region Messages
 	
 	private void OnEnable() {
 		shoppingList = new List<string>();
@@ -28,9 +28,9 @@ public class ReorderableListDemo : EditorWindow {
 		shoppingList.Add("Coffee");
 		shoppingList.Add("Fries");
 
-		pruchaseList = new List<string>();
-		pruchaseList.Add("Cheese");
-		pruchaseList.Add("Crackers");
+		purchaseList = new List<string>();
+		purchaseList.Add("Cheese");
+		purchaseList.Add("Crackers");
 	}
 
 	private Vector2 _scrollPosition;
@@ -42,7 +42,7 @@ public class ReorderableListDemo : EditorWindow {
 			ReorderableListGUI.ListField(shoppingList, PendingItemDrawer, DrawEmpty);
 
 			ReorderableListGUI.Title("Purchased Items");
-			ReorderableListGUI.ListField(pruchaseList, PurchasedItemDrawer, DrawEmpty, ReorderableListFlags.HideAddButton | ReorderableListFlags.DisableReordering);
+			ReorderableListGUI.ListField(purchaseList, PurchasedItemDrawer, DrawEmpty, ReorderableListFlags.HideAddButton | ReorderableListFlags.DisableReordering);
 		}
 		GUILayout.EndScrollView();
 	}
