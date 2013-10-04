@@ -394,10 +394,10 @@ public class ReorderableListControl {
 		RectOffset containerMargin = containerStyle.margin;
 		bool trackingControl = IsTrackingControl(controlID);
 
-		float itemOffset = itemHeight + 3;
+		float itemOffset = itemHeight + 4;
 		float halfItemOffset = Mathf.Ceil(itemOffset / 2f);
 
-		float totalHeight = itemOffset * list.Count + 6 + containerMargin.top + containerMargin.bottom;
+		float totalHeight = 2 + itemOffset * list.Count + containerMargin.top + containerStyle.padding.top + containerStyle.padding.bottom;
 		Rect containerRect = GUILayoutUtility.GetRect(0, totalHeight);
 
 		containerRect.x += containerMargin.left;
@@ -406,7 +406,7 @@ public class ReorderableListControl {
 		containerRect.height -= containerMargin.top + containerMargin.bottom;
 
 		// Position of first item in list.
-		float firstItemY = containerRect.y + 4;
+		float firstItemY = containerRect.y + containerStyle.padding.top;
 		
 		// Get local copy of event information for efficiency.
 		EventType eventType = Event.current.GetTypeForControl(controlID);

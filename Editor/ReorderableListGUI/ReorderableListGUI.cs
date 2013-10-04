@@ -116,7 +116,7 @@ public static class ReorderableListGUI {
 		containerStyle = new GUIStyle();
 		containerStyle.border = new RectOffset(2, 2, 1, 2);
 		containerStyle.margin = new RectOffset(5, 5, 5, 5);
-		containerStyle.padding = new RectOffset(1, 1, 1, 2);
+		containerStyle.padding = new RectOffset(1, 1, 3, 3);
 		containerStyle.normal.background = ReorderableListResources.texContainerBackground;
 
 		addButtonStyle = new GUIStyle();
