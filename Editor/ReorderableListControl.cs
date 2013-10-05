@@ -13,88 +13,10 @@ using Rotorz.ReorderableList.Internal;
 namespace Rotorz.ReorderableList {
 
 	/// <summary>
-	/// List control which can be used within custom editor windows and inspectors with
-	/// support for drag and drop reordering of list items.
+	/// Base class for custom reorderable list control.
 	/// </summary>
 	[Serializable]
-	public class ReorderableListControl {
-
-		#region Generic List Abstraction
-
-		/// <summary>
-		/// Implementation of reorderable list data for generic lists.
-		/// </summary>
-		private sealed class GenericReorderableListData<T> : IReorderableListData {
-
-			public List<T> list;
-
-			public ReorderableListControl.ItemDrawer<T> itemDrawer;
-			public float itemHeight;
-
-			/// <summary>
-			/// Initializes a new instance of <see cref="GenericReorderableListData{T}"/>.
-			/// </summary>
-			/// <param name="list">The list which can be reordered.</param>
-			/// <param name="itemDrawer">Callback to draw list item.</param>
-			/// <param name="itemHeight">Height of list item in pixels.</param>
-			public GenericReorderableListData(List<T> list, ReorderableListControl.ItemDrawer<T> itemDrawer, float itemHeight) {
-				this.list = list;
-				this.itemDrawer = itemDrawer ?? ReorderableListGUI.DefaultItemDrawer;
-				this.itemHeight = itemHeight;
-			}
-
-			#region IReorderableListData - Implementation
-
-			/// <inheritdoc/>
-			public int Count {
-				get { return list.Count; }
-			}
-
-			/// <inheritdoc/>
-			public void AddNew() {
-				list.Add(default(T));
-			}
-			/// <inheritdoc/>
-			public void Insert(int index) {
-				list.Insert(index, default(T));
-			}
-			/// <inheritdoc/>
-			public void Duplicate(int index) {
-				list.Insert(index + 1, list[index]);
-			}
-			/// <inheritdoc/>
-			public void Remove(int index) {
-				list.RemoveAt(index);
-			}
-			/// <inheritdoc/>
-			public void Move(int sourceIndex, int destIndex) {
-				if (destIndex > sourceIndex)
-					--destIndex;
-
-				T item = list[sourceIndex];
-				list.RemoveAt(sourceIndex);
-				list.Insert(destIndex, item);
-			}
-			/// <inheritdoc/>
-			public void Clear() {
-				list.Clear();
-			}
-
-			/// <inheritdoc/>
-			public void DrawItem(Rect position, int index) {
-				list[index] = itemDrawer(position, list[index]);
-			}
-
-			/// <inheritdoc/>
-			public float GetItemHeight(int index) {
-				return itemHeight;
-			}
-
-			#endregion
-
-		}
-
-		#endregion
+	public abstract class ReorderableListControl {
 
 		/// <summary>
 		/// Invoked to draw list item.
@@ -157,7 +79,7 @@ namespace Rotorz.ReorderableList {
 		/// Invoked to draw content for empty list.
 		/// </summary>
 		/// <remarks>
-		/// <para>Callback should make use of <c>GUILayout</c> for to present controls.</para>
+		/// <para>Callback should make use of <c>GUILayout</c> to present controls.</para>
 		/// </remarks>
 		/// <example>
 		/// <para>The following listing displays a label for empty list control:</para>
@@ -202,6 +124,11 @@ namespace Rotorz.ReorderableList {
 		/// ]]></code>
 		/// </example>
 		public delegate void DrawEmpty();
+		/// <summary>
+		/// Invoked to draw content for empty list with absolute positioning.
+		/// </summary>
+		/// <param name="position">Position of empty content.</param>
+		public delegate void DrawEmptyAbsolute(Rect position);
 
 		#region Custom Styles
 
@@ -274,6 +201,19 @@ namespace Rotorz.ReorderableList {
 		public ReorderableListFlags flags {
 			get { return _flags; }
 			set { _flags = value; }
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether add button is shown.
+		/// </summary>
+		protected bool hasAddButton {
+			get { return (_flags & ReorderableListFlags.HideAddButton) == 0; }
+		}
+		/// <summary>
+		/// Gets a value indicating whether remove buttons are shown.
+		/// </summary>
+		protected bool hasRemoveButtons {
+			get { return (_flags & ReorderableListFlags.HideRemoveButtons) == 0; }
 		}
 
 		[SerializeField]
@@ -459,55 +399,23 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <summary>
-		/// Cache of container heights mapped by control ID.
+		/// Draw list container and items.
 		/// </summary>
-		private static Dictionary<int, float> s_ContainerHeightCache = new Dictionary<int, float>();
-		/// <summary>
-		/// Cache of zero height layout option to avoid unnecessary allocations.
-		/// </summary>
-		private static GUILayoutOption[] zeroHeight;
-
-		private Rect BeginListContainer(int controlID) {
-			// Since the number of layout rectangles must be consistent between events,
-			// we get a rectangle both before and after drawning the container. We then
-			// transfer the height from the second one to the first!
-
-			if (zeroHeight == null)
-				zeroHeight = new GUILayoutOption[] { GUILayout.Height(0) };
-
-			Rect rect = GUILayoutUtility.GetRect(GUIContent.none, containerStyle, zeroHeight);
-
-			if (Event.current.type != EventType.Layout) {
-				rect.height = s_ContainerHeightCache.ContainsKey(controlID)
-					? s_ContainerHeightCache[controlID]
-					: 0;
-			}
-
-			return rect;
-		}
-
-		private void EndListContainer(int controlID, float totalHeight) {
-			if (Event.current.type == EventType.Layout)
-				s_ContainerHeightCache[controlID] = totalHeight;
-
-			GUILayoutUtility.GetRect(0, totalHeight);
-		}
-
-		private Rect DoListField(int controlID, IReorderableListData list) {
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="controlID">Unique ID of list control.</param>
+		/// <param name="list">Abstracted representation of list.</param>
+		private void DrawListContainerAndItems(Rect position, int controlID, IReorderableListData list) {
 			bool allowReordering = (flags & ReorderableListFlags.DisableReordering) == 0;
-			bool includeRemoveButtons = (flags & ReorderableListFlags.HideRemoveButtons) == 0;
+			bool includeRemoveButtons = hasRemoveButtons;
 
 			bool trackingControl = IsTrackingControl(controlID);
-			
+
 			// Get local copy of event information for efficiency.
 			EventType eventType = Event.current.GetTypeForControl(controlID);
 			Vector2 mousePosition = Event.current.mousePosition;
 
-			Rect containerRect = BeginListContainer(controlID);
-			float totalHeight = 3;
-
 			// Position of first item in list.
-			float firstItemY = containerRect.y + containerStyle.padding.top;
+			float firstItemY = position.y + containerStyle.padding.top;
 			float newDragHighlighterY = firstItemY - 4;
 
 			// We must put this back!
@@ -565,12 +473,12 @@ namespace Rotorz.ReorderableList {
 
 				case EventType.Repaint:
 					// Draw caption area of list.
-					containerStyle.Draw(containerRect, GUIContent.none, false, false, false, false);
+					containerStyle.Draw(position, GUIContent.none, false, false, false, false);
 					break;
 			}
 
 			// Draw list items!
-			Rect itemPosition = new Rect(containerRect.x + 2, firstItemY - 1, containerRect.width - 4, 0);
+			Rect itemPosition = new Rect(position.x + 2, firstItemY, position.width - 4, 0);
 			Rect itemContentPosition = new Rect(itemPosition.x + 2, itemPosition.y + 1, itemPosition.width - 2, 0);
 			Rect handlePosition = new Rect(itemPosition.x + 6, 0, 9, 5);
 			Rect handleResponsePosition = new Rect(itemPosition.x, itemPosition.y + 1, 20, 0);
@@ -599,7 +507,6 @@ namespace Rotorz.ReorderableList {
 
 				itemPosition.y = itemPosition.yMax;
 				itemPosition.height = itemContentPosition.height + 4;
-				totalHeight += itemPosition.height;
 
 				float halfItemOffset = itemPosition.height / 2f;
 				handlePosition.y = itemPosition.y + halfItemOffset - 3;
@@ -725,63 +632,36 @@ namespace Rotorz.ReorderableList {
 #endif
 			}
 
-			containerRect.height = totalHeight;
-			EndListContainer(controlID, totalHeight);
-
 			// Fake control to catch input focus if auto focus was not possible.
+			// Note: Replicated in layout version of `DoListField`.
 			GUIUtility.GetControlID(FocusType.Keyboard);
 
 			// Update position of drag rectangle.
 			if (eventType == EventType.MouseDown || eventType == EventType.MouseDrag) {
 				if (IsTrackingControl(controlID)) {
 					// Update position of drag rectangle.
-					s_DragHighlighter = new Rect(containerRect.x, newDragHighlighterY, containerRect.width, 4);
+					s_DragHighlighter = new Rect(position.x, newDragHighlighterY, position.width, 4);
 				}
 			}
-			
-			return containerRect;
 		}
-
-		private Rect DoEmptyList(DrawEmpty drawEmpty) {
-			Rect r = EditorGUILayout.BeginVertical(containerStyle);
-			{
-				if (drawEmpty != null)
-					drawEmpty();
-				else
-					GUILayout.Space(5);
-			}
-			EditorGUILayout.EndVertical();
-			return r;
-		}
-
+		
 		/// <summary>
-		/// Draw list field and handle other GUI events.
+		/// Draw additional controls below list control and highlight drop target.
 		/// </summary>
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="controlID">Unique ID of list control.</param>
 		/// <param name="list">Abstracted representation of list.</param>
-		/// <param name="drawEmpty">Delegate for drawing empty list.</param>
-		protected void DoListField(IReorderableListData list, DrawEmpty drawEmpty) {
-			int controlID = GUIUtility.GetControlID(FocusType.Passive);
-
-			// Correct if for some reason one or more styles are missing!
-			containerStyle = containerStyle ?? ReorderableListGUI.containerStyle;
-			addButtonStyle = addButtonStyle ?? ReorderableListGUI.addButtonStyle;
-			removeButtonStyle = removeButtonStyle ?? ReorderableListGUI.removeButtonStyle;
-
-			Rect containerPosition;
-			if (list.Count > 0)
-				containerPosition = DoListField(controlID, list);
-			else
-				containerPosition = DoEmptyList(drawEmpty);
-
-			if ((flags & ReorderableListFlags.HideAddButton) == 0) {
-				Rect addButtonRect = GUILayoutUtility.GetRect(0, addButtonStyle.fixedHeight);
-				addButtonRect.width = addButtonStyle.fixedWidth;
-				addButtonRect.x = containerPosition.xMax - addButtonRect.width;
-				addButtonRect.y -= containerStyle.margin.bottom + 1;
-
+		private void DrawFooterControls(Rect position, int controlID, IReorderableListData list) {
+			if (hasAddButton) {
+				Rect addButtonRect = new Rect(
+					position.xMax - addButtonStyle.fixedWidth,
+					position.yMax - 1,
+					addButtonStyle.fixedWidth,
+					addButtonStyle.fixedHeight
+				);
 				DoAddButton(addButtonRect, controlID, list);
 			}
-			
+
 			// Highight drag rectangle?
 			if (Event.current.type == EventType.Repaint) {
 				// Note: Draw on top of other controls!
@@ -796,52 +676,213 @@ namespace Rotorz.ReorderableList {
 			}
 		}
 
+		/// <summary>
+		/// Cache of container heights mapped by control ID.
+		/// </summary>
+		private static Dictionary<int, float> s_ContainerHeightCache = new Dictionary<int, float>();
+
+		/// <summary>
+		/// Do layout version of list field.
+		/// </summary>
+		/// <param name="controlID">Unique ID of list control.</param>
+		/// <param name="list">Abstracted representation of list.</param>
+		/// <returns>
+		/// Position of list container area in GUI (excludes footer area).
+		/// </returns>
+		private Rect DrawLayoutListField(int controlID, IReorderableListData list) {
+			float totalHeight;
+
+			// Calculate position of list field using layout engine.
+			if (Event.current.type == EventType.Layout) {
+				totalHeight = CalculateListHeight(list);
+				s_ContainerHeightCache[controlID] = totalHeight;
+			}
+			else {
+				totalHeight = s_ContainerHeightCache.ContainsKey(controlID)
+					? s_ContainerHeightCache[controlID]
+					: 0;
+			}
+
+			Rect position = GUILayoutUtility.GetRect(GUIContent.none, containerStyle, GUILayout.Height(totalHeight));
+
+			// Make room for add button?
+			if (hasAddButton)
+				position.height -= addButtonStyle.fixedHeight;
+
+			if (Event.current.type != EventType.Layout) {
+				// Draw list as normal.
+				DrawListContainerAndItems(position, controlID, list);
+			}
+			else {
+				// Layout events are still needed to avoid breaking control ID's in remaining
+				// interface. Let's keep this as simple as possible!
+
+				Rect itemPosition = default(Rect);
+
+				int count = list.Count;
+				for (int i = 0; i < count; ++i) {
+					itemPosition.height = list.GetItemHeight(i);
+
+					list.DrawItem(itemPosition, i);
+
+					if (hasRemoveButtons)
+						DoRemoveButton(default(Rect), false);
+				}
+
+				// Fake control to catch input focus if auto focus was not possible.
+				// Note: Still needed, copied from absolute version of `DoListField`.
+				GUIUtility.GetControlID(FocusType.Keyboard);
+			}
+
+			return position;
+		}
+
+		/// <summary>
+		/// Draw content for empty list (layout version).
+		/// </summary>
+		/// <param name="drawEmpty">Callback to draw empty content.</param>
+		/// <returns>
+		/// Position of list container area in GUI (excludes footer area).
+		/// </returns>
+		private Rect DrawLayoutEmptyList(DrawEmpty drawEmpty) {
+			Rect r = EditorGUILayout.BeginVertical(containerStyle);
+			{
+				if (drawEmpty != null)
+					drawEmpty();
+				else
+					GUILayout.Space(5);
+			}
+			EditorGUILayout.EndVertical();
+
+			// Allow room for add button.
+			GUILayoutUtility.GetRect(0, addButtonStyle.fixedHeight - 1);
+
+			return r;
+		}
+
+		/// <summary>
+		/// Draw content for empty list (layout version).
+		/// </summary>
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="drawEmpty">Callback to draw empty content.</param>
+		/// <param name="emptyContent">Content to display for empty list.</param>
+		private void DrawEmptyListControl(Rect position, DrawEmptyAbsolute drawEmpty) {
+			if (Event.current.type == EventType.Repaint)
+				containerStyle.Draw(position, GUIContent.none, false, false, false, false);
+
+			// Take padding into consideration when drawing empty content.
+			position.x += containerStyle.padding.left;
+			position.y += containerStyle.padding.top;
+			position.width -= containerStyle.padding.horizontal;
+			position.height -= containerStyle.padding.vertical;
+
+			if (drawEmpty != null)
+				drawEmpty(position);
+		}
+
+		/// <summary>
+		/// Correct if for some reason one or more styles are missing!
+		/// </summary>
+		private void FixStyles() {
+			containerStyle = containerStyle ?? ReorderableListGUI.containerStyle;
+			addButtonStyle = addButtonStyle ?? ReorderableListGUI.addButtonStyle;
+			removeButtonStyle = removeButtonStyle ?? ReorderableListGUI.removeButtonStyle;
+		}
+
+		/// <summary>
+		/// Draw layout version of list control.
+		/// </summary>
+		/// <param name="list">Abstracted representation of list.</param>
+		/// <param name="drawEmpty">Delegate for drawing empty list.</param>
+		protected void DoListField(IReorderableListData list, DrawEmpty drawEmpty) {
+			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+
+			FixStyles();
+
+			Rect position;
+
+			if (list.Count > 0)
+				position = DrawLayoutListField(controlID, list);
+			else
+				position = DrawLayoutEmptyList(drawEmpty);
+
+			DrawFooterControls(position, controlID, list);
+		}
+
+		/// <summary>
+		/// Draw list control with absolute positioning.
+		/// </summary>
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="list">Abstracted representation of list.</param>
+		/// <param name="drawEmpty">Delegate for drawing empty list.</param>
+		protected void DoListField(Rect position, IReorderableListData list, DrawEmptyAbsolute drawEmpty) {
+			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+
+			FixStyles();
+
+			// Allow for footer area.
+			if (hasAddButton)
+				position.height -= addButtonStyle.fixedHeight;
+
+			if (list.Count > 0)
+				DrawListContainerAndItems(position, controlID, list);
+			else
+				DrawEmptyListControl(position, drawEmpty);
+
+			DrawFooterControls(position, controlID, list);
+		}
+
 		#endregion
 
 		#region Methods
 
 		/// <summary>
-		/// Draw list field control.
+		/// Calculate height of list control in pixels.
 		/// </summary>
 		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
-		/// <param name="itemHeight">Height of a single list item.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem, DrawEmpty drawEmpty, float itemHeight) {
-			DoListField(new GenericReorderableListData<T>(list, drawItem, itemHeight), drawEmpty);
+		/// <returns>
+		/// Required list height in pixels.
+		/// </returns>
+		protected float CalculateListHeight(IReorderableListData list) {
+			FixStyles();
+
+			float totalHeight = containerStyle.padding.vertical - 1;
+
+			// Take list items into consideration.
+			int count = list.Count;
+			for (int i = 0; i < count; ++i)
+				totalHeight += list.GetItemHeight(i);
+			// Add spacing between list items.
+			totalHeight += 4 * count;
+
+			// Add height of add button.
+			if (hasAddButton)
+				totalHeight += addButtonStyle.fixedHeight;
+
+			return totalHeight;
 		}
 
 		/// <summary>
-		/// Draw list field control.
+		/// Calculate height of list control in pixels.
 		/// </summary>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <param name="itemHeight">Height of a single list item.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem, float itemHeight) {
-			DoListField(new GenericReorderableListData<T>(list, drawItem, itemHeight), null);
-		}
+		/// <param name="itemCount">Count of items in list.</param>
+		/// <param name="itemHeight">Fixed height of list item.</param>
+		/// <returns>
+		/// Required list height in pixels.
+		/// </returns>
+		public float CalculateListHeight(int itemCount, float itemHeight) {
+			FixStyles();
 
-		/// <summary>
-		/// Draw list field control.
-		/// </summary>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem) {
-			DoListField(new GenericReorderableListData<T>(list, drawItem, ReorderableListGUI.DefaultItemHeight), null);
-		}
+			float totalHeight = containerStyle.padding.vertical - 1;
 
-		/// <summary>
-		/// Draw list field control.
-		/// </summary>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <param name="drawEmpty">Callback to draw custom content for empty list.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem, DrawEmpty drawEmpty) {
-			DoListField(new GenericReorderableListData<T>(list, drawItem, ReorderableListGUI.DefaultItemHeight), drawEmpty);
+			// Take list items into consideration.
+			totalHeight += (itemHeight + 4) * itemCount;
+
+			// Add height of add button.
+			if (hasAddButton)
+				totalHeight += addButtonStyle.fixedHeight;
+
+			return totalHeight;
 		}
 
 		#endregion
@@ -946,7 +987,7 @@ namespace Rotorz.ReorderableList {
 				else
 					menu.AddDisabledItem(commandMoveToBottom);
 
-				if ((flags & ReorderableListFlags.HideAddButton) == 0) {
+				if (hasAddButton) {
 					menu.AddSeparator("");
 
 					menu.AddItem(commandInsertAbove, false, defaultContextHandler, commandInsertAbove);
@@ -957,7 +998,7 @@ namespace Rotorz.ReorderableList {
 				}
 			}
 
-			if ((flags & ReorderableListFlags.HideRemoveButtons) == 0) {
+			if (hasRemoveButtons) {
 				if (menu.GetItemCount() > 0)
 					menu.AddSeparator("");
 

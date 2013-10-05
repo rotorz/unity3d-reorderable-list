@@ -84,14 +84,14 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets the default list control implementation.
 		/// </summary>
-		private static ReorderableListControl defaultListControl { get; set; }
+		private static GenericListControl defaultListControl { get; set; }
 		/// <summary>
 		/// Gets the list control for serializable property arrays.
 		/// </summary>
 		private static SerializedPropertyListControl serializedPropertyListControl { get; set; }
 
 		static ReorderableListGUI() {
-			defaultListControl = new ReorderableListControl();
+			defaultListControl = new GenericListControl();
 			serializedPropertyListControl = new SerializedPropertyListControl();
 
 			indexOfChangedItem = -1;
@@ -133,7 +133,7 @@ namespace Rotorz.ReorderableList {
 			containerStyle = new GUIStyle();
 			containerStyle.border = new RectOffset(2, 2, 1, 2);
 			containerStyle.margin = new RectOffset(5, 5, 5, 5);
-			containerStyle.padding = new RectOffset(1, 1, 3, 3);
+			containerStyle.padding = new RectOffset(1, 1, 2, 2);
 			containerStyle.normal.background = ReorderableListResources.texContainerBackground;
 
 			addButtonStyle = new GUIStyle();
@@ -154,6 +154,8 @@ namespace Rotorz.ReorderableList {
 
 		private static GUIContent s_Temp = new GUIContent();
 
+		#region Title Control
+
 		/// <summary>
 		/// Draw title control for list field.
 		/// </summary>
@@ -173,10 +175,8 @@ namespace Rotorz.ReorderableList {
 		/// <param name="caption">Caption for list control.</param>
 		public static void Title(GUIContent caption) {
 			Rect position = GUILayoutUtility.GetRect(caption, titleStyle);
-			if (Event.current.type == EventType.Repaint) {
-				position.height += 6;
-				titleStyle.Draw(position, caption, false, false, false, false);
-			}
+			position.height += 6;
+			Title(position, caption);
 		}
 
 		/// <summary>
@@ -202,6 +202,30 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <summary>
+		/// Draw title control for list field.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="caption">Caption for list control.</param>
+		public static void Title(Rect position, GUIContent caption) {
+			if (Event.current.type == EventType.Repaint)
+				titleStyle.Draw(position, caption, false, false, false, false);
+		}
+
+		/// <summary>
+		/// Draw title control for list field.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="caption">Caption for list control.</param>
+		public static void Title(Rect position, string caption) {
+			s_Temp.text = caption;
+			Title(position, s_Temp);
+		}
+
+		#endregion
+
+		#region List<T> Control
+
+		/// <summary>
 		/// Draw list field control.
 		/// </summary>
 		/// <param name="list">The list which can be reordered.</param>
@@ -213,6 +237,20 @@ namespace Rotorz.ReorderableList {
 		public static void ListField<T>(List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight, ReorderableListFlags flags) {
 			defaultListControl.flags = flags;
 			defaultListControl.Draw(list, drawItem, drawEmpty, itemHeight);
+		}
+		/// <summary>
+		/// Draw list field control.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="list">The list which can be reordered.</param>
+		/// <param name="drawItem">Callback to draw list item.</param>
+		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
+		/// <param name="itemHeight">Height of a single list item.</param>
+		/// <param name="flags">Optional flags to pass into list field.</param>
+		/// <typeparam name="T">Type of list item.</typeparam>
+		public static void ListFieldAbsolute<T>(Rect position, List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty, float itemHeight, ReorderableListFlags flags) {
+			defaultListControl.flags = flags;
+			defaultListControl.Draw(position, list, drawItem, drawEmpty, itemHeight);
 		}
 
 		/// <summary>
@@ -227,6 +265,19 @@ namespace Rotorz.ReorderableList {
 			defaultListControl.flags = flags;
 			defaultListControl.Draw(list, drawItem, drawEmpty, DefaultItemHeight);
 		}
+		/// <summary>
+		/// Draw list field control.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="list">The list which can be reordered.</param>
+		/// <param name="drawItem">Callback to draw list item.</param>
+		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
+		/// <param name="flags">Optional flags to pass into list field.</param>
+		/// <typeparam name="T">Type of list item.</typeparam>
+		public static void ListFieldAbsolute<T>(Rect position, List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
+			defaultListControl.flags = flags;
+			defaultListControl.Draw(position, list, drawItem, drawEmpty, DefaultItemHeight);
+		}
 
 		/// <summary>
 		/// Draw list field control.
@@ -240,6 +291,19 @@ namespace Rotorz.ReorderableList {
 			defaultListControl.flags = 0;
 			defaultListControl.Draw(list, drawItem, drawEmpty, itemHeight);
 		}
+		/// <summary>
+		/// Draw list field control.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="list">The list which can be reordered.</param>
+		/// <param name="drawItem">Callback to draw list item.</param>
+		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
+		/// <param name="itemHeight">Height of a single list item.</param>
+		/// <typeparam name="T">Type of list item.</typeparam>
+		public static void ListFieldAbsolute<T>(Rect position, List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty, float itemHeight) {
+			defaultListControl.flags = 0;
+			defaultListControl.Draw(position, list, drawItem, drawEmpty, itemHeight);
+		}
 
 		/// <summary>
 		/// Draw list field control.
@@ -252,6 +316,18 @@ namespace Rotorz.ReorderableList {
 			defaultListControl.flags = 0;
 			defaultListControl.Draw(list, drawItem, null, itemHeight);
 		}
+		/// <summary>
+		/// Draw list field control.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="list">The list which can be reordered.</param>
+		/// <param name="drawItem">Callback to draw list item.</param>
+		/// <param name="itemHeight">Height of a single list item.</param>
+		/// <typeparam name="T">Type of list item.</typeparam>
+		public static void ListFieldAbsolute<T>(Rect position, List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, float itemHeight) {
+			defaultListControl.flags = 0;
+			defaultListControl.Draw(position, list, drawItem, null, itemHeight);
+		}
 
 		/// <summary>
 		/// Draw list field control.
@@ -262,6 +338,17 @@ namespace Rotorz.ReorderableList {
 		public static void ListField<T>(List<T> list, ReorderableListControl.ItemDrawer<T> drawItem) {
 			defaultListControl.flags = 0;
 			defaultListControl.Draw(list, drawItem, null, DefaultItemHeight);
+		}
+		/// <summary>
+		/// Draw list field control.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="list">The list which can be reordered.</param>
+		/// <param name="drawItem">Callback to draw list item.</param>
+		/// <typeparam name="T">Type of list item.</typeparam>
+		public static void ListFieldAbsolute<T>(Rect position, List<T> list, ReorderableListControl.ItemDrawer<T> drawItem) {
+			defaultListControl.flags = 0;
+			defaultListControl.Draw(position, list, drawItem, null, DefaultItemHeight);
 		}
 
 		/// <summary>
@@ -275,6 +362,44 @@ namespace Rotorz.ReorderableList {
 			defaultListControl.flags = 0;
 			defaultListControl.Draw(list, drawItem, drawEmpty, DefaultItemHeight);
 		}
+		/// <summary>
+		/// Draw list field control.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="list">The list which can be reordered.</param>
+		/// <param name="drawItem">Callback to draw list item.</param>
+		/// <param name="drawEmpty">Callback to draw custom content for empty list.</param>
+		/// <typeparam name="T">Type of list item.</typeparam>
+		public static void ListFieldAbsolute<T>(Rect position, List<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty) {
+			defaultListControl.flags = 0;
+			defaultListControl.Draw(position, list, drawItem, drawEmpty, DefaultItemHeight);
+		}
+
+		/// <summary>
+		/// Calculate height of list field for absolute positioning.
+		/// </summary>
+		/// <param name="itemCount">Count of items in list.</param>
+		/// <param name="itemHeight">Fixed height of list item.</param>
+		/// <returns>
+		/// Required list height in pixels.
+		/// </returns>
+		public static float CalculateListFieldHeight(int itemCount, float itemHeight) {
+			return defaultListControl.CalculateListHeight(itemCount, itemHeight);
+		}
+		/// <summary>
+		/// Calculate height of list field for absolute positioning.
+		/// </summary>
+		/// <param name="itemCount">Count of items in list.</param>
+		/// <returns>
+		/// Required list height in pixels.
+		/// </returns>
+		public static float CalculateListFieldHeight(int itemCount) {
+			return defaultListControl.CalculateListHeight(itemCount, DefaultItemHeight);
+		}
+
+		#endregion
+
+		#region SerializedProperty Control
 
 		/// <summary>
 		/// Draw list field control for serializable property array.
@@ -286,6 +411,17 @@ namespace Rotorz.ReorderableList {
 			serializedPropertyListControl.flags = flags;
 			serializedPropertyListControl.Draw(arrayProperty, drawEmpty);
 		}
+		/// <summary>
+		/// Draw list field control for serializable property array.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="arrayProperty">Serializable property.</param>
+		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
+		/// <param name="flags">Optional flags to pass into list field.</param>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
+			serializedPropertyListControl.flags = flags;
+			serializedPropertyListControl.Draw(position, arrayProperty, drawEmpty);
+		}
 
 		/// <summary>
 		/// Draw list field control for serializable property array.
@@ -293,6 +429,14 @@ namespace Rotorz.ReorderableList {
 		/// <param name="arrayProperty">Serializable property.</param>
 		public static void ListField(SerializedProperty arrayProperty) {
 			ListField(arrayProperty, null, 0);
+		}
+		/// <summary>
+		/// Draw list field control for serializable property array.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="arrayProperty">Serializable property.</param>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty) {
+			ListFieldAbsolute(position, arrayProperty, null, 0);
 		}
 
 		/// <summary>
@@ -303,6 +447,15 @@ namespace Rotorz.ReorderableList {
 		public static void ListField(SerializedProperty arrayProperty, ReorderableListFlags flags) {
 			ListField(arrayProperty, null, flags);
 		}
+		/// <summary>
+		/// Draw list field control for serializable property array.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="arrayProperty">Serializable property.</param>
+		/// <param name="flags">Optional flags to pass into list field.</param>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListFlags flags) {
+			ListFieldAbsolute(position, arrayProperty, null, flags);
+		}
 
 		/// <summary>
 		/// Draw list field control for serializable property array.
@@ -312,6 +465,28 @@ namespace Rotorz.ReorderableList {
 		public static void ListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty) {
 			ListField(arrayProperty, drawEmpty, 0);
 		}
+		/// <summary>
+		/// Draw list field control for serializable property array.
+		/// </summary>
+		/// <param name="position">Position of control.</param>
+		/// <param name="arrayProperty">Serializable property.</param>
+		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListControl.DrawEmptyAbsolute drawEmpty) {
+			ListFieldAbsolute(position, arrayProperty, drawEmpty, 0);
+		}
+
+		/// <summary>
+		/// Calculate height of list field for absolute positioning.
+		/// </summary>
+		/// <param name="arrayProperty">Serializable property.</param>
+		/// <returns>
+		/// Required list height in pixels.
+		/// </returns>
+		public static float CalculateListFieldHeight(SerializedProperty arrayProperty) {
+			return serializedPropertyListControl.CalculateListHeight(arrayProperty);
+		}
+
+		#endregion
 
 	}
 

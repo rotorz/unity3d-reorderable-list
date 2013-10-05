@@ -176,6 +176,17 @@ namespace Rotorz.ReorderableList {
 		#region Methods
 
 		/// <summary>
+		/// Calculate height of list control in pixels.
+		/// </summary>
+		/// <param name="arrayProperty">Serializable property.</param>
+		/// <returns>
+		/// Required list height in pixels.
+		/// </returns>
+		public float CalculateListHeight(SerializedProperty arrayProperty) {
+			return CalculateListHeight(new SerializedPropertyListData(arrayProperty));
+		}
+
+		/// <summary>
 		/// Draw list field control.
 		/// </summary>
 		/// <param name="arrayProperty">Serializable property.</param>
@@ -198,9 +209,22 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Draw list field control.
 		/// </summary>
+		/// <param name="position">Position of control.</param>
 		/// <param name="arrayProperty">Serializable property.</param>
-		public void Draw(SerializedProperty arrayProperty) {
-			Draw(arrayProperty, null);
+		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// Thrown if <c>null</c> was specified for serialized property.
+		/// </exception>
+		/// <exception cref="System.InvalidOperationException">
+		/// Thrown is specified serialized property does not represent an array.
+		/// </exception>
+		public void Draw(Rect position, SerializedProperty arrayProperty, DrawEmptyAbsolute drawEmpty) {
+			if (arrayProperty == null)
+				throw new ArgumentNullException("Array property was null.");
+			if (!arrayProperty.isArray)
+				throw new InvalidOperationException("Specified serialized propery is not an array.");
+
+			DoListField(position, new SerializedPropertyListData(arrayProperty), drawEmpty);
 		}
 
 		#endregion
