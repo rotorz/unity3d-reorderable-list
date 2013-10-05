@@ -173,7 +173,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Zero-based index of item which should be focused.
 		/// </summary>
-		private static int s_AutoFocusIndex;
+		private static int s_AutoFocusIndex = -1;
 
 		/// <summary>
 		/// Zero-based index of list item which is currently being drawn.
@@ -471,14 +471,16 @@ namespace Rotorz.ReorderableList {
 					break;
 
 				case EventType.ExecuteCommand:
-					if (s_contextControlID == controlID) {
-						int itemIndex = s_contextItemIndex;
-						s_contextControlID = 0;
-						s_contextItemIndex = 0;
-
-						DoCommand(s_contextCommandName, itemIndex, list);
-
-						Event.current.Use();
+					if (s_ContextControlID == controlID) {
+						int itemIndex = s_ContextItemIndex;
+						try {
+							DoCommand(s_ContextCommandName, itemIndex, list);
+							Event.current.Use();
+						}
+						finally {
+							s_ContextControlID = 0;
+							s_ContextItemIndex = 0;
+						}
 					}
 					break;
 
@@ -591,8 +593,8 @@ namespace Rotorz.ReorderableList {
 						break;
 				}
 
-				if (s_AutoFocusControlID == controlID && s_AutoFocusIndex == i)
-					GUI.SetNextControlName("AutoFocus_" + controlID);
+				if (s_AutoFocusIndex == i)
+					GUI.SetNextControlName("AutoFocus_" + controlID + "_" + i);
 
 				EditorGUI.BeginChangeCheck();
 
@@ -633,16 +635,6 @@ namespace Rotorz.ReorderableList {
 
 			s_CurrentItemIndex = -1;
 
-			// Automatically focus control!
-			if (s_AutoFocusControlID == controlID) {
-				s_AutoFocusControlID = 0;
-#if (UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2)
-				GUI.FocusControl("AutoFocus_" + controlID);
-#else
-				EditorGUI.FocusTextInControl("AutoFocus_" + controlID);
-#endif
-			}
-
 			// Fake control to catch input focus if auto focus was not possible.
 			// Note: Replicated in layout version of `DoListField`.
 			GUIUtility.GetControlID(FocusType.Keyboard);
@@ -653,6 +645,26 @@ namespace Rotorz.ReorderableList {
 					// Update position of drag rectangle.
 					s_DragHighlighter = new Rect(position.x, newDragHighlighterY, position.width, 4);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Checks to see if list control needs to be automatically focused.
+		/// </summary>
+		/// <param name="controlID">Unique ID of list control.</param>
+		private void CheckForAutoFocusControl(int controlID) {
+			if (Event.current.type == EventType.Used)
+				return;
+
+			// Automatically focus control!
+			if (s_AutoFocusControlID == controlID) {
+				s_AutoFocusControlID = 0;
+#if (UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2)
+				GUI.FocusControl("AutoFocus_" + controlID + "_" + s_AutoFocusIndex);
+#else
+				EditorGUI.FocusTextInControl("AutoFocus_" + controlID + "_" + s_AutoFocusIndex);
+#endif
+				s_AutoFocusIndex = -1;
 			}
 		}
 		
@@ -734,6 +746,9 @@ namespace Rotorz.ReorderableList {
 				for (int i = 0; i < count; ++i) {
 					itemPosition.height = list.GetItemHeight(i);
 
+					if (s_AutoFocusIndex == i)
+						GUI.SetNextControlName("AutoFocus_" + controlID + "_" + i);
+
 					list.DrawItem(itemPosition, i);
 
 					if (hasRemoveButtons)
@@ -744,6 +759,8 @@ namespace Rotorz.ReorderableList {
 				// Note: Still needed, copied from absolute version of `DoListField`.
 				GUIUtility.GetControlID(FocusType.Keyboard);
 			}
+
+			CheckForAutoFocusControl(controlID);
 
 			return position;
 		}
@@ -835,10 +852,13 @@ namespace Rotorz.ReorderableList {
 			if (hasAddButton)
 				position.height -= addButtonStyle.fixedHeight;
 
-			if (list.Count > 0)
+			if (list.Count > 0) {
 				DrawListContainerAndItems(position, controlID, list);
-			else
+				CheckForAutoFocusControl(controlID);
+			}
+			else {
 				DrawEmptyListControl(position, drawEmpty);
+			}
 
 			DrawFooterControls(position, controlID, list);
 		}
@@ -930,17 +950,17 @@ namespace Rotorz.ReorderableList {
 		protected static readonly GUIContent commandClearAll = new GUIContent("Clear All");
 
 		// Command control id and item index are assigned when context menu is shown.
-		private static int s_contextControlID;
-		private static int s_contextItemIndex;
+		private static int s_ContextControlID;
+		private static int s_ContextItemIndex;
 
 		// Command name is assigned by default context menu handler.
-		private static string s_contextCommandName;
+		private static string s_ContextCommandName;
 
 		private void ShowContextMenu(int controlID, int itemIndex, IReorderableListData list) {
 			GenericMenu menu = new GenericMenu();
 
-			s_contextControlID = controlID;
-			s_contextItemIndex = itemIndex;
+			s_ContextControlID = controlID;
+			s_ContextItemIndex = itemIndex;
 
 			AddItemsToMenu(menu, itemIndex, list);
 
@@ -974,7 +994,7 @@ namespace Rotorz.ReorderableList {
 			if (commandContent == null || string.IsNullOrEmpty(commandContent.text))
 				return;
 
-			s_contextCommandName = commandContent.text;
+			s_ContextCommandName = commandContent.text;
 
 			var e = EditorGUIUtility.CommandEvent("ReorderableListContextCommand");
 			EditorWindow.focusedWindow.SendEvent(e);
@@ -1075,12 +1095,15 @@ namespace Rotorz.ReorderableList {
 					break;
 				case "Insert Above":
 					list.Insert(itemIndex);
+					AutoFocusItem(s_ContextControlID, itemIndex);
 					break;
 				case "Insert Below":
 					list.Insert(itemIndex + 1);
+					AutoFocusItem(s_ContextControlID, itemIndex + 1);
 					break;
 				case "Duplicate":
 					list.Duplicate(itemIndex);
+					AutoFocusItem(s_ContextControlID, itemIndex + 1);
 					break;
 				case "Remove":
 					list.Remove(itemIndex);
@@ -1112,7 +1135,7 @@ namespace Rotorz.ReorderableList {
 		/// A value of <c>true</c> if command was known; otherwise <c>false</c>.
 		/// </returns>
 		public bool DoCommand(string commandName, int itemIndex, IReorderableListData list) {
-			if (!HandleCommand(s_contextCommandName, itemIndex, list)) {
+			if (!HandleCommand(s_ContextCommandName, itemIndex, list)) {
 				Debug.LogWarning("Unknown context command.");
 				return false;
 			}
