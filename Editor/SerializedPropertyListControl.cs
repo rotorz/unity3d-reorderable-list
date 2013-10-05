@@ -63,7 +63,9 @@ namespace Rotorz.ReorderableList {
 
 			/// <inheritdoc/>
 			public void AddNew() {
-				Insert(arrayProperty.arraySize);
+				int newIndex = arrayProperty.arraySize;
+				++arrayProperty.arraySize;
+				ResetValue(arrayProperty.GetArrayElementAtIndex(newIndex));
 			}
 			/// <inheritdoc/>
 			public void Insert(int index) {
