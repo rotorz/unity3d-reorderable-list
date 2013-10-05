@@ -19,7 +19,7 @@ namespace Rotorz.ReorderableList {
 	[Serializable]
 	public class ReorderableListControl {
 
-		#region SerializedProperty Abstraction
+		#region Generic List Abstraction
 
 		/// <summary>
 		/// Implementation of reorderable list data for generic lists.
@@ -27,16 +27,20 @@ namespace Rotorz.ReorderableList {
 		private sealed class GenericReorderableListData<T> : IReorderableListData {
 
 			public List<T> list;
+
 			public ReorderableListControl.ItemDrawer<T> itemDrawer;
+			public float itemHeight;
 
 			/// <summary>
 			/// Initializes a new instance of <see cref="GenericReorderableListData{T}"/>.
 			/// </summary>
 			/// <param name="list">The list which can be reordered.</param>
 			/// <param name="itemDrawer">Callback to draw list item.</param>
-			public GenericReorderableListData(List<T> list, ReorderableListControl.ItemDrawer<T> itemDrawer) {
+			/// <param name="itemHeight">Height of list item in pixels.</param>
+			public GenericReorderableListData(List<T> list, ReorderableListControl.ItemDrawer<T> itemDrawer, float itemHeight) {
 				this.list = list;
 				this.itemDrawer = itemDrawer ?? ReorderableListGUI.DefaultItemDrawer;
+				this.itemHeight = itemHeight;
 			}
 
 			#region IReorderableListData - Implementation
@@ -79,6 +83,11 @@ namespace Rotorz.ReorderableList {
 			/// <inheritdoc/>
 			public void DrawItem(Rect position, int index) {
 				list[index] = itemDrawer(position, list[index]);
+			}
+
+			/// <inheritdoc/>
+			public float GetItemHeight(int index) {
+				return itemHeight;
 			}
 
 			#endregion
@@ -449,24 +458,57 @@ namespace Rotorz.ReorderableList {
 			}
 		}
 
-		private Rect DoListField(int controlID, IReorderableListData list, float itemHeight) {
+		/// <summary>
+		/// Cache of container heights mapped by control ID.
+		/// </summary>
+		private static Dictionary<int, float> s_ContainerHeightCache = new Dictionary<int, float>();
+		/// <summary>
+		/// Cache of zero height layout option to avoid unnecessary allocations.
+		/// </summary>
+		private static GUILayoutOption[] zeroHeight;
+
+		private Rect BeginListContainer(int controlID) {
+			// Since the number of layout rectangles must be consistent between events,
+			// we get a rectangle both before and after drawning the container. We then
+			// transfer the height from the second one to the first!
+
+			if (zeroHeight == null)
+				zeroHeight = new GUILayoutOption[] { GUILayout.Height(0) };
+
+			Rect rect = GUILayoutUtility.GetRect(GUIContent.none, containerStyle, zeroHeight);
+
+			if (Event.current.type != EventType.Layout) {
+				rect.height = s_ContainerHeightCache.ContainsKey(controlID)
+					? s_ContainerHeightCache[controlID]
+					: 0;
+			}
+
+			return rect;
+		}
+
+		private void EndListContainer(int controlID, float totalHeight) {
+			if (Event.current.type == EventType.Layout)
+				s_ContainerHeightCache[controlID] = totalHeight;
+
+			GUILayoutUtility.GetRect(0, totalHeight);
+		}
+
+		private Rect DoListField(int controlID, IReorderableListData list) {
 			bool allowReordering = (flags & ReorderableListFlags.DisableReordering) == 0;
 			bool includeRemoveButtons = (flags & ReorderableListFlags.HideRemoveButtons) == 0;
 
 			bool trackingControl = IsTrackingControl(controlID);
-
-			float itemOffset = itemHeight + 4;
-			float halfItemOffset = Mathf.Ceil(itemOffset / 2f);
-
-			float totalHeight = 2 + itemOffset * list.Count;
-			Rect containerRect = GUILayoutUtility.GetRect(GUIContent.none, containerStyle, GUILayout.Height(totalHeight));
-
-			// Position of first item in list.
-			float firstItemY = containerRect.y + containerStyle.padding.top;
-
+			
 			// Get local copy of event information for efficiency.
 			EventType eventType = Event.current.GetTypeForControl(controlID);
 			Vector2 mousePosition = Event.current.mousePosition;
+
+			Rect containerRect = BeginListContainer(controlID);
+			float totalHeight = 2;
+
+			// Position of first item in list.
+			float firstItemY = containerRect.y + containerStyle.padding.top;
+			float newDragHighlighterY = firstItemY - 4;
 
 			// We must put this back!
 			Color restoreColor = GUI.color;
@@ -528,10 +570,10 @@ namespace Rotorz.ReorderableList {
 			}
 
 			// Draw list items!
-			Rect itemPosition = new Rect(containerRect.x + 2, firstItemY - 1, containerRect.width - 4, itemOffset);
-			Rect itemContentPosition = new Rect(itemPosition.x + 2, itemPosition.y + 1, itemPosition.width - 2, itemHeight);
-			Rect handlePosition = new Rect(itemPosition.x + 6, itemPosition.y + 1 + halfItemOffset - 4, 9, 5);
-			Rect handleResponsePosition = new Rect(itemPosition.x, itemPosition.y + 1, 20, itemOffset);
+			Rect itemPosition = new Rect(containerRect.x + 2, firstItemY - 1, containerRect.width - 4, 0);
+			Rect itemContentPosition = new Rect(itemPosition.x + 2, itemPosition.y + 1, itemPosition.width - 2, 0);
+			Rect handlePosition = new Rect(itemPosition.x + 6, 0, 9, 5);
+			Rect handleResponsePosition = new Rect(itemPosition.x, itemPosition.y + 1, 20, 0);
 
 			// Make space for grab handle?
 			if (allowReordering) {
@@ -543,7 +585,7 @@ namespace Rotorz.ReorderableList {
 			Rect removeButtonPosition = default(Rect);
 			if (includeRemoveButtons) {
 				itemContentPosition.width -= removeButtonStyle.fixedWidth;
-				removeButtonPosition = new Rect(itemContentPosition.xMax, itemContentPosition.y, removeButtonStyle.fixedWidth, itemHeight);
+				removeButtonPosition = new Rect(itemContentPosition.xMax, itemContentPosition.y, removeButtonStyle.fixedWidth, 0);
 			}
 
 			bool canDragItem = (allowReordering && GUI.enabled);
@@ -551,6 +593,23 @@ namespace Rotorz.ReorderableList {
 			ReorderableListGUI.indexOfChangedItem = -1;
 
 			for (int i = 0; i < list.Count; ++i) {
+				// Update position for current item.
+				itemContentPosition.y = itemPosition.yMax + 1;
+				itemContentPosition.height = list.GetItemHeight(i);
+
+				itemPosition.y = itemPosition.yMax;
+				itemPosition.height = itemContentPosition.height + 4;
+				totalHeight += itemPosition.height;
+
+				float halfItemOffset = itemPosition.height / 2f;
+				handlePosition.y = itemPosition.y + halfItemOffset - 3;
+
+				handleResponsePosition.y = itemContentPosition.y;
+				handleResponsePosition.height = itemContentPosition.height;
+				removeButtonPosition.y = itemContentPosition.y;
+				removeButtonPosition.height = itemContentPosition.height;
+
+				// Adjust cursor when mouse pointer is positioned over grab handle.
 				if (canDragItem)
 					EditorGUIUtility.AddCursorRect(handleResponsePosition, MouseCursor.MoveArrow);
 
@@ -576,9 +635,18 @@ namespace Rotorz.ReorderableList {
 							if (Event.current.button == 0) {
 								BeginTrackingReorderDrag(controlID, i);
 
-								// Is target index below anchor?
-								if (mousePosition.y > itemPosition.yMax - halfItemOffset)
-									s_TargetIndex = i + 1;
+								if (mousePosition.y >= itemPosition.y) {
+									// Is mouse pointer hovering over upper half of item?
+									if (mousePosition.y - itemPosition.y <= halfItemOffset) {
+										s_TargetIndex = i;
+										newDragHighlighterY = itemPosition.y - 3;
+									}
+									// Lower half?
+									else {
+										s_TargetIndex = i + 1;
+										newDragHighlighterY = itemPosition.yMax - 3;
+									}
+								}
 
 								Event.current.Use();
 							}
@@ -590,9 +658,17 @@ namespace Rotorz.ReorderableList {
 						break;
 
 					case EventType.MouseDrag:
-						if (trackingControl) {
-							if (mousePosition.y >= itemPosition.y - halfItemOffset && mousePosition.y <= itemPosition.yMax - halfItemOffset)
+						if (trackingControl && mousePosition.y >= itemPosition.y) {
+							// Is mouse pointer hovering over upper half of item?
+							if (mousePosition.y - itemPosition.y <= halfItemOffset) {
 								s_TargetIndex = i;
+								newDragHighlighterY = itemPosition.y - 3;
+							}
+							// Lower half?
+							else {
+								s_TargetIndex = i + 1;
+								newDragHighlighterY = itemPosition.yMax - 3;
+							}
 						}
 						break;
 				}
@@ -635,13 +711,6 @@ namespace Rotorz.ReorderableList {
 							break;
 					}
 				}
-
-				// Offset position rectangles for next item.
-				itemPosition.y += itemOffset;
-				itemContentPosition.y += itemOffset;
-				handlePosition.y += itemOffset;
-				handleResponsePosition.y += itemOffset;
-				removeButtonPosition.y += itemOffset;
 			}
 
 			s_CurrentItemIndex = -1;
@@ -656,18 +725,20 @@ namespace Rotorz.ReorderableList {
 #endif
 			}
 
+			containerRect.height = totalHeight;
+			EndListContainer(controlID, totalHeight);
+
 			// Fake control to catch input focus if auto focus was not possible.
 			GUIUtility.GetControlID(FocusType.Keyboard);
 
 			// Update position of drag rectangle.
 			if (eventType == EventType.MouseDown || eventType == EventType.MouseDrag) {
 				if (IsTrackingControl(controlID)) {
-					s_DragHighlighter = containerRect;
-					s_DragHighlighter.y = firstItemY + s_TargetIndex * itemOffset - 3;
-					s_DragHighlighter.height = 4;
+					// Update position of drag rectangle.
+					s_DragHighlighter = new Rect(containerRect.x, newDragHighlighterY, containerRect.width, 4);
 				}
 			}
-
+			
 			return containerRect;
 		}
 
@@ -688,8 +759,7 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		/// <param name="list">Abstracted representation of list.</param>
 		/// <param name="drawEmpty">Delegate for drawing empty list.</param>
-		/// <param name="itemHeight">Height of each item in pixels.</param>
-		protected void DoListField(IReorderableListData list, DrawEmpty drawEmpty, float itemHeight) {
+		protected void DoListField(IReorderableListData list, DrawEmpty drawEmpty) {
 			int controlID = GUIUtility.GetControlID(FocusType.Passive);
 
 			// Correct if for some reason one or more styles are missing!
@@ -699,7 +769,7 @@ namespace Rotorz.ReorderableList {
 
 			Rect containerPosition;
 			if (list.Count > 0)
-				containerPosition = DoListField(controlID, list, itemHeight);
+				containerPosition = DoListField(controlID, list);
 			else
 				containerPosition = DoEmptyList(drawEmpty);
 
@@ -739,7 +809,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="itemHeight">Height of a single list item.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
 		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem, DrawEmpty drawEmpty, float itemHeight) {
-			DoListField(new GenericReorderableListData<T>(list, drawItem), drawEmpty, itemHeight);
+			DoListField(new GenericReorderableListData<T>(list, drawItem, itemHeight), drawEmpty);
 		}
 
 		/// <summary>
@@ -750,7 +820,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="itemHeight">Height of a single list item.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
 		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem, float itemHeight) {
-			DoListField(new GenericReorderableListData<T>(list, drawItem), null, itemHeight);
+			DoListField(new GenericReorderableListData<T>(list, drawItem, itemHeight), null);
 		}
 
 		/// <summary>
@@ -760,7 +830,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawItem">Callback to draw list item.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
 		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem) {
-			DoListField(new GenericReorderableListData<T>(list, drawItem), null, ReorderableListGUI.DefaultItemHeight);
+			DoListField(new GenericReorderableListData<T>(list, drawItem, ReorderableListGUI.DefaultItemHeight), null);
 		}
 
 		/// <summary>
@@ -771,7 +841,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawEmpty">Callback to draw custom content for empty list.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
 		public void Draw<T>(List<T> list, ItemDrawer<T> drawItem, DrawEmpty drawEmpty) {
-			DoListField(new GenericReorderableListData<T>(list, drawItem), drawEmpty, ReorderableListGUI.DefaultItemHeight);
+			DoListField(new GenericReorderableListData<T>(list, drawItem, ReorderableListGUI.DefaultItemHeight), drawEmpty);
 		}
 
 		#endregion

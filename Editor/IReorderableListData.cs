@@ -52,6 +52,14 @@ namespace Rotorz.ReorderableList {
 		/// <param name="position">Position in GUI.</param>
 		/// <param name="index">Zero-based index of array element.</param>
 		void DrawItem(Rect position, int index);
+		/// <summary>
+		/// Gets height of list item in pixels.
+		/// </summary>
+		/// <param name="index">Zero-based index of array element.</param>
+		/// <returns>
+		/// Measurement in pixels.
+		/// </returns>
+		float GetItemHeight(int index);
 
 	}
 

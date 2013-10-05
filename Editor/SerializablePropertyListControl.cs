@@ -100,6 +100,11 @@ namespace Rotorz.ReorderableList {
 				EditorGUI.PropertyField(position, arrayProperty.GetArrayElementAtIndex(index), GUIContent.none, true);
 			}
 
+			/// <inheritdoc/>
+			public float GetItemHeight(int index) {
+				return EditorGUI.GetPropertyHeight(arrayProperty.GetArrayElementAtIndex(index), GUIContent.none, true);
+			}
+
 			#endregion
 
 			#region Methods
@@ -187,11 +192,7 @@ namespace Rotorz.ReorderableList {
 			if (!arrayProperty.isArray)
 				throw new InvalidOperationException("Specified serialized propery is not an array.");
 
-			float itemHeight = (arrayProperty.arraySize > 0)
-				? EditorGUI.GetPropertyHeight(arrayProperty.GetArrayElementAtIndex(0), GUIContent.none, true)
-				: 0f;
-
-			DoListField(new SerializedPropertyListData(arrayProperty), drawEmpty, itemHeight);
+			DoListField(new SerializedPropertyListData(arrayProperty), drawEmpty);
 		}
 
 		/// <summary>
