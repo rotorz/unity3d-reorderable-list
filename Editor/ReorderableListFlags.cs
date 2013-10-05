@@ -31,6 +31,10 @@ namespace Rotorz.ReorderableList {
 		/// Hide "Duplicate" option from context menu.
 		/// </summary>
 		DisableDuplicateCommand = 0x10,
+		/// <summary>
+		/// Do not automatically focus first control of newly added items.
+		/// </summary>
+		DisableAutoFocus = 0x20,
 	}
 
 }

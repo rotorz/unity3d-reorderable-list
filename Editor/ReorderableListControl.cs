@@ -275,6 +275,19 @@ namespace Rotorz.ReorderableList {
 		#region Event Handling
 
 		/// <summary>
+		/// Indicate that first control of list item should be automatically focused
+		/// if possible.
+		/// </summary>
+		/// <param name="controlID">Unique ID of list control.</param>
+		/// <param name="itemIndex">Zero-based index of list item.</param>
+		private void AutoFocusItem(int controlID, int itemIndex) {
+			if ((flags & ReorderableListFlags.DisableAutoFocus) == 0) {
+				s_AutoFocusControlID = controlID;
+				s_AutoFocusIndex = itemIndex;
+			}
+		}
+
+		/// <summary>
 		/// Draw add item button.
 		/// </summary>
 		/// <param name="position">Position of button.</param>
@@ -289,9 +302,7 @@ namespace Rotorz.ReorderableList {
 				GUI.changed = true;
 				ReorderableListGUI.indexOfChangedItem = -1;
 
-				// Attempt to automatically focus list control.
-				s_AutoFocusControlID = controlID;
-				s_AutoFocusIndex = list.Count - 1;
+				AutoFocusItem(controlID, list.Count - 1);
 			}
 		}
 
