@@ -14,7 +14,7 @@ namespace Rotorz.ReorderableList {
 	/// windows and inspectors with support for drag and drop reordering of list items.
 	/// </summary>
 	[Serializable]
-	public class SerializablePropertyListControl : ReorderableListControl {
+	public class SerializedPropertyListControl : ReorderableListControl {
 
 		#region SerializedProperty Abstraction
 
@@ -161,14 +161,14 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Initializes a new instance of <see cref="ReorderableListControl"/>.
 		/// </summary>
-		public SerializablePropertyListControl() : base() {
+		public SerializedPropertyListControl() : base() {
 		}
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ReorderableListControl"/>.
 		/// </summary>
 		/// <param name="flags">Optional flags which affect behavior of control.</param>
-		public SerializablePropertyListControl(ReorderableListFlags flags) : base(flags) {
+		public SerializedPropertyListControl(ReorderableListFlags flags) : base(flags) {
 		}
 
 		#endregion

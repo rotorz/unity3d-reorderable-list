@@ -88,11 +88,11 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets the list control for serializable property arrays.
 		/// </summary>
-		private static SerializablePropertyListControl serializablePropertyListControl { get; set; }
+		private static SerializedPropertyListControl serializedPropertyListControl { get; set; }
 
 		static ReorderableListGUI() {
 			defaultListControl = new ReorderableListControl();
-			serializablePropertyListControl = new SerializablePropertyListControl();
+			serializedPropertyListControl = new SerializedPropertyListControl();
 
 			indexOfChangedItem = -1;
 
@@ -283,8 +283,8 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		public static void ListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
-			serializablePropertyListControl.flags = flags;
-			serializablePropertyListControl.Draw(arrayProperty, drawEmpty);
+			serializedPropertyListControl.flags = flags;
+			serializedPropertyListControl.Draw(arrayProperty, drawEmpty);
 		}
 
 		/// <summary>
