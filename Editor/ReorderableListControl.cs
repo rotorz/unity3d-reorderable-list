@@ -524,8 +524,8 @@ namespace Rotorz.ReorderableList {
 				float halfItemOffset = itemPosition.height / 2f;
 				handlePosition.y = itemPosition.y + halfItemOffset - 3;
 
-				handleResponsePosition.y = itemContentPosition.y;
-				handleResponsePosition.height = itemContentPosition.height;
+				handleResponsePosition.y = itemPosition.y;
+				handleResponsePosition.height = itemPosition.height;
 				removeButtonPosition.y = itemContentPosition.y;
 				removeButtonPosition.height = itemContentPosition.height;
 
