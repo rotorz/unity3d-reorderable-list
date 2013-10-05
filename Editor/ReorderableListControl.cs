@@ -504,7 +504,7 @@ namespace Rotorz.ReorderableList {
 			Vector2 mousePosition = Event.current.mousePosition;
 
 			Rect containerRect = BeginListContainer(controlID);
-			float totalHeight = 2;
+			float totalHeight = 3;
 
 			// Position of first item in list.
 			float firstItemY = containerRect.y + containerStyle.padding.top;
