@@ -427,7 +427,7 @@ namespace Rotorz.ReorderableList {
 
 			// Position of first item in list.
 			float firstItemY = position.y + containerStyle.padding.top;
-			float newDragHighlighterY = firstItemY - 4;
+			float newDragHighlighterY = firstItemY - 3;
 
 			// We must put this back!
 			Color restoreColor = GUI.color;
