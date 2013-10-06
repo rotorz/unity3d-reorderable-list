@@ -430,10 +430,7 @@ namespace Rotorz.ReorderableList {
 		
 		private void DrawListItem(EventType eventType, Rect position, int controlID, IReorderableListData list, int itemIndex) {
 			bool allowReordering = (flags & ReorderableListFlags.DisableReordering) == 0;
-			bool canDragItem = GUI.enabled && allowReordering;
 			bool trackingControl = IsTrackingControl(controlID);
-
-			float halfItemOffset = position.height / 2f;
 
 			s_ItemContentPosition = position;
 			s_ItemContentPosition.x = position.x + 2;
@@ -455,7 +452,7 @@ namespace Rotorz.ReorderableList {
 				case EventType.Repaint:
 					// Draw grab handle?
 					if (allowReordering)
-						GUI.DrawTexture(new Rect(position.x + 6, position.y + halfItemOffset - 3, 9, 5), ReorderableListResources.texGrabHandle);
+						GUI.DrawTexture(new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5), ReorderableListResources.texGrabHandle);
 
 					// Draw splitter between list items.
 					if (!trackingControl || itemIndex != s_AnchorIndex)
