@@ -98,13 +98,13 @@ namespace Rotorz.ReorderableList {
 
 				position.x += _labelWidth;
 				position.width -= _labelWidth;
-
-				EditorGUI.PropertyField(position, arrayProperty.GetArrayElementAtIndex(index), GUIContent.none, true);
+				
+				EditorGUI.PropertyField(position, arrayProperty.GetArrayElementAtIndex(index), GUIContent.none, false);
 			}
 
 			/// <inheritdoc/>
 			public float GetItemHeight(int index) {
-				return EditorGUI.GetPropertyHeight(arrayProperty.GetArrayElementAtIndex(index), GUIContent.none, true);
+				return EditorGUI.GetPropertyHeight(arrayProperty.GetArrayElementAtIndex(index), GUIContent.none, false);
 			}
 
 			#endregion
