@@ -145,6 +145,9 @@ namespace Rotorz.ReorderableList {
 		private static GUIContent RemoveButtonActiveContent { get; set; }
 
 		static ReorderableListControl() {
+			s_CurrentItemIndex = new Stack<int>();
+			s_CurrentItemIndex.Push(-1);
+
 			if (EditorGUIUtility.isProSkin) {
 				AnchorBackgroundColor = new Color(85f / 255f, 85f / 255f, 85f / 255f, 0.85f);
 				TargetBackgroundColor = new Color(0, 0, 0, 0.5f);
@@ -186,7 +189,8 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Zero-based index of list item which is currently being drawn.
 		/// </summary>
-		private static int s_CurrentItemIndex;
+		private static Stack<int> s_CurrentItemIndex;
+
 		/// <summary>
 		/// Gets zero-based index of list item which is currently being drawn;
 		/// or a value of -1 if no item is currently being drawn.
@@ -195,7 +199,7 @@ namespace Rotorz.ReorderableList {
 		/// <para>Use <see cref="ReorderableListGUI.currentItemIndex"/> instead.</para>
 		/// </remarks>
 		internal static int currentItemIndex {
-			get { return s_CurrentItemIndex; }
+			get { return s_CurrentItemIndex.Peek(); }
 		}
 
 		#region Properties
@@ -282,7 +286,7 @@ namespace Rotorz.ReorderableList {
 
 		#region Event Handling
 
-		// Keep track of previously known mouse position.
+		// Keep track of previously known mouse position (in screen space).
 		private static Vector2 s_MousePosition;
 
 		/// <summary>
@@ -326,12 +330,13 @@ namespace Rotorz.ReorderableList {
 		/// </returns>
 		private bool DoRemoveButton(Rect position) {
 			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			Vector2 mousePosition = GUIUtility.ScreenToGUIPoint(s_MousePosition);
 
 			switch (Event.current.GetTypeForControl(controlID)) {
 				case EventType.MouseDown:
 					// Do not allow button to be pressed using right mouse button since
 					// context menu should be shown instead!
-					if (GUI.enabled && Event.current.button != 1 && position.Contains(s_MousePosition)) {
+					if (GUI.enabled && Event.current.button != 1 && position.Contains(mousePosition)) {
 						GUIUtility.hotControl = controlID;
 						GUIUtility.keyboardControl = 0;
 						Event.current.Use();
@@ -347,7 +352,7 @@ namespace Rotorz.ReorderableList {
 					if (GUIUtility.hotControl == controlID) {
 						GUIUtility.hotControl = 0;
 
-						if (position.Contains(s_MousePosition)) {
+						if (position.Contains(mousePosition)) {
 							Event.current.Use();
 							return true;
 						}
@@ -359,7 +364,7 @@ namespace Rotorz.ReorderableList {
 					break;
 
 				case EventType.Repaint:
-					var content = (GUIUtility.hotControl == controlID && position.Contains(s_MousePosition))
+					var content = (GUIUtility.hotControl == controlID && position.Contains(mousePosition))
 						? RemoveButtonActiveContent
 						: RemoveButtonNormalContent;
 					removeButtonStyle.Draw(position, content, controlID);
@@ -425,28 +430,27 @@ namespace Rotorz.ReorderableList {
 		private static Rect s_DragItemPosition;
 
 		// Micro-optimisation to avoid repeated construction.
-		private static Rect s_ItemContentPosition;
 		private static Rect s_RemoveButtonPosition;
 		
 		private void DrawListItem(EventType eventType, Rect position, int controlID, IReorderableListData list, int itemIndex) {
 			bool allowReordering = (flags & ReorderableListFlags.DisableReordering) == 0;
 			bool trackingControl = IsTrackingControl(controlID);
 
-			s_ItemContentPosition = position;
-			s_ItemContentPosition.x = position.x + 2;
-			s_ItemContentPosition.y += 1;
-			s_ItemContentPosition.width = position.width - 4;
-			s_ItemContentPosition.height = position.height - 4;
+			Rect itemContentPosition = position;
+			itemContentPosition.x = position.x + 2;
+			itemContentPosition.y += 1;
+			itemContentPosition.width = position.width - 4;
+			itemContentPosition.height = position.height - 4;
 
 			// Make space for grab handle?
 			if (allowReordering) {
-				s_ItemContentPosition.x += 20;
-				s_ItemContentPosition.width -= 20;
+				itemContentPosition.x += 20;
+				itemContentPosition.width -= 20;
 			}
 
 			// Make space for remove button?
 			if (hasRemoveButtons)
-				s_ItemContentPosition.width -= removeButtonStyle.fixedWidth;
+				itemContentPosition.width -= removeButtonStyle.fixedWidth;
 
 			switch (eventType) {
 				case EventType.Repaint:
@@ -464,35 +468,39 @@ namespace Rotorz.ReorderableList {
 			if (s_AutoFocusIndex == itemIndex)
 				GUI.SetNextControlName("AutoFocus_" + controlID + "_" + itemIndex);
 
-			// Present actual control.
-			EditorGUI.BeginChangeCheck();
-			{
-				s_CurrentItemIndex = itemIndex;
-				list.DrawItem(s_ItemContentPosition, itemIndex);
-			}
-			if (EditorGUI.EndChangeCheck())
-				ReorderableListGUI.indexOfChangedItem = itemIndex;
+			try {
+				s_CurrentItemIndex.Push(itemIndex);
 
-			// Draw remove button?
-			if (hasRemoveButtons) {
-				s_RemoveButtonPosition = position;
-				s_RemoveButtonPosition.width = removeButtonStyle.fixedWidth;
-				s_RemoveButtonPosition.x = s_ItemContentPosition.xMax + 2;
-				s_RemoveButtonPosition.height -= 2;
+				// Present actual control.
+				EditorGUI.BeginChangeCheck();
+				list.DrawItem(itemContentPosition, itemIndex);
+				if (EditorGUI.EndChangeCheck())
+					ReorderableListGUI.indexOfChangedItem = itemIndex;
 
-				if (DoRemoveButton(s_RemoveButtonPosition)) {
-					// Remove last entry in list.
-					list.Remove(itemIndex);
+				// Draw remove button?
+				if (hasRemoveButtons) {
+					s_RemoveButtonPosition = position;
+					s_RemoveButtonPosition.width = removeButtonStyle.fixedWidth;
+					s_RemoveButtonPosition.x = itemContentPosition.xMax + 2;
+					s_RemoveButtonPosition.height -= 2;
 
-					GUI.changed = true;
-					ReorderableListGUI.indexOfChangedItem = -1;
+					if (DoRemoveButton(s_RemoveButtonPosition)) {
+						// Remove last entry in list.
+						list.Remove(itemIndex);
+
+						GUI.changed = true;
+						ReorderableListGUI.indexOfChangedItem = -1;
+					}
+				}
+
+				// Check for context click?
+				if (eventType == EventType.ContextClick && position.Contains(Event.current.mousePosition)) {
+					ShowContextMenu(controlID, itemIndex, list);
+					Event.current.Use();
 				}
 			}
-
-			// Check for context click?
-			if (eventType == EventType.ContextClick && position.Contains(Event.current.mousePosition)) {
-				ShowContextMenu(controlID, itemIndex, list);
-				Event.current.Use();
+			finally {
+				s_CurrentItemIndex.Pop();
 			}
 		}
 
@@ -554,11 +562,12 @@ namespace Rotorz.ReorderableList {
 
 			// Get local copy of event information for efficiency.
 			EventType eventType = Event.current.GetTypeForControl(controlID);
+			Vector2 mousePosition = Event.current.mousePosition;
 			if (Event.current.isMouse)
-				s_MousePosition = Event.current.mousePosition;
+				s_MousePosition = GUIUtility.GUIToScreenPoint(mousePosition);
 
 			int newTargetIndex = s_TargetIndex;
-
+			
 			// Position of first item in list.
 			float firstItemY = position.y + containerStyle.padding.top;
 
@@ -574,9 +583,9 @@ namespace Rotorz.ReorderableList {
 				case EventType.MouseDrag:
 					if (trackingControl) {
 						// Reset target index and adjust when looping through list items.
-						if (s_MousePosition.y < firstItemY)
+						if (mousePosition.y < firstItemY)
 							newTargetIndex = 0;
-						else if (s_MousePosition.y >= position.yMax)
+						else if (mousePosition.y >= position.yMax)
 							newTargetIndex = list.Count;
 					}
 					break;
@@ -662,7 +671,7 @@ namespace Rotorz.ReorderableList {
 				if (Event.current.type != EventType.Used) {
 					switch (eventType) {
 						case EventType.MouseDown:
-							if (GUI.enabled && itemPosition.Contains(s_MousePosition)) {
+							if (GUI.enabled && itemPosition.Contains(mousePosition)) {
 								// Remove input focus from control before attempting a context click or drag.
 								GUIUtility.keyboardControl = 0;
 
@@ -670,7 +679,7 @@ namespace Rotorz.ReorderableList {
 									s_DragItemPosition = itemPosition;
 
 									BeginTrackingReorderDrag(controlID, i);
-									s_AnchorMouseOffset = itemPosition.y - s_MousePosition.y;
+									s_AnchorMouseOffset = itemPosition.y - mousePosition.y;
 									s_TargetIndex = i;
 								}
 
@@ -694,17 +703,16 @@ namespace Rotorz.ReorderableList {
 			// Item which is being dragged should be shown on top of other controls!
 			if (IsTrackingControl(controlID)) {
 				if (eventType == EventType.MouseDrag) {
+					s_DragItemPosition.y = Mathf.Clamp(mousePosition.y + s_AnchorMouseOffset, firstItemY, position.yMax - s_DragItemPosition.height - 1);
+
 					// Force repaint to occur so that dragging rectangle is visible.
 					s_TargetIndex = newTargetIndex;
 					Event.current.Use();
 				}
 
-				s_DragItemPosition.y = Mathf.Clamp(s_MousePosition.y + s_AnchorMouseOffset, firstItemY, position.yMax - s_DragItemPosition.height - 1);
 				DrawFloatingListItem(eventType, controlID, list, targetSlotPosition);
 			}
 			
-			s_CurrentItemIndex = -1;
-
 			// Fake control to catch input focus if auto focus was not possible.
 			// Note: Replicated in layout version of `DoListField`.
 			GUIUtility.GetControlID(FocusType.Keyboard);
