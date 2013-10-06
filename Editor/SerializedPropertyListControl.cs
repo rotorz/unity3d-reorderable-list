@@ -24,18 +24,9 @@ namespace Rotorz.ReorderableList {
 		private sealed class SerializedPropertyListData : IReorderableListData {
 
 			/// <summary>
-			/// Style for right-aligned label for element number prefix.
-			/// </summary>
-			private static GUIStyle s_RightAlignedLabelStyle;
-
-			/// <summary>
 			/// The serialized array property.
 			/// </summary>
 			public SerializedProperty arrayProperty;
-			/// <summary>
-			/// Width of element number prefix.
-			/// </summary>
-			private float _labelWidth;
 
 			/// <summary>
 			/// Initializes a new instance of <see cref="SerializedPropertyListData"/>.
@@ -43,15 +34,6 @@ namespace Rotorz.ReorderableList {
 			/// <param name="arrayProperty">Serialized property for entire array.</param>
 			public SerializedPropertyListData(SerializedProperty arrayProperty) {
 				this.arrayProperty = arrayProperty;
-
-				int digitCount = Mathf.Max(2, Mathf.CeilToInt(Mathf.Log10((float)Count)));
-				_labelWidth = digitCount * 8 + 8;
-
-				if (s_RightAlignedLabelStyle == null) {
-					s_RightAlignedLabelStyle = new GUIStyle(GUI.skin.label);
-					s_RightAlignedLabelStyle.alignment = TextAnchor.UpperRight;
-					s_RightAlignedLabelStyle.padding.right = 4;
-				}
 			}
 
 			#region IReorderableListData - Implementation
@@ -93,12 +75,6 @@ namespace Rotorz.ReorderableList {
 
 			/// <inheritdoc/>
 			public void DrawItem(Rect position, int index) {
-				if (Event.current.type == EventType.repaint)
-					s_RightAlignedLabelStyle.Draw(new Rect(position.x, position.y, _labelWidth, position.height), index + ":", false, false, false, false);
-
-				position.x += _labelWidth;
-				position.width -= _labelWidth;
-				
 				EditorGUI.PropertyField(position, arrayProperty.GetArrayElementAtIndex(index), GUIContent.none, false);
 			}
 

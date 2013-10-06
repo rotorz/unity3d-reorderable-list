@@ -35,6 +35,10 @@ namespace Rotorz.ReorderableList {
 		/// Do not automatically focus first control of newly added items.
 		/// </summary>
 		DisableAutoFocus = 0x20,
+		/// <summary>
+		/// Show zero-based index of array elements.
+		/// </summary>
+		ShowIndices = 0x40,
 	}
 
 }

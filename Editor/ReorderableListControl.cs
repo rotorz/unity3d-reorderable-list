@@ -141,8 +141,13 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		public static readonly Color TargetBackgroundColor;
 
-		private static GUIContent RemoveButtonNormalContent { get; set; }
-		private static GUIContent RemoveButtonActiveContent { get; set; }
+		/// <summary>
+		/// Style for right-aligned label for element number prefix.
+		/// </summary>
+		private static GUIStyle s_RightAlignedLabelStyle;
+
+		private static GUIContent s_RemoveButtonNormalContent;
+		private static GUIContent s_RemoveButtonActiveContent;
 
 		static ReorderableListControl() {
 			s_CurrentItemIndex = new Stack<int>();
@@ -157,8 +162,14 @@ namespace Rotorz.ReorderableList {
 				TargetBackgroundColor = new Color(0, 0, 0, 0.5f);
 			}
 
-			RemoveButtonNormalContent = new GUIContent(ReorderableListResources.texRemoveButton);
-			RemoveButtonActiveContent = new GUIContent(ReorderableListResources.texRemoveButtonActive);
+			if (s_RightAlignedLabelStyle == null) {
+				s_RightAlignedLabelStyle = new GUIStyle(GUI.skin.label);
+				s_RightAlignedLabelStyle.alignment = TextAnchor.MiddleRight;
+				s_RightAlignedLabelStyle.padding.right = 4;
+			}
+
+			s_RemoveButtonNormalContent = new GUIContent(ReorderableListResources.texRemoveButton);
+			s_RemoveButtonActiveContent = new GUIContent(ReorderableListResources.texRemoveButtonActive);
 		}
 
 		#endregion
@@ -284,6 +295,65 @@ namespace Rotorz.ReorderableList {
 
 		#endregion
 
+		#region Control State
+
+		/// <summary>
+		/// Represents current state of control.
+		/// </summary>
+		[Serializable]
+		private class ControlState {
+			/// <summary>
+			/// Unique Id of control.
+			/// </summary>
+			public int controlID;
+			/// <summary>
+			/// Width of index label in pixels (zero indicates no label).
+			/// </summary>
+			public float indexLabelWidth;
+			/// <summary>
+			/// Indicates whether item is currently being dragged within control.
+			/// </summary>
+			public bool tracking;
+			/// <summary>
+			/// Indicates if reordering is allowed.
+			/// </summary>
+			public bool allowReordering;
+			/// <summary>
+			/// Indicates if remove buttons are shown.
+			/// </summary>
+			public bool hasRemoveButtons;
+		}
+
+		/// <summary>
+		/// Prepare initial state for list control.
+		/// </summary>
+		/// <param name="controlID">Unique ID of list control.</param>
+		/// <param name="list">Abstracted representation of list.</param>
+		/// <returns>
+		/// The <see cref="ControlState"/> instance.
+		/// </returns>
+		private ControlState PrepareControlState(int controlID, IReorderableListData list) {
+			var state = GUIUtility.GetStateObject(typeof(ControlState), controlID) as ControlState;
+			state.controlID = controlID;
+
+			if ((flags & ReorderableListFlags.ShowIndices) != 0) {
+				int digitCount = Mathf.Max(2, Mathf.CeilToInt(Mathf.Log10((float)list.Count)));
+				state.indexLabelWidth = digitCount * 8 + 8;
+			}
+			else {
+				state.indexLabelWidth = 0;
+			}
+
+			state.tracking = IsTrackingControl(controlID);
+
+			state.allowReordering = (flags & ReorderableListFlags.DisableReordering) == 0;
+			state.hasRemoveButtons = (flags & ReorderableListFlags.HideRemoveButtons) == 0;
+
+			return state;
+		}
+
+		#endregion
+
 		#region Event Handling
 
 		// Keep track of previously known mouse position (in screen space).
@@ -365,8 +435,8 @@ namespace Rotorz.ReorderableList {
 
 				case EventType.Repaint:
 					var content = (GUIUtility.hotControl == controlID && position.Contains(mousePosition))
-						? RemoveButtonActiveContent
-						: RemoveButtonNormalContent;
+						? s_RemoveButtonActiveContent
+						: s_RemoveButtonNormalContent;
 					removeButtonStyle.Draw(position, content, controlID);
 					break;
 			}
@@ -432,10 +502,7 @@ namespace Rotorz.ReorderableList {
 		// Micro-optimisation to avoid repeated construction.
 		private static Rect s_RemoveButtonPosition;
 		
-		private void DrawListItem(EventType eventType, Rect position, int controlID, IReorderableListData list, int itemIndex) {
-			bool allowReordering = (flags & ReorderableListFlags.DisableReordering) == 0;
-			bool trackingControl = IsTrackingControl(controlID);
-
+		private void DrawListItem(EventType eventType, Rect position, ControlState state, IReorderableListData list, int itemIndex) {
 			Rect itemContentPosition = position;
 			itemContentPosition.x = position.x + 2;
 			itemContentPosition.y += 1;
@@ -443,30 +510,40 @@ namespace Rotorz.ReorderableList {
 			itemContentPosition.height = position.height - 4;
 
 			// Make space for grab handle?
-			if (allowReordering) {
+			if (state.allowReordering) {
 				itemContentPosition.x += 20;
 				itemContentPosition.width -= 20;
 			}
 
+			// Make space for element index.
+			if (state.indexLabelWidth != 0) {
+				itemContentPosition.width -= state.indexLabelWidth;
+
+				if (eventType == EventType.Repaint)
+					s_RightAlignedLabelStyle.Draw(new Rect(itemContentPosition.x, position.y, state.indexLabelWidth, position.height - 4), itemIndex + ":", false, false, false, false);
+
+				itemContentPosition.x += state.indexLabelWidth;
+			}
+
 			// Make space for remove button?
-			if (hasRemoveButtons)
+			if (state.hasRemoveButtons)
 				itemContentPosition.width -= removeButtonStyle.fixedWidth;
 
 			switch (eventType) {
 				case EventType.Repaint:
 					// Draw grab handle?
-					if (allowReordering)
+					if (state.allowReordering)
 						GUI.DrawTexture(new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5), ReorderableListResources.texGrabHandle);
 
 					// Draw splitter between list items.
-					if (!trackingControl || itemIndex != s_AnchorIndex)
+					if (!state.tracking || itemIndex != s_AnchorIndex)
 						GUI.DrawTexture(new Rect(position.x, position.y - 1, position.width, 1), ReorderableListResources.texItemSplitter);
 					break;
 			}
 
 			// Allow control to be automatically focused.
 			if (s_AutoFocusIndex == itemIndex)
-				GUI.SetNextControlName("AutoFocus_" + controlID + "_" + itemIndex);
+				GUI.SetNextControlName("AutoFocus_" + state.controlID + "_" + itemIndex);
 
 			try {
 				s_CurrentItemIndex.Push(itemIndex);
@@ -478,7 +555,7 @@ namespace Rotorz.ReorderableList {
 					ReorderableListGUI.indexOfChangedItem = itemIndex;
 
 				// Draw remove button?
-				if (hasRemoveButtons) {
+				if (state.hasRemoveButtons) {
 					s_RemoveButtonPosition = position;
 					s_RemoveButtonPosition.width = removeButtonStyle.fixedWidth;
 					s_RemoveButtonPosition.x = itemContentPosition.xMax + 2;
@@ -495,7 +572,7 @@ namespace Rotorz.ReorderableList {
 
 				// Check for context click?
 				if (eventType == EventType.ContextClick && position.Contains(Event.current.mousePosition)) {
-					ShowContextMenu(controlID, itemIndex, list);
+					ShowContextMenu(state.controlID, itemIndex, list);
 					Event.current.Use();
 				}
 			}
@@ -504,7 +581,7 @@ namespace Rotorz.ReorderableList {
 			}
 		}
 
-		private void DrawFloatingListItem(EventType eventType, int controlID, IReorderableListData list, float targetSlotPosition) {
+		private void DrawFloatingListItem(EventType eventType, ControlState state, IReorderableListData list, float targetSlotPosition) {
 			if (eventType == EventType.Repaint) {
 				Color restoreColor = GUI.color;
 
@@ -547,7 +624,7 @@ namespace Rotorz.ReorderableList {
 				GUI.color = restoreColor;
 			}
 
-			DrawListItem(eventType, s_DragItemPosition, controlID, list, s_AnchorIndex);
+			DrawListItem(eventType, s_DragItemPosition, state, list, s_AnchorIndex);
 		}
 
 		/// <summary>
@@ -557,8 +634,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="controlID">Unique ID of list control.</param>
 		/// <param name="list">Abstracted representation of list.</param>
 		private void DrawListContainerAndItems(Rect position, int controlID, IReorderableListData list) {
-			bool allowReordering = (flags & ReorderableListFlags.DisableReordering) == 0;
-			bool trackingControl = IsTrackingControl(controlID);
+			var state = PrepareControlState(controlID, list);
 
 			// Get local copy of event information for efficiency.
 			EventType eventType = Event.current.GetTypeForControl(controlID);
@@ -573,7 +649,7 @@ namespace Rotorz.ReorderableList {
 
 			switch (eventType) {
 				case EventType.MouseDown:
-					if (trackingControl) {
+					if (state.tracking) {
 						// Cancel drag when other mouse button is pressed.
 						s_TrackingCancelBlockContext = true;
 						Event.current.Use();
@@ -581,7 +657,7 @@ namespace Rotorz.ReorderableList {
 					break;
 
 				case EventType.MouseDrag:
-					if (trackingControl) {
+					if (state.tracking) {
 						// Reset target index and adjust when looping through list items.
 						if (mousePosition.y < firstItemY)
 							newTargetIndex = 0;
@@ -593,7 +669,7 @@ namespace Rotorz.ReorderableList {
 				case EventType.MouseUp:
 					if (controlID == GUIUtility.hotControl) {
 						// Allow user code to change control over reordering during drag.
-						if (!s_TrackingCancelBlockContext && allowReordering)
+						if (!s_TrackingCancelBlockContext && state.allowReordering)
 							AcceptReorderDrag(list);
 						else
 							StopTrackingReorderDrag();
@@ -602,7 +678,7 @@ namespace Rotorz.ReorderableList {
 					break;
 
 				case EventType.KeyDown:
-					if (trackingControl && Event.current.keyCode == KeyCode.Escape) {
+					if (state.tracking && Event.current.keyCode == KeyCode.Escape) {
 						StopTrackingReorderDrag();
 						Event.current.Use();
 					}
@@ -639,7 +715,7 @@ namespace Rotorz.ReorderableList {
 				itemPosition.y = itemPosition.yMax;
 				itemPosition.height = 0;
 
-				if (trackingControl) {
+				if (state.tracking) {
 					// Does this represent the target index?
 					if (i == s_TargetIndex) {
 						targetSlotPosition = itemPosition.y;
@@ -656,7 +732,7 @@ namespace Rotorz.ReorderableList {
 				itemPosition.height = list.GetItemHeight(i) + 4;
 
 				// Draw list item.
-				DrawListItem(eventType, itemPosition, controlID, list, i);
+				DrawListItem(eventType, itemPosition, state, list, i);
 
 				// Did list count change (i.e. item removed)?
 				if (list.Count < count) {
@@ -675,7 +751,7 @@ namespace Rotorz.ReorderableList {
 								// Remove input focus from control before attempting a context click or drag.
 								GUIUtility.keyboardControl = 0;
 
-								if (allowReordering && Event.current.button == 0) {
+								if (state.allowReordering && Event.current.button == 0) {
 									s_DragItemPosition = itemPosition;
 
 									BeginTrackingReorderDrag(controlID, i);
@@ -689,7 +765,7 @@ namespace Rotorz.ReorderableList {
 
 						case EventType.MouseDrag:
 							float midpoint = itemPosition.y + itemPosition.height / 2f;
-							if (trackingControl) {
+							if (state.tracking) {
 								if (s_DragItemPosition.y > itemPosition.y && s_DragItemPosition.y <= midpoint)
 									newTargetIndex = i;
 								else if (s_DragItemPosition.yMax > midpoint && s_DragItemPosition.yMax <= itemPosition.yMax)
@@ -710,7 +786,7 @@ namespace Rotorz.ReorderableList {
 					Event.current.Use();
 				}
 
-				DrawFloatingListItem(eventType, controlID, list, targetSlotPosition);
+				DrawFloatingListItem(eventType, state, list, targetSlotPosition);
 			}
 			
 			// Fake control to catch input focus if auto focus was not possible.
