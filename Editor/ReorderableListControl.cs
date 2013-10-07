@@ -7,10 +7,102 @@ using UnityEditor;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using Rotorz.ReorderableList.Internal;
 
 namespace Rotorz.ReorderableList {
+	
+	/// <summary>
+	/// Arguments which are passed to <see cref="ItemInsertedEventHandler"/>.
+	/// </summary>
+	public sealed class ItemInsertedEventArgs : EventArgs {
+
+		/// <summary>
+		/// Gets list object which contains item.
+		/// </summary>
+		public object list { get; private set; }
+		/// <summary>
+		/// Gets zero-based index of item which was inserted.
+		/// </summary>
+		public int itemIndex { get; private set; }
+
+		/// <summary>
+		/// Indicates if inserted item was duplicated from another item.
+		/// </summary>
+		public bool wasDuplicated { get; private set; }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="ItemInsertedEventArgs"/>.
+		/// </summary>
+		/// <param name="list">The list object.</param>
+		/// <param name="itemIndex">Zero-based index of item.</param>
+		/// <param name="wasDuplicated">Indicates if inserted item was duplicated from another item.</param>
+		public ItemInsertedEventArgs(object list, int itemIndex, bool wasDuplicated) {
+			this.list = list;
+			this.itemIndex = itemIndex;
+			this.wasDuplicated = wasDuplicated;
+		}
+
+	}
+
+	/// <summary>
+	/// An event handler which is invoked after new list item is inserted.
+	/// </summary>
+	/// <param name="sender">Object which raised event.</param>
+	/// <param name="args">Event arguments.</param>
+	public delegate void ItemInsertedEventHandler(object sender, ItemInsertedEventArgs args);
+
+	/// <summary>
+	/// Arguments which are passed to <see cref="ItemRemovingEventHandler"/>.
+	/// </summary>
+	public sealed class ItemRemovingEventArgs : CancelEventArgs {
+
+		/// <summary>
+		/// Gets list object which contains item.
+		/// </summary>
+		public object list { get; private set; }
+		/// <summary>
+		/// Gets zero-based index of item which was inserted.
+		/// </summary>
+		public int itemIndex { get; internal set; }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="ItemInsertedEventArgs"/>.
+		/// </summary>
+		/// <param name="list">The list object.</param>
+		/// <param name="itemIndex">Zero-based index of item.</param>
+		public ItemRemovingEventArgs(object list, int itemIndex) {
+			this.list = list;
+			this.itemIndex = itemIndex;
+		}
+
+	}
+
+	/// <summary>
+	/// An event handler which is invoked before a list item is removed.
+	/// </summary>
+	/// <remarks>
+	/// <para>Item removal can be cancelled by setting <see cref="ItemRemovingEventArgs.Cancel"/>
+	/// to <c>true</c>.</para>
+	/// </remarks>
+	/// <param name="sender">Object which raised event.</param>
+	/// <param name="args">Event arguments.</param>
+	public delegate void ItemRemovingEventHandler(object sender, ItemRemovingEventArgs args);
+
+	/// <summary>
+	/// Indicates whether item can be removed from list.
+	/// </summary>
+	/// <remarks>
+	/// <para>This should be a light-weight method since it will be used to determine
+	/// whether remove button should be included for each item in list.</para>
+	/// </remarks>
+	/// <param name="list">The list.</param>
+	/// <param name="itemIndex">Zero-based index of item.</param>
+	/// <returns>
+	/// A value of <c>true</c> if item can be removed; otherwise <c>false</c>.
+	/// </returns>
+	public delegate bool CanRemoveItemDelegate(object list, int itemIndex);
 
 	/// <summary>
 	/// Base class for custom reorderable list control.
@@ -162,12 +254,6 @@ namespace Rotorz.ReorderableList {
 				TargetBackgroundColor = new Color(0, 0, 0, 0.5f);
 			}
 
-			if (s_RightAlignedLabelStyle == null) {
-				s_RightAlignedLabelStyle = new GUIStyle(GUI.skin.label);
-				s_RightAlignedLabelStyle.alignment = TextAnchor.MiddleRight;
-				s_RightAlignedLabelStyle.padding.right = 4;
-			}
-
 			s_RemoveButtonNormalContent = new GUIContent(ReorderableListResources.texRemoveButton);
 			s_RemoveButtonActiveContent = new GUIContent(ReorderableListResources.texRemoveButtonActive);
 		}
@@ -269,6 +355,46 @@ namespace Rotorz.ReorderableList {
 		public GUIStyle removeButtonStyle {
 			get { return _removeButtonStyle; }
 			set { _removeButtonStyle = value; }
+		}
+
+		#endregion
+
+		#region Events and Delegates
+		
+		/// <summary>
+		/// Optional delegate to determine whether item can be removed from list.
+		/// </summary>
+		/// <remarks>
+		/// <para>This is redundant when <see cref="ReorderableListFlags.HideRemoveButtons"/> is specified.</para>
+		/// </remarks>
+		public CanRemoveItemDelegate canRemoveItem;
+
+		/// <summary>
+		/// Occurs after list item is inserted or duplicated.
+		/// </summary>
+		public event ItemInsertedEventHandler ItemInserted;
+
+		/// <summary>
+		/// Raises event after list item is inserted or duplicated.
+		/// </summary>
+		/// <param name="args">Event arguments.</param>
+		protected virtual void OnItemInserted(ItemInsertedEventArgs args) {
+			if (ItemInserted != null)
+				ItemInserted(this, args);
+		}
+
+		/// <summary>
+		/// Occurs before list item is removed and allows removal to be cancelled.
+		/// </summary>
+		public event ItemRemovingEventHandler ItemRemoving;
+
+		/// <summary>
+		/// Raises event before list item is removed and provides oppertunity to cancel.
+		/// </summary>
+		/// <param name="args">Event arguments.</param>
+		protected virtual void OnItemRemoving(ItemRemovingEventArgs args) {
+			if (ItemRemoving != null)
+				ItemRemoving(this, args);
 		}
 
 		#endregion
@@ -382,12 +508,7 @@ namespace Rotorz.ReorderableList {
 			if (GUI.Button(position, GUIContent.none, addButtonStyle)) {
 				// Append item to list.
 				GUIUtility.keyboardControl = 0;
-				list.AddNew();
-
-				GUI.changed = true;
-				ReorderableListGUI.indexOfChangedItem = -1;
-
-				AutoFocusItem(controlID, list.Count - 1);
+				AddItem(list);
 			}
 		}
 
@@ -483,14 +604,12 @@ namespace Rotorz.ReorderableList {
 		/// Accept reordering.
 		/// </summary>
 		/// <param name="list">The list which can be reordered.</param>
-		private static void AcceptReorderDrag(IReorderableListData list) {
+		private void AcceptReorderDrag(IReorderableListData list) {
 			try {
 				// Reorder list as needed!
 				s_TargetIndex = Mathf.Clamp(s_TargetIndex, 0, list.Count + 1);
-				if (s_TargetIndex != s_AnchorIndex && s_TargetIndex != s_AnchorIndex + 1) {
-					list.Move(s_AnchorIndex, s_TargetIndex);
-					GUI.changed = true;
-				}
+				if (s_TargetIndex != s_AnchorIndex && s_TargetIndex != s_AnchorIndex + 1)
+					MoveItem(list, s_AnchorIndex, s_TargetIndex);
 			}
 			finally {
 				StopTrackingReorderDrag();
@@ -555,19 +674,14 @@ namespace Rotorz.ReorderableList {
 					ReorderableListGUI.indexOfChangedItem = itemIndex;
 
 				// Draw remove button?
-				if (state.hasRemoveButtons) {
+				if (state.hasRemoveButtons && (canRemoveItem == null || canRemoveItem(list.Raw, itemIndex))) {
 					s_RemoveButtonPosition = position;
 					s_RemoveButtonPosition.width = removeButtonStyle.fixedWidth;
 					s_RemoveButtonPosition.x = itemContentPosition.xMax + 2;
 					s_RemoveButtonPosition.height -= 2;
 
-					if (DoRemoveButton(s_RemoveButtonPosition)) {
-						// Remove last entry in list.
-						list.Remove(itemIndex);
-
-						GUI.changed = true;
-						ReorderableListGUI.indexOfChangedItem = -1;
-					}
+					if (DoRemoveButton(s_RemoveButtonPosition))
+						RemoveItem(list, itemIndex);
 				}
 
 				// Check for context click?
@@ -599,7 +713,7 @@ namespace Rotorz.ReorderableList {
 
 				GUI.color = TargetBackgroundColor;
 				GUI.DrawTexture(targetPosition, EditorGUIUtility.whiteTexture);
-
+				
 				// Fill background of item which is being dragged.
 				--s_DragItemPosition.x;
 				s_DragItemPosition.width += 2;
@@ -947,6 +1061,12 @@ namespace Rotorz.ReorderableList {
 			containerStyle = containerStyle ?? ReorderableListGUI.containerStyle;
 			addButtonStyle = addButtonStyle ?? ReorderableListGUI.addButtonStyle;
 			removeButtonStyle = removeButtonStyle ?? ReorderableListGUI.removeButtonStyle;
+
+			if (s_RightAlignedLabelStyle == null) {
+				s_RightAlignedLabelStyle = new GUIStyle(GUI.skin.label);
+				s_RightAlignedLabelStyle.alignment = TextAnchor.MiddleRight;
+				s_RightAlignedLabelStyle.padding.right = 4;
+			}
 		}
 
 		/// <summary>
@@ -993,59 +1113,6 @@ namespace Rotorz.ReorderableList {
 			}
 
 			DrawFooterControls(position, controlID, list);
-		}
-
-		#endregion
-
-		#region Methods
-
-		/// <summary>
-		/// Calculate height of list control in pixels.
-		/// </summary>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <returns>
-		/// Required list height in pixels.
-		/// </returns>
-		protected float CalculateListHeight(IReorderableListData list) {
-			FixStyles();
-
-			float totalHeight = containerStyle.padding.vertical - 1;
-
-			// Take list items into consideration.
-			int count = list.Count;
-			for (int i = 0; i < count; ++i)
-				totalHeight += list.GetItemHeight(i);
-			// Add spacing between list items.
-			totalHeight += 4 * count;
-
-			// Add height of add button.
-			if (hasAddButton)
-				totalHeight += addButtonStyle.fixedHeight;
-
-			return totalHeight;
-		}
-
-		/// <summary>
-		/// Calculate height of list control in pixels.
-		/// </summary>
-		/// <param name="itemCount">Count of items in list.</param>
-		/// <param name="itemHeight">Fixed height of list item.</param>
-		/// <returns>
-		/// Required list height in pixels.
-		/// </returns>
-		public float CalculateListHeight(int itemCount, float itemHeight) {
-			FixStyles();
-
-			float totalHeight = containerStyle.padding.vertical - 1;
-
-			// Take list items into consideration.
-			totalHeight += (itemHeight + 4) * itemCount;
-
-			// Add height of add button.
-			if (hasAddButton)
-				totalHeight += addButtonStyle.fixedHeight;
-
-			return totalHeight;
 		}
 
 		#endregion
@@ -1176,7 +1243,7 @@ namespace Rotorz.ReorderableList {
 		#region Command Handling
 
 		/// <summary>
-		/// Invoked to handle command.
+		/// Invoked to handle context command.
 		/// </summary>
 		/// <remarks>
 		/// <para>It is important to set the value of <c>GUI.changed</c> to <c>true</c> if any
@@ -1184,7 +1251,7 @@ namespace Rotorz.ReorderableList {
 		/// <para>Default command handling functionality can be inherited:</para>
 		/// <code language="csharp"><![CDATA[
 		/// protected override bool HandleCommand<T>(string commandName, int itemIndex, List<T> list) {
-		///     if (base.HandleContextCommand(itemIndex, list))
+		///     if (base.HandleCommand(itemIndex, list))
 		///         return true;
 		///     
 		///     // Place default command handling code here...
@@ -1198,7 +1265,7 @@ namespace Rotorz.ReorderableList {
 		/// ]]></code>
 		/// <code language="unityscript"><![CDATA[
 		/// function HandleCommand<T>(commandName:String, itemIndex:int, list:List.<T>):boolean {
-		///     if (base.HandleContextCommand(itemIndex, list))
+		///     if (base.HandleCommand(itemIndex, list))
 		///         return true;
 		///     
 		///     // Place default command handling code here...
@@ -1220,38 +1287,32 @@ namespace Rotorz.ReorderableList {
 		protected virtual bool HandleCommand(string commandName, int itemIndex, IReorderableListData list) {
 			switch (commandName) {
 				case "Move to Top":
-					list.Move(itemIndex, 0);
-					break;
+					MoveItem(list, itemIndex, 0);
+					return true;
 				case "Move to Bottom":
-					list.Move(itemIndex, list.Count);
-					break;
+					MoveItem(list, itemIndex, list.Count);
+					return true;
+
 				case "Insert Above":
-					list.Insert(itemIndex);
-					AutoFocusItem(s_ContextControlID, itemIndex);
-					break;
+					InsertItem(list, itemIndex);
+					return true;
 				case "Insert Below":
-					list.Insert(itemIndex + 1);
-					AutoFocusItem(s_ContextControlID, itemIndex + 1);
-					break;
+					InsertItem(list, itemIndex + 1);
+					return true;
 				case "Duplicate":
-					list.Duplicate(itemIndex);
-					AutoFocusItem(s_ContextControlID, itemIndex + 1);
-					break;
+					DuplicateItem(list, itemIndex);
+					return true;
+
 				case "Remove":
-					list.Remove(itemIndex);
-					break;
+					RemoveItem(list, itemIndex);
+					return true;
 				case "Clear All":
-					list.Clear();
-					break;
+					ClearAll(list);
+					return true;
 
 				default:
 					return false;
 			}
-
-			GUI.changed = true;
-			ReorderableListGUI.indexOfChangedItem = -1;
-
-			return true;
 		}
 
 		/// <summary>
@@ -1288,6 +1349,177 @@ namespace Rotorz.ReorderableList {
 		/// </returns>
 		public bool DoCommand<T>(GUIContent command, int itemIndex, IReorderableListData list) {
 			return DoCommand(command.text, itemIndex, list);
+		}
+
+		#endregion
+
+		#region Methods
+
+		/// <summary>
+		/// Calculate height of list control in pixels.
+		/// </summary>
+		/// <param name="list">The list which can be reordered.</param>
+		/// <returns>
+		/// Required list height in pixels.
+		/// </returns>
+		protected float CalculateListHeight(IReorderableListData list) {
+			FixStyles();
+
+			float totalHeight = containerStyle.padding.vertical - 1;
+
+			// Take list items into consideration.
+			int count = list.Count;
+			for (int i = 0; i < count; ++i)
+				totalHeight += list.GetItemHeight(i);
+			// Add spacing between list items.
+			totalHeight += 4 * count;
+
+			// Add height of add button.
+			if (hasAddButton)
+				totalHeight += addButtonStyle.fixedHeight;
+
+			return totalHeight;
+		}
+
+		/// <summary>
+		/// Calculate height of list control in pixels.
+		/// </summary>
+		/// <param name="itemCount">Count of items in list.</param>
+		/// <param name="itemHeight">Fixed height of list item.</param>
+		/// <returns>
+		/// Required list height in pixels.
+		/// </returns>
+		public float CalculateListHeight(int itemCount, float itemHeight) {
+			FixStyles();
+
+			float totalHeight = containerStyle.padding.vertical - 1;
+
+			// Take list items into consideration.
+			totalHeight += (itemHeight + 4) * itemCount;
+
+			// Add height of add button.
+			if (hasAddButton)
+				totalHeight += addButtonStyle.fixedHeight;
+
+			return totalHeight;
+		}
+
+		/// <summary>
+		/// Move item from source index to destination index.
+		/// </summary>
+		/// <param name="list">The reorderable list.</param>
+		/// <param name="sourceIndex">Zero-based index of source item.</param>
+		/// <param name="destIndex">Zero-based index of destination index.</param>
+		protected void MoveItem(IReorderableListData list, int sourceIndex, int destIndex) {
+			list.Move(sourceIndex, destIndex);
+
+			GUI.changed = true;
+			ReorderableListGUI.indexOfChangedItem = -1;
+		}
+
+		/// <summary>
+		/// Add item at end of list and raises the event <see cref="ItemInserted"/>.
+		/// </summary>
+		/// <param name="list">The reorderable list.</param>
+		protected void AddItem(IReorderableListData list) {
+			list.Add();
+			AutoFocusItem(s_ContextControlID, list.Count - 1);
+
+			GUI.changed = true;
+			ReorderableListGUI.indexOfChangedItem = -1;
+
+			var args = new ItemInsertedEventArgs(list.Raw, list.Count - 1, false);
+			OnItemInserted(args);
+		}
+
+		/// <summary>
+		/// Insert item at specified index and raises the event <see cref="ItemInserted"/>.
+		/// </summary>
+		/// <param name="list">The reorderable list.</param>
+		/// <param name="itemIndex">Zero-based index of item.</param>
+		protected void InsertItem(IReorderableListData list, int itemIndex) {
+			list.Insert(itemIndex);
+			AutoFocusItem(s_ContextControlID, itemIndex);
+
+			GUI.changed = true;
+			ReorderableListGUI.indexOfChangedItem = -1;
+
+			var args = new ItemInsertedEventArgs(list.Raw, itemIndex, false);
+			OnItemInserted(args);
+		}
+
+		/// <summary>
+		/// Duplicate specified item and raises the event <see cref="ItemInserted"/>.
+		/// </summary>
+		/// <param name="list">The reorderable list.</param>
+		/// <param name="itemIndex">Zero-based index of item.</param>
+		protected void DuplicateItem(IReorderableListData list, int itemIndex) {
+			list.Duplicate(itemIndex);
+			AutoFocusItem(s_ContextControlID, itemIndex + 1);
+
+			GUI.changed = true;
+			ReorderableListGUI.indexOfChangedItem = -1;
+
+			var args = new ItemInsertedEventArgs(list.Raw, itemIndex + 1, true);
+			OnItemInserted(args);
+		}
+
+		/// <summary>
+		/// Remove specified item.
+		/// </summary>
+		/// <remarks>
+		/// <para>The event <see cref="ItemRemoving"/> is raised prior to removing item
+		/// and allows removal to be cancelled.</para>
+		/// </remarks>
+		/// <param name="list">The reorderable list.</param>
+		/// <param name="itemIndex">Zero-based index of item.</param>
+		/// <returns>
+		/// Returns a value of <c>false</c> if operation was cancelled.
+		/// </returns>
+		protected bool RemoveItem(IReorderableListData list, int itemIndex) {
+			var args = new ItemRemovingEventArgs(list.Raw, itemIndex);
+			OnItemRemoving(args);
+			if (args.Cancel)
+				return false;
+
+			list.Remove(itemIndex);
+
+			GUI.changed = true;
+			ReorderableListGUI.indexOfChangedItem = -1;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Remove all items from list.
+		/// </summary>
+		/// <remarks>
+		/// <para>The event <see cref="ItemRemoving"/> is raised for each item prior to
+		/// clearing array and allows entire operation to be cancelled.</para>
+		/// </remarks>
+		/// <param name="list">The reorderable list.</param>
+		/// <returns>
+		/// Returns a value of <c>false</c> if operation was cancelled.
+		/// </returns>
+		protected bool ClearAll(IReorderableListData list) {
+			if (list.Count == 0)
+				return true;
+
+			var args = new ItemRemovingEventArgs(list.Raw, 0);
+			int count = list.Count;
+			for (int i = 0; i < count; ++i) {
+				args.itemIndex = i;
+				OnItemRemoving(args);
+				if (args.Cancel)
+					return false;
+			}
+
+			list.Clear();
+
+			GUI.changed = true;
+			ReorderableListGUI.indexOfChangedItem = -1;
+
+			return true;
 		}
 
 		#endregion

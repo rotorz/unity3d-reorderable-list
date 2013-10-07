@@ -12,6 +12,11 @@ namespace Rotorz.ReorderableList {
 	public interface IReorderableListData {
 
 		/// <summary>
+		/// Gets the underlying list object.
+		/// </summary>
+		object Raw { get; }
+
+		/// <summary>
 		/// Gets count of elements in list.
 		/// </summary>
 		int Count { get; }
@@ -19,7 +24,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Add new element at end of list.
 		/// </summary>
-		void AddNew();
+		void Add();
 		/// <summary>
 		/// Insert new element at specified index.
 		/// </summary>

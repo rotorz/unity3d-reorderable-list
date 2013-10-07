@@ -39,12 +39,17 @@ namespace Rotorz.ReorderableList {
 			#region IReorderableListData - Implementation
 
 			/// <inheritdoc/>
+			public object Raw {
+				get { return arrayProperty; }
+			}
+
+			/// <inheritdoc/>
 			public int Count {
 				get { return arrayProperty.arraySize; }
 			}
 
 			/// <inheritdoc/>
-			public void AddNew() {
+			public void Add() {
 				int newIndex = arrayProperty.arraySize;
 				++arrayProperty.arraySize;
 				ResetValue(arrayProperty.GetArrayElementAtIndex(newIndex));
@@ -182,6 +187,11 @@ namespace Rotorz.ReorderableList {
 				throw new InvalidOperationException("Specified serialized propery is not an array.");
 
 			DoListField(new SerializedPropertyListData(arrayProperty), drawEmpty);
+		}
+
+		/// <inheritdoc cref="Draw(SerializedProperty, DrawEmpty)"/>
+		public void Draw(SerializedProperty arrayProperty) {
+			Draw(arrayProperty, null);
 		}
 
 		/// <summary>

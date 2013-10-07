@@ -43,12 +43,17 @@ namespace Rotorz.ReorderableList {
 			#region IReorderableListData - Implementation
 
 			/// <inheritdoc/>
+			public object Raw {
+				get { return list; }
+			}
+
+			/// <inheritdoc/>
 			public int Count {
 				get { return list.Count; }
 			}
 
 			/// <inheritdoc/>
-			public void AddNew() {
+			public void Add() {
 				list.Add(default(T));
 			}
 			/// <inheritdoc/>
@@ -126,6 +131,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Draw list field control.
 		/// </summary>
+		/// <param name="position">Position of control.</param>
 		/// <param name="list">The list which can be reordered.</param>
 		/// <param name="drawItem">Callback to draw list item.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
