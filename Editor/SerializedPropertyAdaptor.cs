@@ -57,6 +57,7 @@ namespace Rotorz.ReorderableList {
 				throw new InvalidOperationException("Specified serialized propery is not an array.");
 
 			this._arrayProperty = arrayProperty;
+			this.fixedItemHeight = fixedItemHeight;
 		}
 
 		/// <summary>
