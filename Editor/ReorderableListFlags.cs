@@ -39,6 +39,14 @@ namespace Rotorz.ReorderableList {
 		/// Show zero-based index of array elements.
 		/// </summary>
 		ShowIndices = 0x40,
+		/// <summary>
+		/// Do not attempt to clip items which are out of view.
+		/// </summary>
+		/// <remarks>
+		/// <para>Clipping helps to boost performance, though may lead to issues on
+		/// some interfaces.</para>
+		/// </remarks>
+		DisableClipping = 0x80,
 	}
 
 }

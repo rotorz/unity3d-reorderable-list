@@ -119,7 +119,7 @@ namespace Rotorz.ReorderableList.Internal {
 		private static void GenerateSpecialTextures() {
 			var splitterColor = EditorGUIUtility.isProSkin
 				? new Color(1f, 1f, 1f, 0.14f)
-				: new Color(1f, 1f, 1f, 0.55f)
+				: new Color(0.59f, 0.59f, 0.59f, 0.55f)
 				;
 			texItemSplitter = CreatePixelTexture("(Generated) Item Splitter", splitterColor);
 		}

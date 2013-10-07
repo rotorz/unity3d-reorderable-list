@@ -7,14 +7,9 @@ using UnityEngine;
 namespace Rotorz.ReorderableList {
 
 	/// <summary>
-	/// Represents list data which supports reordering.
+	/// Adaptor allowing reorderable list control to interface with list data.
 	/// </summary>
-	public interface IReorderableListData {
-
-		/// <summary>
-		/// Gets the underlying list object.
-		/// </summary>
-		object Raw { get; }
+	public interface IReorderableListAdaptor {
 
 		/// <summary>
 		/// Gets count of elements in list.
