@@ -433,6 +433,10 @@ namespace Rotorz.ReorderableList {
 			/// </summary>
 			public int controlID;
 			/// <summary>
+			/// Visible rectangle of control.
+			/// </summary>
+			public Rect visibleRect;
+			/// <summary>
 			/// Width of index label in pixels (zero indicates no label).
 			/// </summary>
 			public float indexLabelWidth;
@@ -461,6 +465,7 @@ namespace Rotorz.ReorderableList {
 		private ControlState PrepareControlState(int controlID, IReorderableListData list) {
 			var state = GUIUtility.GetStateObject(typeof(ControlState), controlID) as ControlState;
 			state.controlID = controlID;
+			state.visibleRect = GUIHelper.VisibleRect();
 
 			if ((flags & ReorderableListFlags.ShowIndices) != 0) {
 				int digitCount = Mathf.Max(2, Mathf.CeilToInt(Mathf.Log10((float)list.Count)));
@@ -516,10 +521,11 @@ namespace Rotorz.ReorderableList {
 		/// Draw remove button.
 		/// </summary>
 		/// <param name="position">Position of button.</param>
+		/// <param name="visible">Indicates if control is visible within GUI.</param>
 		/// <returns>
 		/// A value of <c>true</c> if clicked; otherwise <c>false</c>.
 		/// </returns>
-		private bool DoRemoveButton(Rect position) {
+		private bool DoRemoveButton(Rect position, bool visible) {
 			int controlID = GUIUtility.GetControlID(FocusType.Passive);
 			Vector2 mousePosition = GUIUtility.ScreenToGUIPoint(s_MousePosition);
 
@@ -555,10 +561,12 @@ namespace Rotorz.ReorderableList {
 					break;
 
 				case EventType.Repaint:
-					var content = (GUIUtility.hotControl == controlID && position.Contains(mousePosition))
-						? s_RemoveButtonActiveContent
-						: s_RemoveButtonNormalContent;
-					removeButtonStyle.Draw(position, content, controlID);
+					if (visible) {
+						var content = (GUIUtility.hotControl == controlID && position.Contains(mousePosition))
+							? s_RemoveButtonActiveContent
+							: s_RemoveButtonNormalContent;
+						removeButtonStyle.Draw(position, content, controlID);
+					}
 					break;
 			}
 
@@ -622,6 +630,8 @@ namespace Rotorz.ReorderableList {
 		private static Rect s_RemoveButtonPosition;
 		
 		private void DrawListItem(EventType eventType, Rect position, ControlState state, IReorderableListData list, int itemIndex) {
+			bool visible = (position.y < state.visibleRect.yMax && position.yMax > state.visibleRect.y);
+
 			Rect itemContentPosition = position;
 			itemContentPosition.x = position.x + 2;
 			itemContentPosition.y += 1;
@@ -638,7 +648,7 @@ namespace Rotorz.ReorderableList {
 			if (state.indexLabelWidth != 0) {
 				itemContentPosition.width -= state.indexLabelWidth;
 
-				if (eventType == EventType.Repaint)
+				if (eventType == EventType.Repaint && visible)
 					s_RightAlignedLabelStyle.Draw(new Rect(itemContentPosition.x, position.y, state.indexLabelWidth, position.height - 4), itemIndex + ":", false, false, false, false);
 
 				itemContentPosition.x += state.indexLabelWidth;
@@ -648,16 +658,14 @@ namespace Rotorz.ReorderableList {
 			if (state.hasRemoveButtons)
 				itemContentPosition.width -= removeButtonStyle.fixedWidth;
 
-			switch (eventType) {
-				case EventType.Repaint:
-					// Draw grab handle?
-					if (state.allowReordering)
-						GUI.DrawTexture(new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5), ReorderableListResources.texGrabHandle);
+			if (eventType == EventType.Repaint && visible) {
+				// Draw grab handle?
+				if (state.allowReordering)
+					GUI.DrawTexture(new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5), ReorderableListResources.texGrabHandle);
 
-					// Draw splitter between list items.
-					if (!state.tracking || itemIndex != s_AnchorIndex)
-						GUI.DrawTexture(new Rect(position.x, position.y - 1, position.width, 1), ReorderableListResources.texItemSplitter);
-					break;
+				// Draw splitter between list items.
+				if (!state.tracking || itemIndex != s_AnchorIndex)
+					GUI.DrawTexture(new Rect(position.x, position.y - 1, position.width, 1), ReorderableListResources.texItemSplitter);
 			}
 
 			// Allow control to be automatically focused.
@@ -680,7 +688,7 @@ namespace Rotorz.ReorderableList {
 					s_RemoveButtonPosition.x = itemContentPosition.xMax + 2;
 					s_RemoveButtonPosition.height -= 2;
 
-					if (DoRemoveButton(s_RemoveButtonPosition))
+					if (DoRemoveButton(s_RemoveButtonPosition, visible))
 						RemoveItem(list, itemIndex);
 				}
 
@@ -999,7 +1007,7 @@ namespace Rotorz.ReorderableList {
 					list.DrawItem(itemPosition, i);
 
 					if (hasRemoveButtons)
-						DoRemoveButton(default(Rect));
+						DoRemoveButton(default(Rect), false);
 				}
 
 				// Fake control to catch input focus if auto focus was not possible.
