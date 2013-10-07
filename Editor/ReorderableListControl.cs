@@ -97,7 +97,7 @@ namespace Rotorz.ReorderableList {
 	/// <para>This should be a light-weight method since it will be used to determine
 	/// whether remove button should be included for each item in list.</para>
 	/// </remarks>
-	/// <param name="list">The list.</param>
+	/// <param name="adaptor">Reorderable list adaptor.</param>
 	/// <param name="itemIndex">Zero-based index of item.</param>
 	/// <returns>
 	/// A value of <c>true</c> if item can be removed; otherwise <c>false</c>.
@@ -279,6 +279,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Generate and draw control from state object.
 		/// </summary>
+		/// <param name="position">Position of control.</param>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="drawEmpty">Delegate for drawing empty list.</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
@@ -481,9 +482,6 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		/// <param name="controlID">Unique ID of list control.</param>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
-		/// <returns>
-		/// The <see cref="ControlState"/> instance.
-		/// </returns>
 		private void PrepareState(int controlID, IReorderableListAdaptor adaptor) {
 			_controlID = controlID;
 			_visibleRect = GUIHelper.VisibleRect();
@@ -1286,7 +1284,7 @@ namespace Rotorz.ReorderableList {
 		/// ]]></code>
 		/// </example>
 		/// <seealso cref="AddItemsToMenu"/>
-		protected static GenericMenu.MenuFunction2 defaultContextHandler = DefaultContextMenuHandler;
+		protected static readonly GenericMenu.MenuFunction2 defaultContextHandler = DefaultContextMenuHandler;
 
 		private static void DefaultContextMenuHandler(object userData) {
 			var commandContent = userData as GUIContent;
@@ -1350,8 +1348,8 @@ namespace Rotorz.ReorderableList {
 		/// changes are made by command handler.</para>
 		/// <para>Default command handling functionality can be inherited:</para>
 		/// <code language="csharp"><![CDATA[
-		/// protected override bool HandleCommand<T>(string commandName, int itemIndex, List<T> list) {
-		///     if (base.HandleCommand(itemIndex, list))
+		/// protected override bool HandleCommand(string commandName, int itemIndex, IReorderableListAdaptor adaptor) {
+		///     if (base.HandleCommand(itemIndex, adaptor))
 		///         return true;
 		///     
 		///     // Place default command handling code here...
@@ -1364,8 +1362,8 @@ namespace Rotorz.ReorderableList {
 		/// }
 		/// ]]></code>
 		/// <code language="unityscript"><![CDATA[
-		/// function HandleCommand<T>(commandName:String, itemIndex:int, list:List.<T>):boolean {
-		///     if (base.HandleCommand(itemIndex, list))
+		/// function HandleCommand(commandName:String, itemIndex:int, adaptor:IReorderableListAdaptor):boolean {
+		///     if (base.HandleCommand(itemIndex, adaptor))
 		///         return true;
 		///     
 		///     // Place default command handling code here...
@@ -1447,7 +1445,7 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// A value of <c>true</c> if command was known; otherwise <c>false</c>.
 		/// </returns>
-		public bool DoCommand<T>(GUIContent command, int itemIndex, IReorderableListAdaptor adaptor) {
+		public bool DoCommand(GUIContent command, int itemIndex, IReorderableListAdaptor adaptor) {
 			return DoCommand(command.text, itemIndex, adaptor);
 		}
 
@@ -1507,7 +1505,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Move item from source index to destination index.
 		/// </summary>
-		/// <param name="list">The reorderable list.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="sourceIndex">Zero-based index of source item.</param>
 		/// <param name="destIndex">Zero-based index of destination index.</param>
 		protected void MoveItem(IReorderableListAdaptor adaptor, int sourceIndex, int destIndex) {
@@ -1520,7 +1518,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Add item at end of list and raises the event <see cref="ItemInserted"/>.
 		/// </summary>
-		/// <param name="list">The reorderable list.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
 		protected void AddItem(IReorderableListAdaptor adaptor) {
 			adaptor.Add();
 			AutoFocusItem(s_ContextControlID, adaptor.Count - 1);
@@ -1535,7 +1533,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Insert item at specified index and raises the event <see cref="ItemInserted"/>.
 		/// </summary>
-		/// <param name="list">The reorderable list.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="itemIndex">Zero-based index of item.</param>
 		protected void InsertItem(IReorderableListAdaptor adaptor, int itemIndex) {
 			adaptor.Insert(itemIndex);
@@ -1551,7 +1549,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Duplicate specified item and raises the event <see cref="ItemInserted"/>.
 		/// </summary>
-		/// <param name="list">The reorderable list.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="itemIndex">Zero-based index of item.</param>
 		protected void DuplicateItem(IReorderableListAdaptor adaptor, int itemIndex) {
 			adaptor.Duplicate(itemIndex);
@@ -1571,7 +1569,7 @@ namespace Rotorz.ReorderableList {
 		/// <para>The event <see cref="ItemRemoving"/> is raised prior to removing item
 		/// and allows removal to be cancelled.</para>
 		/// </remarks>
-		/// <param name="list">The reorderable list.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="itemIndex">Zero-based index of item.</param>
 		/// <returns>
 		/// Returns a value of <c>false</c> if operation was cancelled.
@@ -1597,7 +1595,7 @@ namespace Rotorz.ReorderableList {
 		/// <para>The event <see cref="ItemRemoving"/> is raised for each item prior to
 		/// clearing array and allows entire operation to be cancelled.</para>
 		/// </remarks>
-		/// <param name="list">The reorderable list.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <returns>
 		/// Returns a value of <c>false</c> if operation was cancelled.
 		/// </returns>
