@@ -871,9 +871,9 @@ namespace Rotorz.ReorderableList {
 									BeginTrackingReorderDrag(controlID, i);
 									s_AnchorMouseOffset = itemPosition.y - mousePosition.y;
 									s_TargetIndex = i;
-								}
 
-								Event.current.Use();
+									Event.current.Use();
+								}
 							}
 							break;
 
