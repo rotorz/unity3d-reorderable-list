@@ -93,16 +93,22 @@ namespace Rotorz.ReorderableList {
 	/// <summary>
 	/// Indicates whether item can be removed from list.
 	/// </summary>
-	/// <remarks>
-	/// <para>This should be a light-weight method since it will be used to determine
-	/// whether remove button should be included for each item in list.</para>
-	/// </remarks>
 	/// <param name="adaptor">Reorderable list adaptor.</param>
 	/// <param name="itemIndex">Zero-based index of item.</param>
 	/// <returns>
 	/// A value of <c>true</c> if item can be removed; otherwise <c>false</c>.
 	/// </returns>
 	public delegate bool CanRemoveItemDelegate(IReorderableListAdaptor adaptor, int itemIndex);
+
+	/// <summary>
+	/// Indicates whether item can be dragged within list.
+	/// </summary>
+	/// <param name="adaptor">Reorderable list adaptor.</param>
+	/// <param name="itemIndex">Zero-based index of item.</param>
+	/// <returns>
+	/// A value of <c>true</c> if item can be dragged; otherwise <c>false</c>.
+	/// </returns>
+	public delegate bool CanDragItemDelegate(IReorderableListAdaptor adaptor, int itemIndex);
 
 	/// <summary>
 	/// Base class for custom reorderable list control.
@@ -392,15 +398,32 @@ namespace Rotorz.ReorderableList {
 
 		#endregion
 
-		#region Events and Delegates
-		
+		#region Delegates
+
 		/// <summary>
 		/// Optional delegate to determine whether item can be removed from list.
 		/// </summary>
 		/// <remarks>
-		/// <para>This is redundant when <see cref="ReorderableListFlags.HideRemoveButtons"/> is specified.</para>
+		/// <para>This should be a light-weight method since it will be used to determine
+		/// whether remove button should be included for each item in list.</para>
+		/// <para>This is redundant when <see cref="ReorderableListFlags.HideRemoveButtons"/>
+		/// is specified.</para>
 		/// </remarks>
 		public CanRemoveItemDelegate canRemoveItem;
+		/// <summary>
+		/// Optional delegate to determine whether item can be dragged.
+		/// </summary>
+		/// <remarks>
+		/// <para>This should be a light-weight method since it will be used to determine
+		/// whether grab handle should be included for each item in a reorderable list.</para>
+		/// <para>Please note that returning a value of <c>false</c> does not prevent movement
+		/// on list item since other draggable items can be moved around it.</para>
+		/// </remarks>
+		public CanDragItemDelegate canDragItem;
+
+		#endregion
+
+		#region Events
 
 		/// <summary>
 		/// Occurs after list item is inserted or duplicated.
@@ -647,6 +670,7 @@ namespace Rotorz.ReorderableList {
 		
 		private void DrawListItem(EventType eventType, Rect position, IReorderableListAdaptor adaptor, int itemIndex) {
 			bool visible = (position.y < _visibleRect.yMax && position.yMax > _visibleRect.y);
+			bool draggable = _allowReordering && (canDragItem == null || canDragItem(adaptor, itemIndex));
 
 			Rect itemContentPosition = position;
 			itemContentPosition.x = position.x + 2;
@@ -655,7 +679,7 @@ namespace Rotorz.ReorderableList {
 			itemContentPosition.height = position.height - 4;
 
 			// Make space for grab handle?
-			if (_allowReordering) {
+			if (draggable) {
 				itemContentPosition.x += 20;
 				itemContentPosition.width -= 20;
 			}
@@ -676,7 +700,7 @@ namespace Rotorz.ReorderableList {
 
 			if (eventType == EventType.Repaint && visible) {
 				// Draw grab handle?
-				if (_allowReordering)
+				if (draggable)
 					GUI.DrawTexture(new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5), ReorderableListResources.texGrabHandle);
 
 				// Draw splitter between list items.
@@ -925,7 +949,7 @@ namespace Rotorz.ReorderableList {
 								// Remove input focus from control before attempting a context click or drag.
 								GUIUtility.keyboardControl = 0;
 
-								if (_allowReordering && Event.current.button == 0) {
+								if (_allowReordering && (canDragItem == null || canDragItem(adaptor, i)) && Event.current.button == 0) {
 									s_DragItemPosition = itemPosition;
 
 									BeginTrackingReorderDrag(controlID, i);
