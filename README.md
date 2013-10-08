@@ -1,11 +1,27 @@
 README
 ======
 
-This repository contains a class which allows editor developers to easily add reorderable
-lists to their GUIs.
+List control for Unity allowing editor developers to add reorderable list controls to
+their GUIs. Supports generic lists and serialized property arrays, though additional
+collection types can be supported by implementing `Rotorz.ReorderableList.IReorderableListAdaptor`.
 
 Use of this source code is governed by a BSD-style license that can be found in
 the LICENSE file.
+
+![screenshot](https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/raw/master/screenshot.png)
+
+Features
+--------
+
+- Drag and drop reordering!
+- Easily customized using flags.
+- Adaptors for `IList<T>` and `SerializedProperty`.
+- Subscribe to add/remove item events.
+- Supports mixed item heights.
+- Disable drag and/or removal on per-item basis.
+- Styles can be overriden on per-list basis if desired.
+- Subclass list control to override context menu.
+- API reference documentation (Asset Path/Support/API Reference.chm).
 
 Installing scripts
 ------------------
@@ -13,32 +29,32 @@ Installing scripts
 Scripts must be placed within an "Editor" folder somewhere within your "Assets"
 folder.
 
-Usage Example
--------------
-
-![screenshot](https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/raw/master/screenshot.png)
-
-**C#:**
+Example 1: Serialized array of strings (C#)
+-------------------------------------------
 
     :::csharp
-    List<string> yourList = new List<string>();
-    
-    void OnGUI() {
-        ReorderableListGUI.ListField(yourList, CustomListItem, DrawEmpty);
-    }
-	
-	string CustomListItem(Rect position, string itemValue) {
-		// Text fields do not like null values!
-		if (itemValue == null)
-			itemValue = "";
-		return EditorGUI.TextField(position, itemValue);
-	}
-	
-	void DrawEmpty() {
-		GUILayout.Label("No items in list.", EditorStyles.miniLabel);
-	}
+    SerializedProperty _wishlistProperty;
+    SerializedProperty _pointsProperty;
 
-**UnityScript:**
+    void OnEnable() {
+        _wishlistProperty = serializedObject.FindProperty("wishlist");
+        _pointsProperty = serializedObject.FindProperty("points");
+    }
+
+    public override void OnInspectorGUI() {
+        serializedObject.Update();
+
+        ReorderableListGUI.Title("Wishlist");
+        ReorderableListGUI.ListField(_wishlistProperty);
+
+        ReorderableListGUI.Title("Points");
+        ReorderableListGUI.ListField(_pointsProperty, ReorderableListFlags.ShowIndices);
+
+        serializedObject.ApplyModifiedProperties();
+    }
+
+Example 2: List of strings (UnityScript)
+----------------------------------------
 
     :::javascript
     var yourList:List.<String> = new List.<String>();
@@ -46,17 +62,17 @@ Usage Example
     function OnGUI() {
         ReorderableListGUI.ListField(yourList, CustomListItem, DrawEmpty);
     }
-	
-	function CustomListItem(position:Rect, itemValue:String):String {
-		// Text fields do not like null values!
-		if (itemValue == null)
-			itemValue = '';
-		return EditorGUI.TextField(position, itemValue);
-	}
-	
-	function DrawEmpty() {
-		GUILayout.Label('No items in list.', EditorStyles.miniLabel);
-	}
+    
+    function CustomListItem(position:Rect, itemValue:String):String {
+        // Text fields do not like null values!
+        if (itemValue == null)
+            itemValue = '';
+        return EditorGUI.TextField(position, itemValue);
+    }
+    
+    function DrawEmpty() {
+        GUILayout.Label('No items in list.', EditorStyles.miniLabel);
+    }
 
 Useful links
 ------------
