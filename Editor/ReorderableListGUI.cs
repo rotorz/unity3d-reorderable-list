@@ -432,7 +432,7 @@ namespace Rotorz.ReorderableList {
 		/// Draw list field control for serializable property array with fixed item heights.
 		/// </summary>
 		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight"/>.</param>
+		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		public static void ListField(SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags = 0) {
@@ -444,7 +444,7 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		/// <param name="position">Position of control.</param>
 		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight"/>.</param>
+		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags = 0) {
@@ -456,7 +456,7 @@ namespace Rotorz.ReorderableList {
 		/// Draw list field control for serializable property array with fixed item heights.
 		/// </summary>
 		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight"/>.</param>
+		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		public static void ListField(SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListFlags flags = 0) {
 			var adaptor = new SerializedPropertyAdaptor(arrayProperty, fixedItemHeight);
@@ -466,7 +466,7 @@ namespace Rotorz.ReorderableList {
 		/// Draw list field control for serializable property array with fixed item heights.
 		/// </summary>
 		/// <param name="position">Position of control.</param>
-		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight"/>.</param>
+		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
 		/// <param name="arrayProperty">Serializable property.</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListFlags flags = 0) {
