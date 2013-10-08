@@ -997,7 +997,6 @@ namespace Rotorz.ReorderableList {
 			}
 			
 			// Fake control to catch input focus if auto focus was not possible.
-			// Note: Replicated in layout version of `DoListField`.
 			GUIUtility.GetControlID(FocusType.Keyboard);
 		}
 
@@ -1072,33 +1071,8 @@ namespace Rotorz.ReorderableList {
 			if (hasAddButton)
 				position.height -= addButtonStyle.fixedHeight;
 
-			if (Event.current.type != EventType.Layout) {
-				// Draw list as normal.
-				DrawListContainerAndItems(position, controlID, adaptor);
-			}
-			else {
-				// Layout events are still needed to avoid breaking control ID's in remaining
-				// interface. Let's keep this as simple as possible!
-
-				Rect itemPosition = default(Rect);
-
-				int count = adaptor.Count;
-				for (int i = 0; i < count; ++i) {
-					itemPosition.height = adaptor.GetItemHeight(i);
-
-					if (s_AutoFocusIndex == i)
-						GUI.SetNextControlName("AutoFocus_" + controlID + "_" + i);
-
-					adaptor.DrawItem(itemPosition, i);
-
-					if (hasRemoveButtons)
-						DoRemoveButton(default(Rect), false);
-				}
-
-				// Fake control to catch input focus if auto focus was not possible.
-				// Note: Still needed, copied from absolute version of `DoListField`.
-				GUIUtility.GetControlID(FocusType.Keyboard);
-			}
+			// Draw list as normal.
+			DrawListContainerAndItems(position, controlID, adaptor);
 
 			CheckForAutoFocusControl(controlID);
 
