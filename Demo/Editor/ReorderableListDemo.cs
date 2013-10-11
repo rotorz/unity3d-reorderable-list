@@ -11,7 +11,7 @@ using Rotorz.ReorderableList;
 
 public class ReorderableListDemo : EditorWindow {
 
-	[MenuItem("Window/List Demo")]
+	[MenuItem("Window/List Demo (C#)")]
 	static void ShowWindow() {
 		GetWindow<ReorderableListDemo>("List Demo");
 	}
@@ -37,13 +37,13 @@ public class ReorderableListDemo : EditorWindow {
 
 	private void OnGUI() {
 		_scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
-		{
-			ReorderableListGUI.Title("Shopping List");
-			ReorderableListGUI.ListField(shoppingList, PendingItemDrawer, DrawEmpty);
+		
+		ReorderableListGUI.Title("Shopping List");
+		ReorderableListGUI.ListField(shoppingList, PendingItemDrawer, DrawEmpty);
 
-			ReorderableListGUI.Title("Purchased Items");
-			ReorderableListGUI.ListField(purchaseList, PurchasedItemDrawer, DrawEmpty, ReorderableListFlags.HideAddButton | ReorderableListFlags.DisableReordering);
-		}
+		ReorderableListGUI.Title("Purchased Items");
+		ReorderableListGUI.ListField(purchaseList, PurchasedItemDrawer, DrawEmpty, ReorderableListFlags.HideAddButton | ReorderableListFlags.DisableReordering);
+	
 		GUILayout.EndScrollView();
 	}
 	
