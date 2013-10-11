@@ -90,15 +90,15 @@ Submission to the Unity Asset Store
 -----------------------------------
 
 If you wish to include this asset as part of a package for the asset store, please
-include the package version as-is to avoid conflict issues in user projects. LICENSE
-and README.md files must be included and remain intact.
+include the latest package version as-is to avoid conflict issues in user projects.
+LICENSE and README.md files must be included and remain intact.
 
 If you would like to include a modified version of this project within your asset:
 
-- Ensure that LICENSE, README.md.
+- Ensure that LICENSE and README.md are included and remain intact.
 - Copyright and license information must remain intact.
-- Change the namespace "Rotorz.ReorderableList" to something unique and avoid
-  use of the name "Rotorz"
+- Change the namespace `Rotorz.ReorderableList` to something unique and DO NOT
+  use the name "Rotorz".
 - Copy scripts into your own asset folder.
 
 This is to avoid causing conflicts if somebody downloads multiple assets which
