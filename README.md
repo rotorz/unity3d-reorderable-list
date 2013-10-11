@@ -30,12 +30,12 @@ This control can be added to your project by importing the Unity package which
 contains a compiled class library (DLL). This can be used by C# and UnityScript
 developers.
 
-[Download RotorzReorderableList v0.2.1 Package (requires Unity 4.2.1+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.2.1.unitypackage>)
+[Download RotorzReorderableList_v0.2.1 Package (requires Unity 4.2.1+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.2.1.unitypackage>)
 
 If you would prefer to use the non-compiled source code version in your project,
 copy the contents of this repository somewhere into your project.
 
-*Note to UnityScript (*.js) developers:*
+**Note to UnityScript (*.js) developers:**
 
 UnityScript will not work with the source code version of this project unless
 the contents of this repository is placed at the path "Assets/Plugins/ReorderableList"
