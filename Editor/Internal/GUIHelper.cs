@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 using UnityEngine;
+using UnityEditor;
 
 using System;
 using System.Reflection;
@@ -15,12 +16,18 @@ namespace Rotorz.ReorderableList.Internal {
 	internal static class GUIHelper {
 
 		static GUIHelper() {
-			Type tyGUIClip = typeof(GUI).Assembly.GetType("UnityEngine.GUIClip");
+			var tyGUIClip = typeof(GUI).Assembly.GetType("UnityEngine.GUIClip");
 			if (tyGUIClip != null) {
-				PropertyInfo piVisibleRect = tyGUIClip.GetProperty("visibleRect", BindingFlags.Static | BindingFlags.Public);
+				var piVisibleRect = tyGUIClip.GetProperty("visibleRect", BindingFlags.Static | BindingFlags.Public);
 				if (piVisibleRect != null)
 					VisibleRect = (Func<Rect>)Delegate.CreateDelegate(typeof(Func<Rect>), piVisibleRect.GetGetMethod());
 			}
+			
+			var miFocusTextInControl = typeof(EditorGUI).GetMethod("FocusTextInControl", BindingFlags.Static | BindingFlags.Public);
+			if (miFocusTextInControl == null)
+				miFocusTextInControl = typeof(GUI).GetMethod("FocusControl", BindingFlags.Static | BindingFlags.Public);
+
+			FocusTextInControl = (Action<string>)Delegate.CreateDelegate(typeof(Action<string>), miFocusTextInControl);
 		}
 
 		/// <summary>
@@ -30,6 +37,11 @@ namespace Rotorz.ReorderableList.Internal {
 		/// <para>VisibleRect = TopmostRect + scrollViewOffsets</para>
 		/// </remarks>
 		public static Func<Rect> VisibleRect;
+
+		/// <summary>
+		/// Focus control and text editor where applicable.
+		/// </summary>
+		public static Action<string> FocusTextInControl;
 
 	}
 

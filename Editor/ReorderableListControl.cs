@@ -1011,11 +1011,7 @@ namespace Rotorz.ReorderableList {
 			// Automatically focus control!
 			if (s_AutoFocusControlID == controlID) {
 				s_AutoFocusControlID = 0;
-#if (UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2)
-				GUI.FocusControl("AutoFocus_" + controlID + "_" + s_AutoFocusIndex);
-#else
-				EditorGUI.FocusTextInControl("AutoFocus_" + controlID + "_" + s_AutoFocusIndex);
-#endif
+				GUIHelper.FocusTextInControl("AutoFocus_" + controlID + "_" + s_AutoFocusIndex);
 				s_AutoFocusIndex = -1;
 			}
 		}
