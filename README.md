@@ -86,6 +86,24 @@ Example 2: List of strings (UnityScript)
         GUILayout.Label('No items in list.', EditorStyles.miniLabel);
     }
 
+Submission to the Unity Asset Store
+-----------------------------------
+
+If you wish to include this asset as part of a package for the asset store, please
+include the package version as-is to avoid conflict issues in user projects. LICENSE
+and README.md files must be included and remain intact.
+
+If you would like to include a modified version of this project within your asset:
+
+- Ensure that LICENSE, README.md.
+- Copyright and license information must remain intact.
+- Change the namespace "Rotorz.ReorderableList" to something unique and avoid
+  use of the name "Rotorz"
+- Copy scripts into your own asset folder.
+
+This is to avoid causing conflicts if somebody downloads multiple assets which
+make use of this project.
+
 Useful links
 ------------
 
