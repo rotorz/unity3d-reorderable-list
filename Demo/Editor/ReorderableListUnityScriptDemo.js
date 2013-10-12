@@ -36,7 +36,7 @@ class ReorderableListUnityScriptDemo extends EditorWindow {
 		_scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
 		
 		ReorderableListGUI.Title('Shopping List');
-		ReorderableListGUI.ListField(shoppingList, PendingItemDrawer, DrawEmpty, 0);
+		ReorderableListGUI.ListField(shoppingList, PendingItemDrawer, DrawEmpty);
 
 		ReorderableListGUI.Title('Purchased Items');
 		ReorderableListGUI.ListField(purchaseList, PurchasedItemDrawer, DrawEmpty, ReorderableListFlags.HideAddButton | ReorderableListFlags.DisableReordering);

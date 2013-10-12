@@ -20,10 +20,10 @@ class DemoBehaviourUnityScriptEditor extends Editor {
 		serializedObject.Update();
 
 		ReorderableListGUI.Title('Wishlist');
-		ReorderableListGUI.ListField(_wishlistProperty, 0);
+		ReorderableListGUI.ListField(_wishlistProperty);
 
 		ReorderableListGUI.Title('Points');
-		ReorderableListGUI.ListField(_pointsProperty, 0);
+		ReorderableListGUI.ListField(_pointsProperty);
 
 		serializedObject.ApplyModifiedProperties();
 	}

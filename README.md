@@ -72,7 +72,7 @@ Example 2: List of strings (UnityScript)
     var yourList:List.<String> = new List.<String>();
     
     function OnGUI() {
-        ReorderableListGUI.ListField(yourList, CustomListItem, DrawEmpty, 0);
+        ReorderableListGUI.ListField(yourList, CustomListItem, DrawEmpty);
     }
     
     function CustomListItem(position:Rect, itemValue:String):String {
