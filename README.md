@@ -6,7 +6,8 @@ their GUIs. Supports generic lists and serialized property arrays, though additi
 collection types can be supported by implementing `Rotorz.ReorderableList.IReorderableListAdaptor`.
 
 Use of this source code is governed by a BSD-style license that can be found in
-the LICENSE file.
+the LICENSE file. DO NOT contribute to this project unless you accept the terms of the
+contribution agreement.
 
 ![screenshot](https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/raw/master/screenshot.png)
 
