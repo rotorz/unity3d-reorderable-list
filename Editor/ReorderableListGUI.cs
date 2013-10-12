@@ -87,11 +87,17 @@ namespace Rotorz.ReorderableList {
 		private static ReorderableListControl defaultListControl { get; set; }
 
 		static ReorderableListGUI() {
+			InitStyles();
+
 			defaultListControl = new ReorderableListControl();
 
-			indexOfChangedItem = -1;
+			// Duplicate default styles to prevent user scripts from interferring with
+			// the default list control instance.
+			defaultListControl.containerStyle = new GUIStyle(defaultContainerStyle);
+			defaultListControl.addButtonStyle = new GUIStyle(defaultAddButtonStyle);
+			defaultListControl.removeButtonStyle = new GUIStyle(defaultRemoveButtonStyle);
 
-			InitStyles();
+			indexOfChangedItem = -1;
 		}
 
 		#region Custom Styles
