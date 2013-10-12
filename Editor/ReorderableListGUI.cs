@@ -371,10 +371,11 @@ namespace Rotorz.ReorderableList {
 		/// Draw list field control for serializable property array.
 		/// </summary>
 		/// <param name="arrayProperty">Serializable property.</param>
+		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
-		private static void DoListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
-			var adaptor = new SerializedPropertyAdaptor(arrayProperty);
+		private static void DoListField(SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
+			var adaptor = new SerializedPropertyAdaptor(arrayProperty, fixedItemHeight);
 			ReorderableListControl.DrawControlFromState(adaptor, drawEmpty, flags);
 		}
 		/// <summary>
@@ -382,51 +383,52 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		/// <param name="position">Position of control.</param>
 		/// <param name="arrayProperty">Serializable property.</param>
+		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
-		private static void DoListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
-			var adaptor = new SerializedPropertyAdaptor(arrayProperty);
+		private static void DoListFieldAbsolute(Rect position, SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
+			var adaptor = new SerializedPropertyAdaptor(arrayProperty, fixedItemHeight);
 			ReorderableListControl.DrawControlFromState(position, adaptor, drawEmpty, flags);
 		}
 
 
-		/// <inheritdoc cref="DoListField(SerializedProperty, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		/// <inheritdoc cref="DoListField(SerializedProperty, float, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
 		public static void ListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
-			DoListField(arrayProperty, drawEmpty, flags);
+			DoListField(arrayProperty, 0, drawEmpty, flags);
 		}
-		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, float, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
 		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
-			DoListFieldAbsolute(position, arrayProperty, drawEmpty, flags);
+			DoListFieldAbsolute(position, arrayProperty, 0, drawEmpty, flags);
 		}
 
 
-		/// <inheritdoc cref="DoListField(SerializedProperty, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		/// <inheritdoc cref="DoListField(SerializedProperty, float, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
 		public static void ListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty) {
-			DoListField(arrayProperty, drawEmpty, 0);
+			DoListField(arrayProperty, 0, drawEmpty, 0);
 		}
-		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, float, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
 		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListControl.DrawEmptyAbsolute drawEmpty) {
-			DoListFieldAbsolute(position, arrayProperty, drawEmpty, 0);
+			DoListFieldAbsolute(position, arrayProperty, 0, drawEmpty, 0);
 		}
 
 
-		/// <inheritdoc cref="DoListField(SerializedProperty, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		/// <inheritdoc cref="DoListField(SerializedProperty, float, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
 		public static void ListField(SerializedProperty arrayProperty, ReorderableListFlags flags) {
-			DoListField(arrayProperty, null, flags);
+			DoListField(arrayProperty, 0, null, flags);
 		}
-		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, float, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
 		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListFlags flags) {
-			DoListFieldAbsolute(position, arrayProperty, null, flags);
+			DoListFieldAbsolute(position, arrayProperty, 0, null, flags);
 		}
 
 
-		/// <inheritdoc cref="DoListField(SerializedProperty, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		/// <inheritdoc cref="DoListField(SerializedProperty, float, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
 		public static void ListField(SerializedProperty arrayProperty) {
-			DoListField(arrayProperty, null, 0);
+			DoListField(arrayProperty, 0, null, 0);
 		}
-		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, float, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
 		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty) {
-			DoListFieldAbsolute(position, arrayProperty, null, 0);
+			DoListFieldAbsolute(position, arrayProperty, 0, null, 0);
 		}
 
 
@@ -455,55 +457,48 @@ namespace Rotorz.ReorderableList {
 			return CalculateListFieldHeight(arrayProperty, 0);
 		}
 
-		#region Fixed Item Heights
-
-		/// <summary>
-		/// Draw list field control for serializable property array with fixed item heights.
-		/// </summary>
-		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
-		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListField(SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags = 0) {
-			var adaptor = new SerializedPropertyAdaptor(arrayProperty, fixedItemHeight);
-			ReorderableListControl.DrawControlFromState(adaptor, drawEmpty, flags);
-		}
-		/// <summary>
-		/// Draw list field control for serializable property array with fixed item heights.
-		/// </summary>
-		/// <param name="position">Position of control.</param>
-		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
-		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags = 0) {
-			var adaptor = new SerializedPropertyAdaptor(arrayProperty, fixedItemHeight);
-			ReorderableListControl.DrawControlFromState(position, adaptor, drawEmpty, flags);
-		}
-
-		/// <summary>
-		/// Draw list field control for serializable property array with fixed item heights.
-		/// </summary>
-		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListField(SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListFlags flags = 0) {
-			var adaptor = new SerializedPropertyAdaptor(arrayProperty, fixedItemHeight);
-			ReorderableListControl.DrawControlFromState(adaptor, null, flags);
-		}
-		/// <summary>
-		/// Draw list field control for serializable property array with fixed item heights.
-		/// </summary>
-		/// <param name="position">Position of control.</param>
-		/// <param name="fixedItemHeight">Use fixed height for items rather than <see cref="UnityEditor.EditorGUI.GetPropertyHeight(SerializedProperty)"/>.</param>
-		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListFlags flags = 0) {
-			var adaptor = new SerializedPropertyAdaptor(arrayProperty, fixedItemHeight);
-			ReorderableListControl.DrawControlFromState(position, adaptor, null, flags);
-		}
-
 		#endregion
+
+		#region SerializedProperty Control (Fixed Item Height)
+
+		/// <inheritdoc cref="DoListField(SerializedProperty, float, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
+			DoListField(arrayProperty, fixedItemHeight, drawEmpty, flags);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, float, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
+			DoListFieldAbsolute(position, arrayProperty, fixedItemHeight, drawEmpty, flags);
+		}
+
+
+		/// <inheritdoc cref="DoListField(SerializedProperty, float, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmpty drawEmpty) {
+			DoListField(arrayProperty, fixedItemHeight, drawEmpty, 0);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, float, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListControl.DrawEmptyAbsolute drawEmpty) {
+			DoListFieldAbsolute(position, arrayProperty, fixedItemHeight, drawEmpty, 0);
+		}
+
+
+		/// <inheritdoc cref="DoListField(SerializedProperty, float, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListFlags flags) {
+			DoListField(arrayProperty, fixedItemHeight, null, flags);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, float, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, float fixedItemHeight, ReorderableListFlags flags) {
+			DoListFieldAbsolute(position, arrayProperty, fixedItemHeight, null, flags);
+		}
+
+
+		/// <inheritdoc cref="DoListField(SerializedProperty, float, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(SerializedProperty arrayProperty, float fixedItemHeight) {
+			DoListField(arrayProperty, fixedItemHeight, null, 0);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, float, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, float fixedItemHeight) {
+			DoListFieldAbsolute(position, arrayProperty, fixedItemHeight, null, 0);
+		}
 
 		#endregion
 
