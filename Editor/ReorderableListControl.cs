@@ -1346,10 +1346,10 @@ namespace Rotorz.ReorderableList {
 		///     if (base.HandleCommand(itemIndex, adaptor))
 		///         return true;
 		///     
-		///     // Place default command handling code here...
+		///     // Place custom command handling code here...
 		///     switch (commandName) {
 		///         case "Your Command":
-		///             break;
+		///             return true;
 		///     }
 		/// 
 		///     return false;
@@ -1360,10 +1360,10 @@ namespace Rotorz.ReorderableList {
 		///     if (base.HandleCommand(itemIndex, adaptor))
 		///         return true;
 		///     
-		///     // Place default command handling code here...
+		///     // Place custom command handling code here...
 		///     switch (commandName) {
 		///         case 'Your Command':
-		///             break;
+		///             return true;
 		///     }
 		/// 
 		///     return false;
