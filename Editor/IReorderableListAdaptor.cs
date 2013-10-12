@@ -17,7 +17,7 @@ namespace Rotorz.ReorderableList {
 		int Count { get; }
 
 		/// <summary>
-		/// Determines whether an item can be dragged.
+		/// Determines whether an item can be reordered by dragging mouse.
 		/// </summary>
 		/// <remarks>
 		/// <para>This should be a light-weight method since it will be used to determine
@@ -29,7 +29,7 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// A value of <c>true</c> if item can be dragged; otherwise <c>false</c>.
 		/// </returns>
-		bool CanDrag(int index);
+		bool CanReorder(int index);
 		/// <summary>
 		/// Determines whether an item can be removed from list.
 		/// </summary>
