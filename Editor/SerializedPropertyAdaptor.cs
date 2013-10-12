@@ -12,7 +12,12 @@ namespace Rotorz.ReorderableList {
 	/// <summary>
 	/// Reorderable list adaptor for serialized array property.
 	/// </summary>
-	public sealed class SerializedPropertyAdaptor : IReorderableListAdaptor {
+	/// <remarks>
+	/// <para>This adaptor can be subclassed to add special logic to item height calculation.
+	/// You may want to implement a custom adaptor class where specialised functionality
+	/// is needed.</para>
+	/// </remarks>
+	public class SerializedPropertyAdaptor : IReorderableListAdaptor {
 
 		private SerializedProperty _arrayProperty;
 
@@ -77,6 +82,15 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <inheritdoc/>
+		public virtual bool CanDrag(int index) {
+			return true;
+		}
+		/// <inheritdoc/>
+		public virtual bool CanRemove(int index) {
+			return true;
+		}
+
+		/// <inheritdoc/>
 		public void Add() {
 			int newIndex = _arrayProperty.arraySize;
 			++_arrayProperty.arraySize;
@@ -107,12 +121,12 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <inheritdoc/>
-		public void DrawItem(Rect position, int index) {
+		public virtual void DrawItem(Rect position, int index) {
 			EditorGUI.PropertyField(position, this[index], GUIContent.none, false);
 		}
 
 		/// <inheritdoc/>
-		public float GetItemHeight(int index) {
+		public virtual float GetItemHeight(int index) {
 			return fixedItemHeight != 0f
 				? fixedItemHeight
 				: EditorGUI.GetPropertyHeight(this[index], GUIContent.none, false)

@@ -69,6 +69,15 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <inheritdoc/>
+		public virtual bool CanDrag(int index) {
+			return true;
+		}
+		/// <inheritdoc/>
+		public virtual bool CanRemove(int index) {
+			return true;
+		}
+
+		/// <inheritdoc/>
 		public void Add() {
 			_list.Add(default(T));
 		}
