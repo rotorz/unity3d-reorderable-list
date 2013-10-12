@@ -167,11 +167,11 @@ namespace Rotorz.ReorderableList {
 		/// ReorderableListGUI.ListField(list, DynamicListGU.TextFieldItemDrawer);
 		/// ]]></code>
 		/// </example>
-		/// <param name="caption">Caption for list control.</param>
-		public static void Title(GUIContent caption) {
-			Rect position = GUILayoutUtility.GetRect(caption, defaultTitleStyle);
+		/// <param name="title">Content for title control.</param>
+		public static void Title(GUIContent title) {
+			Rect position = GUILayoutUtility.GetRect(title, defaultTitleStyle);
 			position.height += 6;
-			Title(position, caption);
+			Title(position, title);
 		}
 
 		/// <summary>
@@ -190,29 +190,29 @@ namespace Rotorz.ReorderableList {
 		/// ReorderableListGUI.ListField(list, DynamicListGU.TextFieldItemDrawer);
 		/// ]]></code>
 		/// </example>
-		/// <param name="caption">Caption for list control.</param>
-		public static void Title(string caption) {
-			s_Temp.text = caption;
+		/// <param name="title">Text for title control.</param>
+		public static void Title(string title) {
+			s_Temp.text = title;
 			Title(s_Temp);
 		}
 
 		/// <summary>
-		/// Draw title control for list field.
+		/// Draw title control for list field with absolute positioning.
 		/// </summary>
 		/// <param name="position">Position of control.</param>
-		/// <param name="caption">Caption for list control.</param>
-		public static void Title(Rect position, GUIContent caption) {
+		/// <param name="title">Content for title control.</param>
+		public static void Title(Rect position, GUIContent title) {
 			if (Event.current.type == EventType.Repaint)
-				defaultTitleStyle.Draw(position, caption, false, false, false, false);
+				defaultTitleStyle.Draw(position, title, false, false, false, false);
 		}
 
 		/// <summary>
-		/// Draw title control for list field.
+		/// Draw title control for list field with absolute positioning.
 		/// </summary>
 		/// <param name="position">Position of control.</param>
-		/// <param name="caption">Caption for list control.</param>
-		public static void Title(Rect position, string caption) {
-			s_Temp.text = caption;
+		/// <param name="text">Text for title control.</param>
+		public static void Title(Rect position, string text) {
+			s_Temp.text = text;
 			Title(position, s_Temp);
 		}
 
@@ -229,12 +229,12 @@ namespace Rotorz.ReorderableList {
 		/// <param name="itemHeight">Height of a single list item.</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight, ReorderableListFlags flags = 0) {
+		private static void DoListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight, ReorderableListFlags flags) {
 			var adaptor = new GenericListAdaptor<T>(list, drawItem, itemHeight);
 			ReorderableListControl.DrawControlFromState(adaptor, drawEmpty, flags);
 		}
 		/// <summary>
-		/// Draw list field control.
+		/// Draw list field control with absolute positioning.
 		/// </summary>
 		/// <param name="position">Position of control.</param>
 		/// <param name="list">The list which can be reordered.</param>
@@ -243,82 +243,91 @@ namespace Rotorz.ReorderableList {
 		/// <param name="itemHeight">Height of a single list item.</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty, float itemHeight, ReorderableListFlags flags = 0) {
+		private static void DoListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty, float itemHeight, ReorderableListFlags flags) {
 			var adaptor = new GenericListAdaptor<T>(list, drawItem, itemHeight);
 			ReorderableListControl.DrawControlFromState(position, adaptor, drawEmpty, flags);
 		}
 
-		/// <summary>
-		/// Draw list field control.
-		/// </summary>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags = 0) {
-			var adaptor = new GenericListAdaptor<T>(list, drawItem, DefaultItemHeight);
-			ReorderableListControl.DrawControlFromState(adaptor, drawEmpty, flags);
+
+		/// <inheritdoc cref="DoListField{T}(IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmpty, float, ReorderableListFlags)"/>
+		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight, ReorderableListFlags flags) {
+			DoListField<T>(list, drawItem, drawEmpty, itemHeight, flags);
 		}
-		/// <summary>
-		/// Draw list field control.
-		/// </summary>
-		/// <param name="position">Position of control.</param>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags = 0) {
-			var adaptor = new GenericListAdaptor<T>(list, drawItem, DefaultItemHeight);
-			ReorderableListControl.DrawControlFromState(position, adaptor, drawEmpty, flags);
+		/// <inheritdoc cref="DoListFieldAbsolute{T}(Rect, IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmptyAbsolute, float, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty, float itemHeight, ReorderableListFlags flags) {
+			DoListFieldAbsolute<T>(position, list, drawItem, drawEmpty, itemHeight, flags);
 		}
 
-		/// <summary>
-		/// Draw list field control.
-		/// </summary>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <param name="itemHeight">Height of a single list item.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
+
+		/// <inheritdoc cref="DoListField{T}(IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmpty, float, ReorderableListFlags)"/>
+		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, float itemHeight) {
+			DoListField<T>(list, drawItem, drawEmpty, itemHeight, 0);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute{T}(Rect, IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmptyAbsolute, float, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty, float itemHeight) {
+			DoListFieldAbsolute<T>(position, list, drawItem, drawEmpty, itemHeight, 0);
+		}
+
+
+		/// <inheritdoc cref="DoListField{T}(IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmpty, float, ReorderableListFlags)"/>
+		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
+			DoListField<T>(list, drawItem, drawEmpty, DefaultItemHeight, flags);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute{T}(Rect, IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmptyAbsolute, float, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
+			DoListFieldAbsolute<T>(position, list, drawItem, drawEmpty, DefaultItemHeight, flags);
+		}
+
+
+		/// <inheritdoc cref="DoListField{T}(IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmpty, float, ReorderableListFlags)"/>
+		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmpty drawEmpty) {
+			DoListField<T>(list, drawItem, drawEmpty, DefaultItemHeight, 0);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute{T}(Rect, IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmptyAbsolute, float, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListControl.DrawEmptyAbsolute drawEmpty) {
+			DoListFieldAbsolute<T>(position, list, drawItem, drawEmpty, DefaultItemHeight, 0);
+		}
+
+
+		/// <inheritdoc cref="DoListField{T}(IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmpty, float, ReorderableListFlags)"/>
+		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, float itemHeight, ReorderableListFlags flags) {
+			DoListField<T>(list, drawItem, null, itemHeight, flags);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute{T}(Rect, IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmptyAbsolute, float, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, float itemHeight, ReorderableListFlags flags) {
+			DoListFieldAbsolute<T>(position, list, drawItem, null, itemHeight, flags);
+		}
+
+
+		/// <inheritdoc cref="DoListField{T}(IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmpty, float, ReorderableListFlags)"/>
 		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, float itemHeight) {
-			var adaptor = new GenericListAdaptor<T>(list, drawItem, itemHeight);
-			ReorderableListControl.DrawControlFromState(adaptor, null, 0);
+			DoListField<T>(list, drawItem, null, itemHeight, 0);
 		}
-		/// <summary>
-		/// Draw list field control.
-		/// </summary>
-		/// <param name="position">Position of control.</param>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <param name="itemHeight">Height of a single list item.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
+		/// <inheritdoc cref="DoListFieldAbsolute{T}(Rect, IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmptyAbsolute, float, ReorderableListFlags)"/>
 		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, float itemHeight) {
-			var adaptor = new GenericListAdaptor<T>(list, drawItem, itemHeight);
-			ReorderableListControl.DrawControlFromState(position, adaptor, null, 0);
+			DoListFieldAbsolute<T>(position, list, drawItem, null, itemHeight, 0);
 		}
 
-		/// <summary>
-		/// Draw list field control.
-		/// </summary>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
+
+		/// <inheritdoc cref="DoListField{T}(IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmpty, float, ReorderableListFlags)"/>
+		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListFlags flags) {
+			DoListField<T>(list, drawItem, null, DefaultItemHeight, flags);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute{T}(Rect, IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmptyAbsolute, float, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem, ReorderableListFlags flags) {
+			DoListFieldAbsolute<T>(position, list, drawItem, null, DefaultItemHeight, flags);
+		}
+
+
+		/// <inheritdoc cref="DoListField{T}(IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmpty, float, ReorderableListFlags)"/>
 		public static void ListField<T>(IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem) {
-			var adaptor = new GenericListAdaptor<T>(list, drawItem, DefaultItemHeight);
-			ReorderableListControl.DrawControlFromState(adaptor, null, 0);
+			DoListField<T>(list, drawItem, null, DefaultItemHeight, 0);
 		}
-		/// <summary>
-		/// Draw list field control.
-		/// </summary>
-		/// <param name="position">Position of control.</param>
-		/// <param name="list">The list which can be reordered.</param>
-		/// <param name="drawItem">Callback to draw list item.</param>
-		/// <typeparam name="T">Type of list item.</typeparam>
-		public static void ListFieldAbsolute<T>(Rect position, List<T> list, ReorderableListControl.ItemDrawer<T> drawItem) {
-			var adaptor = new GenericListAdaptor<T>(list, drawItem, DefaultItemHeight);
-			ReorderableListControl.DrawControlFromState(position, adaptor, null, 0);
+		/// <inheritdoc cref="DoListFieldAbsolute{T}(Rect, IList{T}, ReorderableListControl.ItemDrawer{T}, ReorderableListControl.DrawEmptyAbsolute, float, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute<T>(Rect position, IList<T> list, ReorderableListControl.ItemDrawer<T> drawItem) {
+			DoListFieldAbsolute<T>(position, list, drawItem, null, DefaultItemHeight, 0);
 		}
+
 
 		/// <summary>
 		/// Calculate height of list field for absolute positioning.
@@ -329,7 +338,7 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// Required list height in pixels.
 		/// </returns>
-		public static float CalculateListFieldHeight(int itemCount, float itemHeight, ReorderableListFlags flags = 0) {
+		public static float CalculateListFieldHeight(int itemCount, float itemHeight, ReorderableListFlags flags) {
 			// We need to push/pop flags so that nested controls are properly calculated.
 			var restoreFlags = defaultListControl.flags;
 			try {
@@ -340,24 +349,18 @@ namespace Rotorz.ReorderableList {
 				defaultListControl.flags = restoreFlags;
 			}
 		}
-		/// <summary>
-		/// Calculate height of list field for absolute positioning.
-		/// </summary>
-		/// <param name="itemCount">Count of items in list.</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		/// <returns>
-		/// Required list height in pixels.
-		/// </returns>
-		public static float CalculateListFieldHeight(int itemCount, ReorderableListFlags flags = 0) {
-			// We need to push/pop flags so that nested controls are properly calculated.
-			var restoreFlags = defaultListControl.flags;
-			try {
-				defaultListControl.flags = flags;
-				return defaultListControl.CalculateListHeight(itemCount, DefaultItemHeight);
-			}
-			finally {
-				defaultListControl.flags = restoreFlags;
-			}
+
+		/// <inheritdoc cref="CalculateListFieldHeight(int, float, ReorderableListFlags)"/>
+		public static float CalculateListFieldHeight(int itemCount, ReorderableListFlags flags) {
+			return CalculateListFieldHeight(itemCount, DefaultItemHeight, flags);
+		}
+		/// <inheritdoc cref="CalculateListFieldHeight(int, float, ReorderableListFlags)"/>
+		public static float CalculateListFieldHeight(int itemCount, float itemHeight) {
+			return CalculateListFieldHeight(itemCount, itemHeight, 0);
+		}
+		/// <inheritdoc cref="CalculateListFieldHeight(int, float, ReorderableListFlags)"/>
+		public static float CalculateListFieldHeight(int itemCount) {
+			return CalculateListFieldHeight(itemCount, DefaultItemHeight, 0);
 		}
 
 		#endregion
@@ -370,7 +373,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="arrayProperty">Serializable property.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags = 0) {
+		private static void DoListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
 			var adaptor = new SerializedPropertyAdaptor(arrayProperty);
 			ReorderableListControl.DrawControlFromState(adaptor, drawEmpty, flags);
 		}
@@ -381,30 +384,51 @@ namespace Rotorz.ReorderableList {
 		/// <param name="arrayProperty">Serializable property.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags = 0) {
+		private static void DoListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
 			var adaptor = new SerializedPropertyAdaptor(arrayProperty);
 			ReorderableListControl.DrawControlFromState(position, adaptor, drawEmpty, flags);
 		}
 
-		/// <summary>
-		/// Draw list field control for serializable property array.
-		/// </summary>
-		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListField(SerializedProperty arrayProperty, ReorderableListFlags flags = 0) {
-			var adaptor = new SerializedPropertyAdaptor(arrayProperty);
-			ReorderableListControl.DrawControlFromState(adaptor, null, flags);
+
+		/// <inheritdoc cref="DoListField(SerializedProperty, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
+			DoListField(arrayProperty, drawEmpty, flags);
 		}
-		/// <summary>
-		/// Draw list field control for serializable property array.
-		/// </summary>
-		/// <param name="position">Position of control.</param>
-		/// <param name="arrayProperty">Serializable property.</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListFlags flags = 0) {
-			var adaptor = new SerializedPropertyAdaptor(arrayProperty);
-			ReorderableListControl.DrawControlFromState(position, adaptor, null, flags);
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
+			DoListFieldAbsolute(position, arrayProperty, drawEmpty, flags);
 		}
+
+
+		/// <inheritdoc cref="DoListField(SerializedProperty, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(SerializedProperty arrayProperty, ReorderableListControl.DrawEmpty drawEmpty) {
+			DoListField(arrayProperty, drawEmpty, 0);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListControl.DrawEmptyAbsolute drawEmpty) {
+			DoListFieldAbsolute(position, arrayProperty, drawEmpty, 0);
+		}
+
+
+		/// <inheritdoc cref="DoListField(SerializedProperty, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(SerializedProperty arrayProperty, ReorderableListFlags flags) {
+			DoListField(arrayProperty, null, flags);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty, ReorderableListFlags flags) {
+			DoListFieldAbsolute(position, arrayProperty, null, flags);
+		}
+
+
+		/// <inheritdoc cref="DoListField(SerializedProperty, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(SerializedProperty arrayProperty) {
+			DoListField(arrayProperty, null, 0);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, SerializedProperty, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, SerializedProperty arrayProperty) {
+			DoListFieldAbsolute(position, arrayProperty, null, 0);
+		}
+
 
 		/// <summary>
 		/// Calculate height of list field for absolute positioning.
@@ -414,7 +438,7 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// Required list height in pixels.
 		/// </returns>
-		public static float CalculateListFieldHeight(SerializedProperty arrayProperty, ReorderableListFlags flags = 0) {
+		public static float CalculateListFieldHeight(SerializedProperty arrayProperty, ReorderableListFlags flags) {
 			// We need to push/pop flags so that nested controls are properly calculated.
 			var restoreFlags = defaultListControl.flags;
 			try {
@@ -424,6 +448,11 @@ namespace Rotorz.ReorderableList {
 			finally {
 				defaultListControl.flags = restoreFlags;
 			}
+		}
+
+		/// <inheritdoc cref="CalculateListFieldHeight(SerializedProperty, ReorderableListFlags)"/>
+		public static float CalculateListFieldHeight(SerializedProperty arrayProperty) {
+			return CalculateListFieldHeight(arrayProperty, 0);
 		}
 
 		#region Fixed Item Heights
@@ -486,7 +515,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListField(IReorderableListAdaptor adaptor, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags = 0) {
+		private static void DoListField(IReorderableListAdaptor adaptor, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags = 0) {
 			ReorderableListControl.DrawControlFromState(adaptor, drawEmpty, flags);
 		}
 		/// <summary>
@@ -496,27 +525,50 @@ namespace Rotorz.ReorderableList {
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="drawEmpty">Callback to draw custom content for empty list (optional).</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListFieldAbsolute(Rect position, IReorderableListAdaptor adaptor, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags = 0) {
+		private static void DoListFieldAbsolute(Rect position, IReorderableListAdaptor adaptor, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags = 0) {
 			ReorderableListControl.DrawControlFromState(position, adaptor, drawEmpty, flags);
 		}
 
-		/// <summary>
-		/// Draw list field control for adapted collection.
-		/// </summary>
-		/// <param name="adaptor">Reorderable list adaptor.</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListField(IReorderableListAdaptor adaptor, ReorderableListFlags flags = 0) {
-			ReorderableListControl.DrawControlFromState(adaptor, null, flags);
+
+		/// <inheritdoc cref="DoListField(IReorderableListAdaptor, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(IReorderableListAdaptor adaptor, ReorderableListControl.DrawEmpty drawEmpty, ReorderableListFlags flags) {
+			DoListField(adaptor, drawEmpty, flags);
 		}
-		/// <summary>
-		/// Draw list field control for adapted collection.
-		/// </summary>
-		/// <param name="position">Position of control.</param>
-		/// <param name="adaptor">Reorderable list adaptor.</param>
-		/// <param name="flags">Optional flags to pass into list field.</param>
-		public static void ListFieldAbsolute(Rect position, IReorderableListAdaptor adaptor, ReorderableListFlags flags = 0) {
-			ReorderableListControl.DrawControlFromState(position, adaptor, null, flags);
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, IReorderableListAdaptor, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, IReorderableListAdaptor adaptor, ReorderableListControl.DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
+			DoListFieldAbsolute(position, adaptor, drawEmpty, flags);
 		}
+
+
+		/// <inheritdoc cref="DoListField(IReorderableListAdaptor, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(IReorderableListAdaptor adaptor, ReorderableListControl.DrawEmpty drawEmpty) {
+			DoListField(adaptor, drawEmpty, 0);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, IReorderableListAdaptor, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, IReorderableListAdaptor adaptor, ReorderableListControl.DrawEmptyAbsolute drawEmpty) {
+			DoListFieldAbsolute(position, adaptor, drawEmpty, 0);
+		}
+
+
+		/// <inheritdoc cref="DoListField(IReorderableListAdaptor, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(IReorderableListAdaptor adaptor, ReorderableListFlags flags) {
+			DoListField(adaptor, null, flags);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, IReorderableListAdaptor, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, IReorderableListAdaptor adaptor, ReorderableListFlags flags) {
+			DoListFieldAbsolute(position, adaptor, null, flags);
+		}
+
+
+		/// <inheritdoc cref="DoListField(IReorderableListAdaptor, ReorderableListControl.DrawEmpty, ReorderableListFlags)"/>
+		public static void ListField(IReorderableListAdaptor adaptor) {
+			DoListField(adaptor, null, 0);
+		}
+		/// <inheritdoc cref="DoListFieldAbsolute(Rect, IReorderableListAdaptor, ReorderableListControl.DrawEmptyAbsolute, ReorderableListFlags)"/>
+		public static void ListFieldAbsolute(Rect position, IReorderableListAdaptor adaptor) {
+			DoListFieldAbsolute(position, adaptor, null, 0);
+		}
+
 
 		/// <summary>
 		/// Calculate height of list field for adapted collection.
@@ -526,7 +578,7 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// Required list height in pixels.
 		/// </returns>
-		public static float CalculateListFieldHeight(IReorderableListAdaptor adaptor, ReorderableListFlags flags = 0) {
+		public static float CalculateListFieldHeight(IReorderableListAdaptor adaptor, ReorderableListFlags flags) {
 			// We need to push/pop flags so that nested controls are properly calculated.
 			var restoreFlags = defaultListControl.flags;
 			try {
@@ -536,6 +588,11 @@ namespace Rotorz.ReorderableList {
 			finally {
 				defaultListControl.flags = restoreFlags;
 			}
+		}
+
+		/// <inheritdoc cref="CalculateListFieldHeight(IReorderableListAdaptor, ReorderableListFlags)"/>
+		public static float CalculateListFieldHeight(IReorderableListAdaptor adaptor) {
+			return CalculateListFieldHeight(adaptor, 0);
 		}
 
 		#endregion
