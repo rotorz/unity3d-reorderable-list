@@ -11,7 +11,12 @@ namespace Rotorz.ReorderableList {
 	/// <summary>
 	/// Reorderable list adaptor for generic list.
 	/// </summary>
-	public sealed class GenericListAdaptor<T> : IReorderableListAdaptor {
+	/// <remarks>
+	/// <para>This adaptor can be subclassed to add special logic to item height calculation.
+	/// You may want to implement a custom adaptor class where specialised functionality
+	/// is needed.</para>
+	/// </remarks>
+	public class GenericListAdaptor<T> : IReorderableListAdaptor {
 
 		private IList<T> _list;
 
@@ -99,7 +104,7 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <inheritdoc/>
-		public float GetItemHeight(int index) {
+		public virtual float GetItemHeight(int index) {
 			return fixedItemHeight;
 		}
 
