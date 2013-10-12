@@ -625,7 +625,7 @@ namespace Rotorz.ReorderableList {
 		
 		private void DrawListItem(EventType eventType, Rect position, IReorderableListAdaptor adaptor, int itemIndex) {
 			bool visible = (position.y < _visibleRect.yMax && position.yMax > _visibleRect.y);
-			bool draggable = _allowReordering && adaptor.CanReorder(itemIndex);
+			bool draggable = _allowReordering && adaptor.CanDrag(itemIndex);
 
 			Rect itemContentPosition = position;
 			itemContentPosition.x = position.x + 2;
@@ -904,7 +904,7 @@ namespace Rotorz.ReorderableList {
 								// Remove input focus from control before attempting a context click or drag.
 								GUIUtility.keyboardControl = 0;
 
-								if (_allowReordering && adaptor.CanReorder(i) && Event.current.button == 0) {
+								if (_allowReordering && adaptor.CanDrag(i) && Event.current.button == 0) {
 									s_DragItemPosition = itemPosition;
 
 									BeginTrackingReorderDrag(controlID, i);

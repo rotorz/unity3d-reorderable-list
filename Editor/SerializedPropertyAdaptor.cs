@@ -82,7 +82,7 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <inheritdoc/>
-		public virtual bool CanReorder(int index) {
+		public virtual bool CanDrag(int index) {
 			return true;
 		}
 		/// <inheritdoc/>

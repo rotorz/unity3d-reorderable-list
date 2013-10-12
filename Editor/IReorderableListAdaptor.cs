@@ -29,7 +29,7 @@ namespace Rotorz.ReorderableList {
 		/// <returns>
 		/// A value of <c>true</c> if item can be dragged; otherwise <c>false</c>.
 		/// </returns>
-		bool CanReorder(int index);
+		bool CanDrag(int index);
 		/// <summary>
 		/// Determines whether an item can be removed from list.
 		/// </summary>
