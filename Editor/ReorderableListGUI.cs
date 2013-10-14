@@ -17,7 +17,7 @@ namespace Rotorz.ReorderableList {
 	public static class ReorderableListGUI {
 
 		/// <summary>
-		/// Default list item height.
+		/// Default list item height is 18 pixels.
 		/// </summary>
 		public const float DefaultItemHeight = 18;
 

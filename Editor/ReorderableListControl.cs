@@ -334,13 +334,13 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets a value indicating whether add button is shown.
 		/// </summary>
-		protected bool hasAddButton {
+		private bool hasAddButton {
 			get { return (_flags & ReorderableListFlags.HideAddButton) == 0; }
 		}
 		/// <summary>
 		/// Gets a value indicating whether remove buttons are shown.
 		/// </summary>
-		protected bool hasRemoveButtons {
+		private bool hasRemoveButtons {
 			get { return (_flags & ReorderableListFlags.HideRemoveButtons) == 0; }
 		}
 

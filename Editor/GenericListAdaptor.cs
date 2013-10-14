@@ -16,6 +16,7 @@ namespace Rotorz.ReorderableList {
 	/// You may want to implement a custom adaptor class where specialised functionality
 	/// is needed.</para>
 	/// </remarks>
+	/// <typeparam name="T">Type of list element.</typeparam>
 	public class GenericListAdaptor<T> : IReorderableListAdaptor {
 
 		private IList<T> _list;
