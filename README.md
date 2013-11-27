@@ -22,6 +22,7 @@ Features
 - Disable drag and/or removal on per-item basis.
 - Styles can be overriden on per-list basis if desired.
 - Subclass list control to override context menu.
+- User guide (Asset Path/Support/User Guide.pdf).
 - API reference documentation (Asset Path/Support/API Reference.chm).
 
 Installing scripts
@@ -31,7 +32,7 @@ This control can be added to your project by importing the Unity package which
 contains a compiled class library (DLL). This can be used by C# and UnityScript
 developers.
 
-[Download RotorzReorderableList_v0.2.3 Package (requires Unity 4.2.1+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.2.3.unitypackage>)
+[Download RotorzReorderableList_v0.2.4 Package (requires Unity 4.2.1+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.2.4.unitypackage>)
 
 If you would prefer to use the non-compiled source code version in your project,
 copy the contents of this repository somewhere into your project.
@@ -87,23 +88,27 @@ Example 2: List of strings (UnityScript)
         GUILayout.Label('No items in list.', EditorStyles.miniLabel);
     }
 
+Refer to API reference for further examples!
+
 Submission to the Unity Asset Store
 -----------------------------------
 
 If you wish to include this asset as part of a package for the asset store, please
 include the latest package version as-is to avoid conflict issues in user projects.
-LICENSE and README.md files must be included and remain intact.
+It is important that license and documentation files are included and remain intact.
 
-If you would like to include a modified version of this project within your asset:
+**To include a modified version within your package:**
 
-- Ensure that LICENSE and README.md are included and remain intact.
-- Copyright and license information must remain intact.
-- Change the namespace `Rotorz.ReorderableList` to something unique and DO NOT
-  use the name "Rotorz".
-- Copy scripts into your own asset folder.
+- Ensure that license and documentation files are included and remain intact. It should
+  be clear that these relate to the reorderable list field library.
 
-This is to avoid causing conflicts if somebody downloads multiple assets which
-make use of this project.
+- Copyright and license information must remain intact in source files.
+
+- Change the namespace `Rotorz.ReorderableList` to something unique and DO NOT use the
+  name "Rotorz". For example, `YourName.ReorderableList` or `YourName.Internal.ReorderableList`.
+
+- Place files somewhere within your own asset folder to avoid causing conflicts with
+  other assets which make use of this project.
 
 Useful links
 ------------
