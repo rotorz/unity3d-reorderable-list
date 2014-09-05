@@ -130,14 +130,8 @@ must be met:
   contributors own work.
 
 - The contributor disclaims all copyright and accepts that their contributed
-  content will be released to the [public domain](<http://en.wikipedia.org/wiki/Public_domain>).
+  content will be released to the public domain.
 
 - The act of submitting a contribution indicates that the contributor agrees
   with this agreement. This includes (but is not limited to) pull requests, issues,
   tickets, e-mails, newsgroups, blogs, forums, etc.
-
-### Disclaimer
-
-External content linked in the above text are for convienence purposes only and
-do not contribute to the agreement in any way. Linked content should be digested
-under the readers discretion.
