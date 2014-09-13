@@ -133,7 +133,7 @@ namespace Rotorz.ReorderableList.Internal {
 		/// The new <c>Texture2D</c> instance.
 		/// </returns>
 		public static Texture2D CreatePixelTexture(string name, Color color) {
-			var tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+			var tex = new Texture2D(1, 1, TextureFormat.ARGB32, false, true);
 			tex.name = name;
 			tex.hideFlags = HideFlags.HideAndDontSave;
 			tex.filterMode = FilterMode.Point;
@@ -165,7 +165,7 @@ namespace Rotorz.ReorderableList.Internal {
 				GetImageSize(imageData, out texWidth, out texHeight);
 
 				// Generate texture asset.
-				var tex = new Texture2D(texWidth, texHeight, TextureFormat.ARGB32, false);
+				var tex = new Texture2D(texWidth, texHeight, TextureFormat.ARGB32, false, true);
 				tex.hideFlags = HideFlags.HideAndDontSave;
 				tex.name = "(Generated) ReorderableList:" + i;
 				tex.filterMode = FilterMode.Point;
