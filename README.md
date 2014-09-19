@@ -20,7 +20,7 @@ Features
 - Subscribe to add/remove item events.
 - Supports mixed item heights.
 - Disable drag and/or removal on per-item basis.
-- Styles can be overriden on per-list basis if desired.
+- Styles can be overridden on per-list basis if desired.
 - Subclass list control to override context menu.
 - User guide (Asset Path/Support/User Guide.pdf).
 - API reference documentation (Asset Path/Support/API Reference.chm).
