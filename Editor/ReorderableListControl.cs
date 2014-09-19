@@ -655,12 +655,16 @@ namespace Rotorz.ReorderableList {
 
 			if (eventType == EventType.Repaint && visible) {
 				// Draw grab handle?
-				if (draggable)
-					GUI.DrawTexture(new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5), ReorderableListResources.texGrabHandle);
+				if (draggable) {
+					var texturePosition = new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5);
+					GUIHelper.DrawTexture(texturePosition, ReorderableListResources.texGrabHandle);
+				}
 
 				// Draw splitter between list items.
-				if (!_tracking || itemIndex != s_AnchorIndex)
-					GUI.DrawTexture(new Rect(position.x, position.y - 1, position.width, 1), ReorderableListResources.texItemSplitter);
+				if (!_tracking || itemIndex != s_AnchorIndex) {
+					var texturePosition = new Rect(position.x, position.y - 1, position.width, 1);
+					GUIHelper.DrawTexture(texturePosition, ReorderableListResources.texItemSplitter);
+				}
 			}
 
 			// Allow control to be automatically focused.
@@ -707,7 +711,7 @@ namespace Rotorz.ReorderableList {
 				targetPosition.y = targetSlotPosition - 1;
 				targetPosition.height = 1;
 
-				GUI.DrawTexture(targetPosition, ReorderableListResources.texItemSplitter);
+				GUIHelper.DrawTexture(targetPosition, ReorderableListResources.texItemSplitter);
 
 				--targetPosition.x;
 				++targetPosition.y;
@@ -715,7 +719,7 @@ namespace Rotorz.ReorderableList {
 				targetPosition.height = s_DragItemPosition.height - 1;
 
 				GUI.color = TargetBackgroundColor;
-				GUI.DrawTexture(targetPosition, EditorGUIUtility.whiteTexture);
+				GUIHelper.DrawTexture(targetPosition, EditorGUIUtility.whiteTexture);
 				
 				// Fill background of item which is being dragged.
 				--s_DragItemPosition.x;
@@ -723,7 +727,7 @@ namespace Rotorz.ReorderableList {
 				--s_DragItemPosition.height;
 
 				GUI.color = AnchorBackgroundColor;
-				GUI.DrawTexture(s_DragItemPosition, EditorGUIUtility.whiteTexture);
+				GUIHelper.DrawTexture(s_DragItemPosition, EditorGUIUtility.whiteTexture);
 
 				++s_DragItemPosition.x;
 				s_DragItemPosition.width -= 2;
@@ -733,10 +737,10 @@ namespace Rotorz.ReorderableList {
 				GUI.color = new Color(0f, 0f, 0f, 0.6f);
 				targetPosition.y = s_DragItemPosition.y - 1;
 				targetPosition.height = 1;
-				GUI.DrawTexture(targetPosition, EditorGUIUtility.whiteTexture);
+				GUIHelper.DrawTexture(targetPosition, EditorGUIUtility.whiteTexture);
 
 				targetPosition.y += s_DragItemPosition.height;
-				GUI.DrawTexture(targetPosition, EditorGUIUtility.whiteTexture);
+				GUIHelper.DrawTexture(targetPosition, EditorGUIUtility.whiteTexture);
 
 				GUI.color = restoreColor;
 			}

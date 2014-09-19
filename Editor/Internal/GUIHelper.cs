@@ -45,6 +45,23 @@ namespace Rotorz.ReorderableList.Internal {
 		/// </summary>
 		public static Action<string> FocusTextInControl;
 
+		private static GUIStyle s_TempStyle = new GUIStyle();
+
+		/// <summary>
+		/// Draw texture using <see cref="GUIStyle"/> to workaround bug in Unity where
+		/// <see cref="GUI.DrawTexture"/> flickers when embedded inside a property drawer.
+		/// </summary>
+		/// <param name="position">Position of which to draw texture in space of GUI.</param>
+		/// <param name="texture">Texture.</param>
+		public static void DrawTexture(Rect position, Texture2D texture) {
+			if (Event.current.type != EventType.Repaint)
+				return;
+
+			s_TempStyle.normal.background = texture;
+
+			s_TempStyle.Draw(position, GUIContent.none, false, false, false, false);
+		}
+
 	}
 
 }
