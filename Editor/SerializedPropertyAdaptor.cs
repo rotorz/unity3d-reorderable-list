@@ -107,6 +107,11 @@ namespace Rotorz.ReorderableList {
 		}
 		/// <inheritdoc/>
 		public void Remove(int index) {
+			// Unity doesn't remove element when it contains an object reference.
+			var elementProperty = _arrayProperty.GetArrayElementAtIndex(index);
+			if (elementProperty.objectReferenceValue != null)
+				 elementProperty.objectReferenceValue = null;
+
 			_arrayProperty.DeleteArrayElementAtIndex(index);
 		}
 		/// <inheritdoc/>
