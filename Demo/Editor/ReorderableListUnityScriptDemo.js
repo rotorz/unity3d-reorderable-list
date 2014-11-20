@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 #pragma strict
 
-import System.Collections.Generic;
 import Rotorz.ReorderableList;
+import System.Collections.Generic;
 
 class ReorderableListUnityScriptDemo extends EditorWindow {
 

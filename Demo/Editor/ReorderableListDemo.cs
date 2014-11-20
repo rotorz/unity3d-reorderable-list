@@ -2,12 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-using UnityEngine;
-using UnityEditor;
-
-using System.Collections.Generic;
-
 using Rotorz.ReorderableList;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 public class ReorderableListDemo : EditorWindow {
 

@@ -2,14 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-using UnityEngine;
-using UnityEditor;
-
+using Rotorz.ReorderableList.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-
-using Rotorz.ReorderableList.Internal;
+using UnityEditor;
+using UnityEngine;
 
 namespace Rotorz.ReorderableList {
 	
@@ -106,10 +104,10 @@ namespace Rotorz.ReorderableList {
 		/// <example>
 		/// <para>The following listing presents a text field for each list item:</para>
 		/// <code language="csharp"><![CDATA[
-		/// using UnityEngine;
-		/// using UnityEditor;
-		/// 
+        /// using Rotorz.ReorderableList;
 		/// using System.Collections.Generic;
+		/// using UnityEditor;
+		/// using UnityEngine;
 		/// 
 		/// public class ExampleWindow : EditorWindow {
 		///     public List<string> wishlist = new List<string>();
@@ -126,7 +124,8 @@ namespace Rotorz.ReorderableList {
 		///     }
 		/// }
 		/// ]]></code>
-		/// <code language="unityscript"><![CDATA[
+        /// <code language="unityscript"><![CDATA[
+        /// import Rotorz.ReorderableList;
 		/// import System.Collections.Generic;
 		/// 
 		/// class ExampleWindow extends EditorWindow {
@@ -161,11 +160,11 @@ namespace Rotorz.ReorderableList {
 		/// </remarks>
 		/// <example>
 		/// <para>The following listing displays a label for empty list control:</para>
-		/// <code language="csharp"><![CDATA[
-		/// using UnityEngine;
-		/// using UnityEditor;
-		/// 
+        /// <code language="csharp"><![CDATA[
+        /// using Rotorz.ReorderableList;
 		/// using System.Collections.Generic;
+		/// using UnityEditor;
+		/// using UnityEngine;
 		/// 
 		/// public class ExampleWindow : EditorWindow {
 		///     private List<string> _list;
@@ -182,7 +181,8 @@ namespace Rotorz.ReorderableList {
 		///     }
 		/// }
 		/// ]]></code>
-		/// <code language="unityscript"><![CDATA[
+        /// <code language="unityscript"><![CDATA[
+        /// import Rotorz.ReorderableList;
 		/// import System.Collections.Generic;
 		/// 
 		/// class ExampleWindow extends EditorWindow {
