@@ -5,8 +5,8 @@ List control for Unity allowing editor developers to add reorderable list contro
 their GUIs. Supports generic lists and serialized property arrays, though additional
 collection types can be supported by implementing `Rotorz.ReorderableList.IReorderableListAdaptor`.
 
-Use of this source code is governed by a BSD-style license that can be found in
-the LICENSE file. DO NOT contribute to this project unless you accept the terms of the
+Licensed under the MIT license. See LICENSE file in the project root for full license
+information. DO NOT contribute to this project unless you accept the terms of the
 contribution agreement.
 
 ![screenshot](https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/raw/master/screenshot.png)
@@ -33,8 +33,7 @@ contains a compiled class library (DLL). This can be used by C# and UnityScript
 developers. Minimal version of package does not include demonstration assets or
 zip archive of image source resources.
 
-- [Download RotorzReorderableList_v0.2.5 Package (requires Unity 4.3.4+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.2.5.unitypackage>)
-- [Download RotorzReorderableList_v0.2.5 Minimal Package (requires Unity 4.3.4+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.2.5_min.unitypackage>)
+- [Download RotorzReorderableList_v0.2.6 Package (requires Unity 4.3.4+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.2.6.unitypackage>)
 
 If you would prefer to use the non-compiled source code version in your project,
 copy the contents of this repository somewhere into your project.
@@ -120,7 +119,7 @@ Useful links
 Contribution Agreement
 ----------------------
 
-This project is licensed under the BSD license (see LICENSE). To be in the best
+This project is licensed under the MIT license (see LICENSE). To be in the best
 position to enforce these licenses the copyright status of this project needs to
 be as simple as possible. To achieve this the following terms and conditions
 must be met:
