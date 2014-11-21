@@ -77,23 +77,23 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <inheritdoc/>
-		public void Add() {
+		public virtual void Add() {
 			_list.Add(default(T));
 		}
 		/// <inheritdoc/>
-		public void Insert(int index) {
+		public virtual void Insert(int index) {
 			_list.Insert(index, default(T));
 		}
 		/// <inheritdoc/>
-		public void Duplicate(int index) {
+		public virtual void Duplicate(int index) {
 			_list.Insert(index + 1, _list[index]);
 		}
 		/// <inheritdoc/>
-		public void Remove(int index) {
+		public virtual void Remove(int index) {
 			_list.RemoveAt(index);
 		}
 		/// <inheritdoc/>
-		public void Move(int sourceIndex, int destIndex) {
+		public virtual void Move(int sourceIndex, int destIndex) {
 			if (destIndex > sourceIndex)
 				--destIndex;
 
@@ -102,7 +102,7 @@ namespace Rotorz.ReorderableList {
 			_list.Insert(destIndex, item);
 		}
 		/// <inheritdoc/>
-		public void Clear() {
+		public virtual void Clear() {
 			_list.Clear();
 		}
 
