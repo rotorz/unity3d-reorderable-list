@@ -56,6 +56,10 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Duplicate existing element.
 		/// </summary>
+		/// <remarks>
+		/// <para>Consider using the <see cref="System.ICloneable"/> interface to
+		/// duplicate list elements where appropriate.</para>
+		/// </remarks>
 		/// <param name="index">Zero-based index of list element.</param>
 		void Duplicate(int index);
 		/// <summary>
