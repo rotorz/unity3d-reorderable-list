@@ -14,6 +14,9 @@ namespace Rotorz.ReorderableList {
 	/// <para>This adaptor can be subclassed to add special logic to item height calculation.
 	/// You may want to implement a custom adaptor class where specialised functionality
 	/// is needed.</para>
+	/// <para>List elements are <b>not</b> cloned using the <see cref="System.ICloneable"/>
+	/// interface when using a <see cref="UnityEditor.SerializedProperty"/> to
+	/// manipulate lists.</para>
 	/// </remarks>
 	public class SerializedPropertyAdaptor : IReorderableListAdaptor {
 
