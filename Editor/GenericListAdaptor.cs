@@ -1,6 +1,7 @@
 // Copyright (c) Rotorz Limited. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +14,9 @@ namespace Rotorz.ReorderableList {
 	/// <para>This adaptor can be subclassed to add special logic to item height calculation.
 	/// You may want to implement a custom adaptor class where specialised functionality
 	/// is needed.</para>
+	/// <para>List elements which implement the <see cref="System.ICloneable"/> interface are
+	/// cloned using that interface upon duplication; otherwise the item value or reference is
+	/// simply copied.</para>
 	/// </remarks>
 	/// <typeparam name="T">Type of list element.</typeparam>
 	public class GenericListAdaptor<T> : IReorderableListAdaptor {
@@ -86,7 +90,13 @@ namespace Rotorz.ReorderableList {
 		}
 		/// <inheritdoc/>
 		public virtual void Duplicate(int index) {
-			_list.Insert(index + 1, _list[index]);
+			T newItem = _list[index];
+
+			ICloneable existingItem = newItem as ICloneable;
+			if (existingItem != null)
+				newItem = (T)existingItem.Clone();
+
+			_list.Insert(index + 1, newItem);
 		}
 		/// <inheritdoc/>
 		public virtual void Remove(int index) {
