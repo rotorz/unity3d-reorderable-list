@@ -88,6 +88,63 @@ namespace Rotorz.ReorderableList {
 	public delegate void ItemRemovingEventHandler(object sender, ItemRemovingEventArgs args);
 
 	/// <summary>
+	/// Arguments which are passed to <see cref="ItemMovingEventHandler"/>.
+	/// </summary>
+	public sealed class ItemMovingEventArgs : CancelEventArgs {
+
+		/// <summary>
+		/// Gets adaptor to reorderable list container which contains element.
+		/// </summary>
+		public IReorderableListAdaptor adaptor { get; private set; }
+		/// <summary>
+		/// Gets current zero-based index of item which is going to be moved.
+		/// </summary>
+		public int itemIndex { get; internal set; }
+		/// <summary>
+		/// Gets the new candidate zero-based index for the item.
+		/// </summary>
+		/// <seealso cref="newItemIndex"/>
+		public int destinationItemIndex { get; internal set; }
+
+		/// <summary>
+		/// Gets zero-based index of item <strong>after</strong> it has been moved.
+		/// </summary>
+		/// <seealso cref="destinationItemIndex"/>
+		public int newItemIndex {
+			get {
+				int result = destinationItemIndex;
+				if (result > itemIndex)
+					--result;
+				return result;
+			}
+		}
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="ItemMovingEventArgs"/>.
+		/// </summary>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		/// <param name="itemIndex">Zero-based index of item.</param>
+		/// <param name="destinationItemIndex">Xero-based index of item destination.</param>
+		public ItemMovingEventArgs(IReorderableListAdaptor adaptor, int itemIndex, int destinationItemIndex) {
+			this.adaptor = adaptor;
+			this.itemIndex = itemIndex;
+			this.destinationItemIndex = destinationItemIndex;
+		}
+
+	}
+
+	/// <summary>
+	/// An event handler which is invoked before a list item is moved.
+	/// </summary>
+	/// <remarks>
+	/// <para>Moving of item can be cancelled by setting <see cref="CancelEventArgs.Cancel"/>
+	/// to <c>true</c>.</para>
+	/// </remarks>
+	/// <param name="sender">Object which raised event.</param>
+	/// <param name="args">Event arguments.</param>
+	public delegate void ItemMovingEventHandler(object sender, ItemMovingEventArgs args);
+
+	/// <summary>
 	/// Arguments which are passed to <see cref="ItemMovedEventHandler"/>.
 	/// </summary>
 	public sealed class ItemMovedEventArgs : EventArgs {
@@ -433,7 +490,7 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <summary>
-		/// Occurs before list item is removed and allows removal to be cancelled.
+		/// Occurs before list item is removed and allowing for remove operation to be cancelled.
 		/// </summary>
 		public event ItemRemovingEventHandler ItemRemoving;
 
@@ -444,6 +501,20 @@ namespace Rotorz.ReorderableList {
 		protected virtual void OnItemRemoving(ItemRemovingEventArgs args) {
 			if (ItemRemoving != null)
 				ItemRemoving(this, args);
+		}
+
+		/// <summary>
+		/// Occurs immediately before list item is moved allowing for move operation to be cancelled.
+		/// </summary>
+		public event ItemMovingEventHandler ItemMoving;
+
+		/// <summary>
+		/// Raises event immediately before list item is moved and provides oppertunity to cancel.
+		/// </summary>
+		/// <param name="args">Event arguments.</param>
+		protected virtual void OnItemMoving(ItemMovingEventArgs args) {
+			if (ItemMoving != null)
+				ItemMoving(this, args);
 		}
 
 		/// <summary>
@@ -1514,15 +1585,20 @@ namespace Rotorz.ReorderableList {
 		/// <param name="sourceIndex">Zero-based index of source item.</param>
 		/// <param name="destIndex">Zero-based index of destination index.</param>
 		protected void MoveItem(IReorderableListAdaptor adaptor, int sourceIndex, int destIndex) {
-			adaptor.Move(sourceIndex, destIndex);
+			// Raise event before moving item so that the operation can be cancelled.
+			var movingEventArgs = new ItemMovingEventArgs(adaptor, sourceIndex, destIndex);
+			OnItemMoving(movingEventArgs);
+			if (!movingEventArgs.Cancel) {
+				adaptor.Move(sourceIndex, destIndex);
 
-			// Raise event!
-			int newIndex = destIndex;
-			if (newIndex > sourceIndex)
-				--newIndex;
-			OnItemMoved(new ItemMovedEventArgs(adaptor, sourceIndex, newIndex));
+				// Item was actually moved!
+				int newIndex = destIndex;
+				if (newIndex > sourceIndex)
+					--newIndex;
+				OnItemMoved(new ItemMovedEventArgs(adaptor, sourceIndex, newIndex));
 
-			GUI.changed = true;
+				GUI.changed = true;
+			}
 			ReorderableListGUI.indexOfChangedItem = -1;
 		}
 
