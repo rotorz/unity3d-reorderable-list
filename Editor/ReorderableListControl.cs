@@ -88,6 +88,45 @@ namespace Rotorz.ReorderableList {
 	public delegate void ItemRemovingEventHandler(object sender, ItemRemovingEventArgs args);
 
 	/// <summary>
+	/// Arguments which are passed to <see cref="ItemMovedEventHandler"/>.
+	/// </summary>
+	public sealed class ItemMovedEventArgs : EventArgs {
+
+		/// <summary>
+		/// Gets adaptor to reorderable list container which contains element.
+		/// </summary>
+		public IReorderableListAdaptor adaptor { get; private set; }
+		/// <summary>
+		/// Gets old zero-based index of the item which was moved.
+		/// </summary>
+		public int oldItemIndex { get; internal set; }
+		/// <summary>
+		/// Gets new zero-based index of the item which was moved.
+		/// </summary>
+		public int newItemIndex { get; internal set; }
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="ItemMovedEventArgs"/>.
+		/// </summary>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		/// <param name="oldItemIndex">Old zero-based index of item.</param>
+		/// <param name="newItemIndex">New zero-based index of item.</param>
+		public ItemMovedEventArgs(IReorderableListAdaptor adaptor, int oldItemIndex, int newItemIndex) {
+			this.adaptor = adaptor;
+			this.oldItemIndex = oldItemIndex;
+			this.newItemIndex = newItemIndex;
+		}
+
+	}
+
+	/// <summary>
+	/// An event handler which is invoked after a list item is moved.
+	/// </summary>
+	/// <param name="sender">Object which raised event.</param>
+	/// <param name="args">Event arguments.</param>
+	public delegate void ItemMovedEventHandler(object sender, ItemMovedEventArgs args);
+
+	/// <summary>
 	/// Base class for custom reorderable list control.
 	/// </summary>
 	[Serializable]
@@ -405,6 +444,20 @@ namespace Rotorz.ReorderableList {
 		protected virtual void OnItemRemoving(ItemRemovingEventArgs args) {
 			if (ItemRemoving != null)
 				ItemRemoving(this, args);
+		}
+
+		/// <summary>
+		/// Occurs after list item has been moved.
+		/// </summary>
+		public event ItemMovedEventHandler ItemMoved;
+
+		/// <summary>
+		/// Raises event after list item has been moved.
+		/// </summary>
+		/// <param name="args">Event arguments.</param>
+		protected virtual void OnItemMoved(ItemMovedEventArgs args) {
+			if (ItemMoved != null)
+				ItemMoved(this, args);
 		}
 
 		#endregion
@@ -1462,6 +1515,12 @@ namespace Rotorz.ReorderableList {
 		/// <param name="destIndex">Zero-based index of destination index.</param>
 		protected void MoveItem(IReorderableListAdaptor adaptor, int sourceIndex, int destIndex) {
 			adaptor.Move(sourceIndex, destIndex);
+
+			// Raise event!
+			int newIndex = destIndex;
+			if (newIndex > sourceIndex)
+				--newIndex;
+			OnItemMoved(new ItemMovedEventArgs(adaptor, sourceIndex, newIndex));
 
 			GUI.changed = true;
 			ReorderableListGUI.indexOfChangedItem = -1;
