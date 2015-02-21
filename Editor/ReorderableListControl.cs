@@ -65,7 +65,7 @@ namespace Rotorz.ReorderableList {
 		public int itemIndex { get; internal set; }
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="ItemInsertedEventArgs"/>.
+		/// Initializes a new instance of <see cref="ItemRemovingEventArgs"/>.
 		/// </summary>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="itemIndex">Zero-based index of item.</param>
