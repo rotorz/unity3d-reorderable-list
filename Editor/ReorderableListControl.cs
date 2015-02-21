@@ -60,7 +60,7 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		public IReorderableListAdaptor adaptor { get; private set; }
 		/// <summary>
-		/// Gets zero-based index of item which was inserted.
+		/// Gets zero-based index of item which is being removed.
 		/// </summary>
 		public int itemIndex { get; internal set; }
 
