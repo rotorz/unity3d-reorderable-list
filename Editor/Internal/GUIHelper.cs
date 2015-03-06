@@ -17,17 +17,15 @@ namespace Rotorz.ReorderableList.Internal {
 			var tyGUIClip = Type.GetType("UnityEngine.GUIClip,UnityEngine");
 			if (tyGUIClip != null) {
 				var piVisibleRect = tyGUIClip.GetProperty("visibleRect", BindingFlags.Static | BindingFlags.Public);
-				if (piVisibleRect != null) {
-					var getGetMethod = piVisibleRect.GetGetMethod();
-					VisibleRect = () => (Rect)getGetMethod.Invoke(null, null);
-				}
+				if (piVisibleRect != null)
+					VisibleRect = (Func<Rect>)Delegate.CreateDelegate(typeof(Func<Rect>), piVisibleRect.GetGetMethod());
 			}
-
+			
 			var miFocusTextInControl = typeof(EditorGUI).GetMethod("FocusTextInControl", BindingFlags.Static | BindingFlags.Public);
 			if (miFocusTextInControl == null)
 				miFocusTextInControl = typeof(GUI).GetMethod("FocusControl", BindingFlags.Static | BindingFlags.Public);
 
-			FocusTextInControl = str => miFocusTextInControl.Invoke(null, new object[] { str });
+			FocusTextInControl = (Action<string>)Delegate.CreateDelegate(typeof(Action<string>), miFocusTextInControl);
 		}
 
 		/// <summary>
