@@ -14,7 +14,7 @@ namespace Rotorz.ReorderableList.Internal {
 	internal static class GUIHelper {
 
 		static GUIHelper() {
-			var tyGUIClip = typeof(GUI).Assembly.GetType("UnityEngine.GUIClip");
+			var tyGUIClip = Type.GetType("UnityEngine.GUIClip,UnityEngine");
 			if (tyGUIClip != null) {
 				var piVisibleRect = tyGUIClip.GetProperty("visibleRect", BindingFlags.Static | BindingFlags.Public);
 				if (piVisibleRect != null) {
