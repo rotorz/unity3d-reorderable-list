@@ -59,12 +59,12 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <summary>
-		/// Gets default style for title header.
+		/// Gets style for title header.
 		/// </summary>
 		public static GUIStyle Title { get; private set; }
 
 		/// <summary>
-		/// Gets default style for the background of list control.
+		/// Gets style for the background of list control.
 		/// </summary>
 		public static GUIStyle Container { get; private set; }
 		/// <summary>
@@ -72,7 +72,7 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		public static GUIStyle Container2 { get; private set; }
 		/// <summary>
-		/// Gets default style for add item button.
+		/// Gets style for add item button.
 		/// </summary>
 		public static GUIStyle AddButton { get; private set; }
 		/// <summary>
@@ -80,7 +80,7 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		public static GUIStyle AddButton2 { get; private set; }
 		/// <summary>
-		/// Gets default style for remove item button.
+		/// Gets style for remove item button.
 		/// </summary>
 		public static GUIStyle RemoveButton { get; private set; }
 
