@@ -39,7 +39,8 @@ namespace Rotorz.ReorderableList {
 			FooterButton.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.Button_Normal);
 			FooterButton.active.background = ReorderableListResources.GetTexture(ReorderableListTexture.Button_Active);
 			FooterButton.border = new RectOffset(3, 3, 1, 3);
-			FooterButton.padding = new RectOffset(5, 5, 0, 2);
+			FooterButton.padding = new RectOffset(2, 2, 0, 2);
+			FooterButton.clipping = TextClipping.Overflow;
 
 			FooterButton2 = new GUIStyle();
 			FooterButton2.fixedHeight = 18;
@@ -47,7 +48,8 @@ namespace Rotorz.ReorderableList {
 			FooterButton2.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.Button2_Normal);
 			FooterButton2.active.background = ReorderableListResources.GetTexture(ReorderableListTexture.Button2_Active);
 			FooterButton2.border = new RectOffset(3, 3, 3, 3);
-			FooterButton2.padding = new RectOffset(5, 5, 2, 2);
+			FooterButton2.padding = new RectOffset(2, 2, 2, 2);
+			FooterButton2.clipping = TextClipping.Overflow;
 
 			RemoveButton = new GUIStyle();
 			RemoveButton.fixedWidth = 27;
