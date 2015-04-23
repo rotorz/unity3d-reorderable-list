@@ -776,30 +776,35 @@ namespace Rotorz.ReorderableList {
 			if (HasRemoveButtons)
 				itemContentPosition.width -= RemoveButtonStyle.fixedWidth;
 
-			if (eventType == EventType.Repaint && visible) {
-				// Draw grab handle?
-				if (draggable) {
-					var texturePosition = new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5);
-					GUIHelper.DrawTexture(texturePosition, ReorderableListResources.texGrabHandle);
-				}
-
-				// Draw splitter between list items.
-				if (itemIndex != 0 && (!_tracking || itemIndex != s_AnchorIndex)) {
-					var texturePosition = new Rect(position.x, position.y - 1, position.width, 1);
-					GUIHelper.DrawTexture(texturePosition, ReorderableListResources.texItemSplitter);
-				}
-			}
-
-			// Allow control to be automatically focused.
-			if (s_AutoFocusIndex == itemIndex)
-				GUI.SetNextControlName("AutoFocus_" + _controlID + "_" + itemIndex);
-
 			try {
 				s_CurrentItemIndex.Push(itemIndex);
+				EditorGUI.BeginChangeCheck();
+
+				if (eventType == EventType.Repaint && visible) {
+					// Draw background of list item.
+					var backgroundPosition = new Rect(position.x, position.y, position.width, position.height - 1);
+					adaptor.DrawItemBackground(backgroundPosition, itemIndex);
+
+					// Draw grab handle?
+					if (draggable) {
+						var texturePosition = new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5);
+						GUIHelper.DrawTexture(texturePosition, ReorderableListResources.texGrabHandle);
+					}
+
+					// Draw splitter between list items.
+					if (itemIndex != 0 && (!_tracking || itemIndex != s_AnchorIndex)) {
+						var texturePosition = new Rect(position.x, position.y - 1, position.width, 1);
+						GUIHelper.DrawTexture(texturePosition, ReorderableListResources.texItemSplitter);
+					}
+				}
+
+				// Allow control to be automatically focused.
+				if (s_AutoFocusIndex == itemIndex)
+					GUI.SetNextControlName("AutoFocus_" + _controlID + "_" + itemIndex);
 
 				// Present actual control.
-				EditorGUI.BeginChangeCheck();
 				adaptor.DrawItem(itemContentPosition, itemIndex);
+
 				if (EditorGUI.EndChangeCheck())
 					ReorderableListGUI.IndexOfChangedItem = itemIndex;
 

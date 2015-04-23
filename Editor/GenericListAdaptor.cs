@@ -117,6 +117,10 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <inheritdoc/>
+		public virtual void DrawItemBackground(Rect position, int index) {
+		}
+
+		/// <inheritdoc/>
 		public virtual void DrawItem(Rect position, int index) {
 			_list[index] = _itemDrawer(position, _list[index]);
 		}

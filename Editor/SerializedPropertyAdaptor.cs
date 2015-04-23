@@ -129,6 +129,10 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <inheritdoc/>
+		public virtual void DrawItemBackground(Rect position, int index) {
+		}
+
+		/// <inheritdoc/>
 		public virtual void DrawItem(Rect position, int index) {
 			EditorGUI.PropertyField(position, this[index], GUIContent.none, false);
 		}

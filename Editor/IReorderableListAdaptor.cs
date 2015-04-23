@@ -79,8 +79,23 @@ namespace Rotorz.ReorderableList {
 		void Clear();
 
 		/// <summary>
-		/// Draw interface for list element.
+		/// Draws background of a list item.
 		/// </summary>
+		/// <remarks>
+		/// <para>This method is only used to handle GUI repaint events.</para>
+		/// <para>Background of list item spans a slightly larger area than the main
+		/// interface that is drawn by <see cref="DrawItem(Rect, int)"/> since it is
+		/// drawn behind the grab handle.</para>
+		/// </remarks>
+		/// <param name="position">Total position of list element in GUI.</param>
+		/// <param name="index">Zero-based index of array element.</param>
+		void DrawItemBackground(Rect position, int index);
+		/// <summary>
+		/// Draws main interface for a list item.
+		/// </summary>
+		/// <remarks>
+		/// <para>This method is used to handle all GUI events.</para>
+		/// </remarks>
 		/// <param name="position">Position in GUI.</param>
 		/// <param name="index">Zero-based index of array element.</param>
 		void DrawItem(Rect position, int index);
