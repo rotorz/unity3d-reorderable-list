@@ -539,9 +539,9 @@ namespace Rotorz.ReorderableList {
 		/// Initializes a new instance of <see cref="ReorderableListControl"/>.
 		/// </summary>
 		public ReorderableListControl() {
-			_containerStyle = ReorderableListGUI.defaultContainerStyle;
-			_addButtonStyle = ReorderableListGUI.defaultAddButtonStyle;
-			_removeButtonStyle = ReorderableListGUI.defaultRemoveButtonStyle;
+			_containerStyle = ReorderableListStyles.defaultContainerStyle;
+			_addButtonStyle = ReorderableListStyles.defaultAddButtonStyle;
+			_removeButtonStyle = ReorderableListStyles.defaultRemoveButtonStyle;
 		}
 
 		/// <summary>
@@ -1203,9 +1203,9 @@ namespace Rotorz.ReorderableList {
 		/// Correct if for some reason one or more styles are missing!
 		/// </summary>
 		private void FixStyles() {
-			containerStyle = containerStyle ?? ReorderableListGUI.defaultContainerStyle;
-			addButtonStyle = addButtonStyle ?? ReorderableListGUI.defaultAddButtonStyle;
-			removeButtonStyle = removeButtonStyle ?? ReorderableListGUI.defaultRemoveButtonStyle;
+			containerStyle = containerStyle ?? ReorderableListStyles.defaultContainerStyle;
+			addButtonStyle = addButtonStyle ?? ReorderableListStyles.defaultAddButtonStyle;
+			removeButtonStyle = removeButtonStyle ?? ReorderableListStyles.defaultRemoveButtonStyle;
 
 			if (s_RightAlignedLabelStyle == null) {
 				s_RightAlignedLabelStyle = new GUIStyle(GUI.skin.label);

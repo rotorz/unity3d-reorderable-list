@@ -46,6 +46,7 @@
     <Compile Include="Editor\Internal\GUIHelper.cs" />
     <Compile Include="Editor\Internal\ReorderableListResources.cs" />
     <Compile Include="Editor\IReorderableListAdaptor.cs" />
+    <Compile Include="Editor\ReorderableListStyles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Editor\ReorderableListControl.cs" />
     <Compile Include="Editor\ReorderableListFlags.cs" />
