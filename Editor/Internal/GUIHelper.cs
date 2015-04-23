@@ -11,6 +11,7 @@ namespace Rotorz.ReorderableList.Internal {
 	/// <summary>
 	/// Utility functions to assist with GUIs.
 	/// </summary>
+	/// <exclude/>
 	public static class GUIHelper {
 
 		static GUIHelper() {
@@ -105,6 +106,10 @@ namespace Rotorz.ReorderableList.Internal {
 			}
 
 			return false;
+		}
+
+		public static bool IconButton(Rect position, Texture2D iconNormal, Texture2D iconActive, GUIStyle style) {
+			return IconButton(position, true, iconNormal, iconActive, style);
 		}
 
 	}

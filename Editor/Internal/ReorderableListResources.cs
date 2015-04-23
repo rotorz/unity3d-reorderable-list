@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Rotorz.ReorderableList.Internal {
 
+	/// <exclude/>
 	public enum ReorderableListTexture {
 		Icon_Add_Normal = 0,
 		Icon_Add_Active,
@@ -28,6 +29,7 @@ namespace Rotorz.ReorderableList.Internal {
 	/// <summary>
 	/// Resources to assist with reorderable list control.
 	/// </summary>
+	/// <exclude/>
 	public static class ReorderableListResources {
 
 		static ReorderableListResources() {
