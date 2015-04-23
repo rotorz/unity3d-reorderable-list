@@ -89,7 +89,7 @@ namespace Rotorz.ReorderableList {
 			// Duplicate default styles to prevent user scripts from interferring with
 			// the default list control instance.
 			DefaultListControl.ContainerStyle = new GUIStyle(ReorderableListStyles.Container);
-			DefaultListControl.AddButtonStyle = new GUIStyle(ReorderableListStyles.AddButton);
+			DefaultListControl.FooterButtonStyle = new GUIStyle(ReorderableListStyles.FooterButton);
 			DefaultListControl.RemoveButtonStyle = new GUIStyle(ReorderableListStyles.RemoveButton);
 
 			IndexOfChangedItem = -1;

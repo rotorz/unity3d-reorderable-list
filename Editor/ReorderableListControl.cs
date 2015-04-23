@@ -319,9 +319,6 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		private static GUIStyle s_RightAlignedLabelStyle;
 
-		private static GUIContent s_RemoveButtonNormalContent;
-		private static GUIContent s_RemoveButtonActiveContent;
-
 		static ReorderableListControl() {
 			s_CurrentItemIndex = new Stack<int>();
 			s_CurrentItemIndex.Push(-1);
@@ -334,9 +331,6 @@ namespace Rotorz.ReorderableList {
 				AnchorBackgroundColor = new Color(225f / 255f, 225f / 255f, 225f / 255f, 0.85f);
 				TargetBackgroundColor = new Color(0, 0, 0, 0.5f);
 			}
-
-			s_RemoveButtonNormalContent = new GUIContent(ReorderableListResources.texRemoveButton);
-			s_RemoveButtonActiveContent = new GUIContent(ReorderableListResources.texRemoveButtonActive);
 		}
 
 		#endregion
@@ -442,7 +436,7 @@ namespace Rotorz.ReorderableList {
 		[SerializeField]
 		private GUIStyle _containerStyle;
 		[SerializeField]
-		private GUIStyle _addButtonStyle;
+		private GUIStyle _footerButtonStyle;
 		[SerializeField]
 		private GUIStyle _removeButtonStyle;
 
@@ -455,12 +449,12 @@ namespace Rotorz.ReorderableList {
 			set { _containerStyle = value; }
 		}
 		/// <summary>
-		/// Gets or sets style used to draw add button.
+		/// Gets or sets style used to draw footer buttons.
 		/// </summary>
-		/// <seealso cref="ReorderableListStyles.AddButton"/>
-		public GUIStyle AddButtonStyle {
-			get { return _addButtonStyle; }
-			set { _addButtonStyle = value; }
+		/// <seealso cref="ReorderableListStyles.FooterButton"/>
+		public GUIStyle FooterButtonStyle {
+			get { return _footerButtonStyle; }
+			set { _footerButtonStyle = value; }
 		}
 		/// <summary>
 		/// Gets or sets style used to draw remove button.
@@ -540,7 +534,7 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		public ReorderableListControl() {
 			_containerStyle = ReorderableListStyles.Container;
-			_addButtonStyle = ReorderableListStyles.AddButton;
+			_footerButtonStyle = ReorderableListStyles.FooterButton;
 			_removeButtonStyle = ReorderableListStyles.RemoveButton;
 		}
 
@@ -627,7 +621,10 @@ namespace Rotorz.ReorderableList {
 		/// <param name="controlID">Unique ID of list control.</param>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		private void DoAddButton(Rect position, int controlID, IReorderableListAdaptor adaptor) {
-			if (GUI.Button(position, GUIContent.none, AddButtonStyle)) {
+			var addIconNormal = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_Add_Normal);
+			var addIconActive = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_Add_Active);
+
+			if (GUIHelper.IconButton(position, true, addIconNormal, addIconActive, FooterButtonStyle)) {
 				// Append item to list.
 				GUIUtility.keyboardControl = 0;
 				AddItem(adaptor);
@@ -643,51 +640,10 @@ namespace Rotorz.ReorderableList {
 		/// A value of <c>true</c> if clicked; otherwise <c>false</c>.
 		/// </returns>
 		private bool DoRemoveButton(Rect position, bool visible) {
-			int controlID = GUIUtility.GetControlID(FocusType.Passive);
-			Vector2 mousePosition = GUIUtility.ScreenToGUIPoint(s_MousePosition);
+			var removeIconNormal = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_Remove_Normal);
+			var removeIconActive = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_Remove_Active);
 
-			switch (Event.current.GetTypeForControl(controlID)) {
-				case EventType.MouseDown:
-					// Do not allow button to be pressed using right mouse button since
-					// context menu should be shown instead!
-					if (GUI.enabled && Event.current.button != 1 && position.Contains(mousePosition)) {
-						GUIUtility.hotControl = controlID;
-						GUIUtility.keyboardControl = 0;
-						Event.current.Use();
-					}
-					break;
-
-				case EventType.MouseDrag:
-					if (GUIUtility.hotControl == controlID)
-						Event.current.Use();
-					break;
-
-				case EventType.MouseUp:
-					if (GUIUtility.hotControl == controlID) {
-						GUIUtility.hotControl = 0;
-
-						if (position.Contains(mousePosition)) {
-							Event.current.Use();
-							return true;
-						}
-						else {
-							Event.current.Use();
-							return false;
-						}
-					}
-					break;
-
-				case EventType.Repaint:
-					if (visible) {
-						var content = (GUIUtility.hotControl == controlID && position.Contains(mousePosition))
-							? s_RemoveButtonActiveContent
-							: s_RemoveButtonNormalContent;
-						RemoveButtonStyle.Draw(position, content, controlID);
-					}
-					break;
-			}
-
-			return false;
+			return GUIHelper.IconButton(position, visible, removeIconNormal, removeIconActive, RemoveButtonStyle);
 		}
 
 		private static bool s_TrackingCancelBlockContext;
@@ -788,7 +744,7 @@ namespace Rotorz.ReorderableList {
 					// Draw grab handle?
 					if (draggable) {
 						var texturePosition = new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5);
-						GUIHelper.DrawTexture(texturePosition, ReorderableListResources.texGrabHandle);
+						GUIHelper.DrawTexture(texturePosition, ReorderableListResources.GetTexture(ReorderableListTexture.GrabHandle));
 					}
 
 					// Draw splitter between list items.
@@ -1112,10 +1068,10 @@ namespace Rotorz.ReorderableList {
 		private void DrawFooterControls(Rect position, int controlID, IReorderableListAdaptor adaptor) {
 			if (HasAddButton) {
 				Rect addButtonRect = new Rect(
-					position.xMax - AddButtonStyle.fixedWidth,
+					position.xMax - 30,
 					position.yMax - 1,
-					AddButtonStyle.fixedWidth,
-					AddButtonStyle.fixedHeight
+					30,
+					FooterButtonStyle.fixedHeight
 				);
 				DoAddButton(addButtonRect, controlID, adaptor);
 			}
@@ -1152,7 +1108,7 @@ namespace Rotorz.ReorderableList {
 
 			// Make room for add button?
 			if (HasAddButton)
-				position.height -= AddButtonStyle.fixedHeight;
+				position.height -= FooterButtonStyle.fixedHeight;
 
 			// Draw list as normal.
 			DrawListContainerAndItems(position, controlID, adaptor);
@@ -1181,7 +1137,7 @@ namespace Rotorz.ReorderableList {
 
 			// Allow room for add button?
 			if (HasAddButton)
-				GUILayoutUtility.GetRect(0, AddButtonStyle.fixedHeight - 1);
+				GUILayoutUtility.GetRect(0, FooterButtonStyle.fixedHeight - 1);
 
 			return r;
 		}
@@ -1210,7 +1166,7 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		private void FixStyles() {
 			ContainerStyle = ContainerStyle ?? ReorderableListStyles.Container;
-			AddButtonStyle = AddButtonStyle ?? ReorderableListStyles.AddButton;
+			FooterButtonStyle = FooterButtonStyle ?? ReorderableListStyles.FooterButton;
 			RemoveButtonStyle = RemoveButtonStyle ?? ReorderableListStyles.RemoveButton;
 
 			if (s_RightAlignedLabelStyle == null) {
@@ -1265,7 +1221,7 @@ namespace Rotorz.ReorderableList {
 
 			// Allow for footer area.
 			if (HasAddButton)
-				position.height -= AddButtonStyle.fixedHeight;
+				position.height -= FooterButtonStyle.fixedHeight;
 
 			if (adaptor.Count > 0) {
 				DrawListContainerAndItems(position, controlID, adaptor);
@@ -1556,7 +1512,7 @@ namespace Rotorz.ReorderableList {
 
 			// Add height of add button.
 			if (HasAddButton)
-				totalHeight += AddButtonStyle.fixedHeight;
+				totalHeight += FooterButtonStyle.fixedHeight;
 
 			return totalHeight;
 		}
@@ -1579,7 +1535,7 @@ namespace Rotorz.ReorderableList {
 
 			// Add height of add button.
 			if (HasAddButton)
-				totalHeight += AddButtonStyle.fixedHeight;
+				totalHeight += FooterButtonStyle.fixedHeight;
 
 			return totalHeight;
 		}

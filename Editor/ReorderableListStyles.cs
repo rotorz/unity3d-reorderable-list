@@ -18,7 +18,7 @@ namespace Rotorz.ReorderableList {
 			Title.margin = new RectOffset(5, 5, 5, 0);
 			Title.padding = new RectOffset(5, 5, 0, 0);
 			Title.alignment = TextAnchor.MiddleLeft;
-			Title.normal.background = ReorderableListResources.texTitleBackground;
+			Title.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.TitleBackground);
 			Title.normal.textColor = EditorGUIUtility.isProSkin
 				? new Color(0.8f, 0.8f, 0.8f)
 				: new Color(0.2f, 0.2f, 0.2f);
@@ -27,23 +27,27 @@ namespace Rotorz.ReorderableList {
 			Container.border = new RectOffset(2, 2, 1, 2);
 			Container.margin = new RectOffset(5, 5, 5, 5);
 			Container.padding = new RectOffset(1, 1, 2, 2);
-			Container.normal.background = ReorderableListResources.texContainerBackground;
+			Container.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.ContainerBackground);
 
 			Container2 = new GUIStyle(Container);
 			Container2.normal = GUI.skin.box.normal;
 			Container2.border = GUI.skin.box.border;
 
-			AddButton = new GUIStyle();
-			AddButton.fixedWidth = 30;
-			AddButton.fixedHeight = 16;
-			AddButton.normal.background = ReorderableListResources.texAddButton;
-			AddButton.active.background = ReorderableListResources.texAddButtonActive;
+			FooterButton = new GUIStyle();
+			FooterButton.fixedHeight = 16;
+			FooterButton.alignment = TextAnchor.MiddleCenter;
+			FooterButton.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.Button_Normal);
+			FooterButton.active.background = ReorderableListResources.GetTexture(ReorderableListTexture.Button_Active);
+			FooterButton.border = new RectOffset(3, 3, 1, 3);
+			FooterButton.padding = new RectOffset(5, 5, 0, 2);
 
-			AddButton2 = new GUIStyle();
-			AddButton2.fixedWidth = 30;
-			AddButton2.fixedHeight = 18;
-			AddButton2.normal.background = ReorderableListResources.texAddButton2;
-			AddButton2.active.background = ReorderableListResources.texAddButton2Active;
+			FooterButton2 = new GUIStyle();
+			FooterButton2.fixedHeight = 18;
+			FooterButton2.alignment = TextAnchor.MiddleCenter;
+			FooterButton2.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.Button2_Normal);
+			FooterButton2.active.background = ReorderableListResources.GetTexture(ReorderableListTexture.Button2_Active);
+			FooterButton2.border = new RectOffset(3, 3, 3, 3);
+			FooterButton2.padding = new RectOffset(5, 5, 2, 2);
 
 			RemoveButton = new GUIStyle();
 			RemoveButton.fixedWidth = 27;
@@ -72,13 +76,13 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		public static GUIStyle Container2 { get; private set; }
 		/// <summary>
-		/// Gets style for add item button.
+		/// Gets style for footer button.
 		/// </summary>
-		public static GUIStyle AddButton { get; private set; }
+		public static GUIStyle FooterButton { get; private set; }
 		/// <summary>
-		/// Gets an alternative style for add item button 2.
+		/// Gets an alternative style for footer button.
 		/// </summary>
-		public static GUIStyle AddButton2 { get; private set; }
+		public static GUIStyle FooterButton2 { get; private set; }
 		/// <summary>
 		/// Gets style for remove item button.
 		/// </summary>
