@@ -84,13 +84,13 @@ namespace Rotorz.ReorderableList.Internal {
 		/// Gets light or dark texture "add_button2.png".
 		/// </summary>
 		public static Texture2D texAddButton2 {
-			get { return s_Cached[(int)ResourceName.add_button]; }
+			get { return s_Cached[(int)ResourceName.add_button2]; }
 		}
 		/// <summary>
 		/// Gets light or dark texture "add_button2_active.png".
 		/// </summary>
 		public static Texture2D texAddButton2Active {
-			get { return s_Cached[(int)ResourceName.add_button_active]; }
+			get { return s_Cached[(int)ResourceName.add_button2_active]; }
 		}
 		/// <summary>
 		/// Gets light or dark texture "container_background.png".
