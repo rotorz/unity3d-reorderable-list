@@ -25,14 +25,14 @@ namespace Rotorz.ReorderableList {
 		/// <remarks>
 		/// <para>This property should not be set when items are added or removed.</para>
 		/// </remarks>
-		public static int indexOfChangedItem { get; internal set; }
+		public static int IndexOfChangedItem { get; internal set; }
 
 		/// <summary>
 		/// Gets zero-based index of list item which is currently being drawn;
 		/// or a value of -1 if no item is currently being drawn.
 		/// </summary>
-		public static int currentItemIndex {
-			get { return ReorderableListControl.currentItemIndex; }
+		public static int CurrentItemIndex {
+			get { return ReorderableListControl.CurrentItemIndex; }
 		}
 
 		#region Basic Item Drawers
@@ -81,18 +81,18 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets the default list control implementation.
 		/// </summary>
-		private static ReorderableListControl defaultListControl { get; set; }
+		private static ReorderableListControl DefaultListControl { get; set; }
 
 		static ReorderableListGUI() {
-			defaultListControl = new ReorderableListControl();
+			DefaultListControl = new ReorderableListControl();
 
 			// Duplicate default styles to prevent user scripts from interferring with
 			// the default list control instance.
-			defaultListControl.containerStyle = new GUIStyle(ReorderableListStyles.Container);
-			defaultListControl.addButtonStyle = new GUIStyle(ReorderableListStyles.AddButton);
-			defaultListControl.removeButtonStyle = new GUIStyle(ReorderableListStyles.RemoveButton);
+			DefaultListControl.ContainerStyle = new GUIStyle(ReorderableListStyles.Container);
+			DefaultListControl.AddButtonStyle = new GUIStyle(ReorderableListStyles.AddButton);
+			DefaultListControl.RemoveButtonStyle = new GUIStyle(ReorderableListStyles.RemoveButton);
 
-			indexOfChangedItem = -1;
+			IndexOfChangedItem = -1;
 		}
 
 		private static GUIContent s_Temp = new GUIContent();
@@ -288,13 +288,13 @@ namespace Rotorz.ReorderableList {
 		/// </returns>
 		public static float CalculateListFieldHeight(int itemCount, float itemHeight, ReorderableListFlags flags) {
 			// We need to push/pop flags so that nested controls are properly calculated.
-			var restoreFlags = defaultListControl.flags;
+			var restoreFlags = DefaultListControl.Flags;
 			try {
-				defaultListControl.flags = flags;
-				return defaultListControl.CalculateListHeight(itemCount, itemHeight);
+				DefaultListControl.Flags = flags;
+				return DefaultListControl.CalculateListHeight(itemCount, itemHeight);
 			}
 			finally {
-				defaultListControl.flags = restoreFlags;
+				DefaultListControl.Flags = restoreFlags;
 			}
 		}
 
@@ -390,13 +390,13 @@ namespace Rotorz.ReorderableList {
 		/// </returns>
 		public static float CalculateListFieldHeight(SerializedProperty arrayProperty, ReorderableListFlags flags) {
 			// We need to push/pop flags so that nested controls are properly calculated.
-			var restoreFlags = defaultListControl.flags;
+			var restoreFlags = DefaultListControl.Flags;
 			try {
-				defaultListControl.flags = flags;
-				return defaultListControl.CalculateListHeight(new SerializedPropertyAdaptor(arrayProperty));
+				DefaultListControl.Flags = flags;
+				return DefaultListControl.CalculateListHeight(new SerializedPropertyAdaptor(arrayProperty));
 			}
 			finally {
-				defaultListControl.flags = restoreFlags;
+				DefaultListControl.Flags = restoreFlags;
 			}
 		}
 
@@ -523,13 +523,13 @@ namespace Rotorz.ReorderableList {
 		/// </returns>
 		public static float CalculateListFieldHeight(IReorderableListAdaptor adaptor, ReorderableListFlags flags) {
 			// We need to push/pop flags so that nested controls are properly calculated.
-			var restoreFlags = defaultListControl.flags;
+			var restoreFlags = DefaultListControl.Flags;
 			try {
-				defaultListControl.flags = flags;
-				return defaultListControl.CalculateListHeight(adaptor);
+				DefaultListControl.Flags = flags;
+				return DefaultListControl.CalculateListHeight(adaptor);
 			}
 			finally {
-				defaultListControl.flags = restoreFlags;
+				DefaultListControl.Flags = restoreFlags;
 			}
 		}
 

@@ -28,7 +28,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Fixed height of each list item.
 		/// </summary>
-		public float fixedItemHeight;
+		public float FixedItemHeight;
 
 		/// <summary>
 		/// Gets the underlying list data structure.
@@ -59,7 +59,7 @@ namespace Rotorz.ReorderableList {
 		public GenericListAdaptor(IList<T> list, ReorderableListControl.ItemDrawer<T> itemDrawer, float itemHeight) {
 			this._list = list;
 			this._itemDrawer = itemDrawer ?? ReorderableListGUI.DefaultItemDrawer;
-			this.fixedItemHeight = itemHeight;
+			this.FixedItemHeight = itemHeight;
 		}
 
 		#endregion
@@ -123,7 +123,7 @@ namespace Rotorz.ReorderableList {
 
 		/// <inheritdoc/>
 		public virtual float GetItemHeight(int index) {
-			return fixedItemHeight;
+			return FixedItemHeight;
 		}
 
 		#endregion
