@@ -11,7 +11,7 @@ namespace Rotorz.ReorderableList.Internal {
 	/// <summary>
 	/// Utility functions to assist with GUIs.
 	/// </summary>
-	internal static class GUIHelper {
+	public static class GUIHelper {
 
 		static GUIHelper() {
 			var tyGUIClip = Type.GetType("UnityEngine.GUIClip,UnityEngine");

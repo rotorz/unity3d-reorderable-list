@@ -10,7 +10,7 @@ namespace Rotorz.ReorderableList.Internal {
 	/// <summary>
 	/// Resources to assist with reorderable list control.
 	/// </summary>
-	internal static class ReorderableListResources {
+	public static class ReorderableListResources {
 
 		static ReorderableListResources() {
 			GenerateSpecialTextures();
