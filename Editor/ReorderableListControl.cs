@@ -784,7 +784,7 @@ namespace Rotorz.ReorderableList {
 				}
 
 				// Draw splitter between list items.
-				if (!_tracking || itemIndex != s_AnchorIndex) {
+				if (itemIndex != 0 && (!_tracking || itemIndex != s_AnchorIndex)) {
 					var texturePosition = new Rect(position.x, position.y - 1, position.width, 1);
 					GUIHelper.DrawTexture(texturePosition, ReorderableListResources.texItemSplitter);
 				}
