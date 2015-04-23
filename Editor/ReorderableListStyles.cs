@@ -29,6 +29,10 @@ namespace Rotorz.ReorderableList {
 			Container.padding = new RectOffset(1, 1, 2, 2);
 			Container.normal.background = ReorderableListResources.texContainerBackground;
 
+			Container2 = new GUIStyle(Container);
+			Container2.normal = GUI.skin.box.normal;
+			Container2.border = GUI.skin.box.border;
+
 			AddButton = new GUIStyle();
 			AddButton.fixedWidth = 30;
 			AddButton.fixedHeight = 16;
@@ -54,15 +58,19 @@ namespace Rotorz.ReorderableList {
 		public static GUIStyle Title { get; private set; }
 
 		/// <summary>
-		/// Gets default style for background of list control.
+		/// Gets default style for the background of list control.
 		/// </summary>
 		public static GUIStyle Container { get; private set; }
+		/// <summary>
+		/// Gets an alternative style for the background of list control.
+		/// </summary>
+		public static GUIStyle Container2 { get; private set; }
 		/// <summary>
 		/// Gets default style for add item button.
 		/// </summary>
 		public static GUIStyle AddButton { get; private set; }
 		/// <summary>
-		/// Gets default style for add item button 2.
+		/// Gets an alternative style for add item button 2.
 		/// </summary>
 		public static GUIStyle AddButton2 { get; private set; }
 		/// <summary>
