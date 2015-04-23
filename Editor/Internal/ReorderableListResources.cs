@@ -22,7 +22,7 @@ namespace Rotorz.ReorderableList.Internal {
 		private enum ResourceName {
 			add_button = 0,
 			add_button_active,
-			add_button2 = 0,
+			add_button2,
 			add_button2_active,
 			container_background,
 			grab_handle,
