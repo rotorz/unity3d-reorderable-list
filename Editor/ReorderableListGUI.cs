@@ -113,6 +113,10 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		public static GUIStyle defaultAddButtonStyle { get; private set; }
 		/// <summary>
+		/// Gets default style for add item button 2.
+		/// </summary>
+		public static GUIStyle defaultAddButton2Style { get; private set; }
+		/// <summary>
 		/// Gets default style for remove item button.
 		/// </summary>
 		public static GUIStyle defaultRemoveButtonStyle { get; private set; }
@@ -139,6 +143,12 @@ namespace Rotorz.ReorderableList {
 			defaultAddButtonStyle.fixedHeight = 16;
 			defaultAddButtonStyle.normal.background = ReorderableListResources.texAddButton;
 			defaultAddButtonStyle.active.background = ReorderableListResources.texAddButtonActive;
+
+			defaultAddButton2Style = new GUIStyle();
+			defaultAddButton2Style.fixedWidth = 30;
+			defaultAddButton2Style.fixedHeight = 18;
+			defaultAddButton2Style.normal.background = ReorderableListResources.texAddButton2;
+			defaultAddButton2Style.active.background = ReorderableListResources.texAddButton2Active;
 
 			defaultRemoveButtonStyle = new GUIStyle();
 			defaultRemoveButtonStyle.fixedWidth = 27;
