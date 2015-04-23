@@ -1164,6 +1164,9 @@ namespace Rotorz.ReorderableList {
 						Rect totalAddButtonPosition = buttonPosition;
 						totalAddButtonPosition.xMax = position.xMax;
 						OnAddMenuClicked(new AddMenuClickedEventArgs(adaptor, totalAddButtonPosition));
+
+						// This will be helpful in many circumstances; including by default!
+						GUIUtility.ExitGUI();
 					}
 				}
 			}
