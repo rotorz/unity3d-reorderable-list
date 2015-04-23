@@ -13,66 +13,62 @@ namespace Rotorz.ReorderableList {
 	public static class ReorderableListStyles {
 
 		static ReorderableListStyles() {
+			Title = new GUIStyle();
+			Title.border = new RectOffset(2, 2, 2, 1);
+			Title.margin = new RectOffset(5, 5, 5, 0);
+			Title.padding = new RectOffset(5, 5, 0, 0);
+			Title.alignment = TextAnchor.MiddleLeft;
+			Title.normal.background = ReorderableListResources.texTitleBackground;
+			Title.normal.textColor = EditorGUIUtility.isProSkin
+				? new Color(0.8f, 0.8f, 0.8f)
+				: new Color(0.2f, 0.2f, 0.2f);
+
+			Container = new GUIStyle();
+			Container.border = new RectOffset(2, 2, 1, 2);
+			Container.margin = new RectOffset(5, 5, 5, 5);
+			Container.padding = new RectOffset(1, 1, 2, 2);
+			Container.normal.background = ReorderableListResources.texContainerBackground;
+
+			AddButton = new GUIStyle();
+			AddButton.fixedWidth = 30;
+			AddButton.fixedHeight = 16;
+			AddButton.normal.background = ReorderableListResources.texAddButton;
+			AddButton.active.background = ReorderableListResources.texAddButtonActive;
+
+			AddButton2 = new GUIStyle();
+			AddButton2.fixedWidth = 30;
+			AddButton2.fixedHeight = 18;
+			AddButton2.normal.background = ReorderableListResources.texAddButton2;
+			AddButton2.active.background = ReorderableListResources.texAddButton2Active;
+
+			RemoveButton = new GUIStyle();
+			RemoveButton.fixedWidth = 27;
+			RemoveButton.active.background = ReorderableListResources.CreatePixelTexture("Dark Pixel (List GUI)", new Color32(18, 18, 18, 255));
+			RemoveButton.imagePosition = ImagePosition.ImageOnly;
+			RemoveButton.alignment = TextAnchor.MiddleCenter;
 		}
 
 		/// <summary>
 		/// Gets default style for title header.
 		/// </summary>
-		public static GUIStyle defaultTitleStyle { get; private set; }
+		public static GUIStyle Title { get; private set; }
 
 		/// <summary>
 		/// Gets default style for background of list control.
 		/// </summary>
-		public static GUIStyle defaultContainerStyle { get; private set; }
+		public static GUIStyle Container { get; private set; }
 		/// <summary>
 		/// Gets default style for add item button.
 		/// </summary>
-		public static GUIStyle defaultAddButtonStyle { get; private set; }
+		public static GUIStyle AddButton { get; private set; }
 		/// <summary>
 		/// Gets default style for add item button 2.
 		/// </summary>
-		public static GUIStyle defaultAddButton2Style { get; private set; }
+		public static GUIStyle AddButton2 { get; private set; }
 		/// <summary>
 		/// Gets default style for remove item button.
 		/// </summary>
-		public static GUIStyle defaultRemoveButtonStyle { get; private set; }
-
-		private static void InitStyles() {
-			defaultTitleStyle = new GUIStyle();
-			defaultTitleStyle.border = new RectOffset(2, 2, 2, 1);
-			defaultTitleStyle.margin = new RectOffset(5, 5, 5, 0);
-			defaultTitleStyle.padding = new RectOffset(5, 5, 0, 0);
-			defaultTitleStyle.alignment = TextAnchor.MiddleLeft;
-			defaultTitleStyle.normal.background = ReorderableListResources.texTitleBackground;
-			defaultTitleStyle.normal.textColor = EditorGUIUtility.isProSkin
-				? new Color(0.8f, 0.8f, 0.8f)
-				: new Color(0.2f, 0.2f, 0.2f);
-
-			defaultContainerStyle = new GUIStyle();
-			defaultContainerStyle.border = new RectOffset(2, 2, 1, 2);
-			defaultContainerStyle.margin = new RectOffset(5, 5, 5, 5);
-			defaultContainerStyle.padding = new RectOffset(1, 1, 2, 2);
-			defaultContainerStyle.normal.background = ReorderableListResources.texContainerBackground;
-
-			defaultAddButtonStyle = new GUIStyle();
-			defaultAddButtonStyle.fixedWidth = 30;
-			defaultAddButtonStyle.fixedHeight = 16;
-			defaultAddButtonStyle.normal.background = ReorderableListResources.texAddButton;
-			defaultAddButtonStyle.active.background = ReorderableListResources.texAddButtonActive;
-
-			defaultAddButton2Style = new GUIStyle();
-			defaultAddButton2Style.fixedWidth = 30;
-			defaultAddButton2Style.fixedHeight = 18;
-			defaultAddButton2Style.normal.background = ReorderableListResources.texAddButton2;
-			defaultAddButton2Style.active.background = ReorderableListResources.texAddButton2Active;
-
-			defaultRemoveButtonStyle = new GUIStyle();
-			defaultRemoveButtonStyle.fixedWidth = 27;
-			defaultRemoveButtonStyle.active.background = ReorderableListResources.CreatePixelTexture("Dark Pixel (List GUI)", new Color32(18, 18, 18, 255));
-			defaultRemoveButtonStyle.imagePosition = ImagePosition.ImageOnly;
-			defaultRemoveButtonStyle.alignment = TextAnchor.MiddleCenter;
-
-		}
+		public static GUIStyle RemoveButton { get; private set; }
 
 	}
 

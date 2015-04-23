@@ -88,9 +88,9 @@ namespace Rotorz.ReorderableList {
 
 			// Duplicate default styles to prevent user scripts from interferring with
 			// the default list control instance.
-			defaultListControl.containerStyle = new GUIStyle(ReorderableListStyles.defaultContainerStyle);
-			defaultListControl.addButtonStyle = new GUIStyle(ReorderableListStyles.defaultAddButtonStyle);
-			defaultListControl.removeButtonStyle = new GUIStyle(ReorderableListStyles.defaultRemoveButtonStyle);
+			defaultListControl.containerStyle = new GUIStyle(ReorderableListStyles.Container);
+			defaultListControl.addButtonStyle = new GUIStyle(ReorderableListStyles.AddButton);
+			defaultListControl.removeButtonStyle = new GUIStyle(ReorderableListStyles.RemoveButton);
 
 			indexOfChangedItem = -1;
 		}
@@ -117,7 +117,7 @@ namespace Rotorz.ReorderableList {
 		/// </example>
 		/// <param name="title">Content for title control.</param>
 		public static void Title(GUIContent title) {
-			Rect position = GUILayoutUtility.GetRect(title, ReorderableListStyles.defaultTitleStyle);
+			Rect position = GUILayoutUtility.GetRect(title, ReorderableListStyles.Title);
 			position.height += 6;
 			Title(position, title);
 		}
@@ -151,7 +151,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="title">Content for title control.</param>
 		public static void Title(Rect position, GUIContent title) {
 			if (Event.current.type == EventType.Repaint)
-				ReorderableListStyles.defaultTitleStyle.Draw(position, title, false, false, false, false);
+				ReorderableListStyles.Title.Draw(position, title, false, false, false, false);
 		}
 
 		/// <summary>
