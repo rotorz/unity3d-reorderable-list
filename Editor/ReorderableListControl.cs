@@ -449,7 +449,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets or sets style used to draw background of list control.
 		/// </summary>
-		/// <seealso cref="ReorderableListGUI.defaultContainerStyle"/>
+		/// <seealso cref="ReorderableListStyles.Container"/>
 		public GUIStyle containerStyle {
 			get { return _containerStyle; }
 			set { _containerStyle = value; }
@@ -457,7 +457,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets or sets style used to draw add button.
 		/// </summary>
-		/// <seealso cref="ReorderableListGUI.defaultAddButtonStyle"/>
+		/// <seealso cref="ReorderableListStyles.AddButton"/>
 		public GUIStyle addButtonStyle {
 			get { return _addButtonStyle; }
 			set { _addButtonStyle = value; }
@@ -465,7 +465,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets or sets style used to draw remove button.
 		/// </summary>
-		/// <seealso cref="ReorderableListGUI.defaultRemoveButtonStyle"/>
+		/// <seealso cref="ReorderableListStyles.RemoveButton"/>
 		public GUIStyle removeButtonStyle {
 			get { return _removeButtonStyle; }
 			set { _removeButtonStyle = value; }
