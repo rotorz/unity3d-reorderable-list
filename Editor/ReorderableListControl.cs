@@ -1179,8 +1179,9 @@ namespace Rotorz.ReorderableList {
 			}
 			EditorGUILayout.EndVertical();
 
-			// Allow room for add button.
-			GUILayoutUtility.GetRect(0, AddButtonStyle.fixedHeight - 1);
+			// Allow room for add button?
+			if (HasAddButton)
+				GUILayoutUtility.GetRect(0, AddButtonStyle.fixedHeight - 1);
 
 			return r;
 		}
