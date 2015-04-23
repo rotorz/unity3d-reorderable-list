@@ -50,6 +50,12 @@ namespace Rotorz.ReorderableList {
 			RemoveButton.active.background = ReorderableListResources.CreatePixelTexture("Dark Pixel (List GUI)", new Color32(18, 18, 18, 255));
 			RemoveButton.imagePosition = ImagePosition.ImageOnly;
 			RemoveButton.alignment = TextAnchor.MiddleCenter;
+
+			var highlightLabelStyle = GUI.skin.FindStyle("Hi Label");
+			SelectedItem = new GUIStyle();
+			SelectedItem.normal.background = highlightLabelStyle.onActive.background;
+			SelectedItem.normal.textColor = Color.white;
+			SelectedItem.fontSize = 12;
 		}
 
 		/// <summary>
@@ -77,6 +83,11 @@ namespace Rotorz.ReorderableList {
 		/// Gets default style for remove item button.
 		/// </summary>
 		public static GUIStyle RemoveButton { get; private set; }
+
+		/// <summary>
+		/// Gets style for the background of a selected item.
+		/// </summary>
+		public static GUIStyle SelectedItem { get; private set; }
 
 	}
 
