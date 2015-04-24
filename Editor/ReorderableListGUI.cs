@@ -90,7 +90,7 @@ namespace Rotorz.ReorderableList {
 			// the default list control instance.
 			DefaultListControl.ContainerStyle = new GUIStyle(ReorderableListStyles.Container);
 			DefaultListControl.FooterButtonStyle = new GUIStyle(ReorderableListStyles.FooterButton);
-			DefaultListControl.RemoveButtonStyle = new GUIStyle(ReorderableListStyles.RemoveButton);
+			DefaultListControl.ItemButtonStyle = new GUIStyle(ReorderableListStyles.ItemButton);
 
 			IndexOfChangedItem = -1;
 		}

@@ -482,7 +482,7 @@ namespace Rotorz.ReorderableList {
 		[SerializeField]
 		private GUIStyle _footerButtonStyle;
 		[SerializeField]
-		private GUIStyle _removeButtonStyle;
+		private GUIStyle _itemButtonStyle;
 
 		/// <summary>
 		/// Gets or sets style used to draw background of list control.
@@ -501,12 +501,12 @@ namespace Rotorz.ReorderableList {
 			set { _footerButtonStyle = value; }
 		}
 		/// <summary>
-		/// Gets or sets style used to draw remove button.
+		/// Gets or sets style used to draw list item buttons (like the remove button).
 		/// </summary>
-		/// <seealso cref="ReorderableListStyles.RemoveButton"/>
-		public GUIStyle RemoveButtonStyle {
-			get { return _removeButtonStyle; }
-			set { _removeButtonStyle = value; }
+		/// <seealso cref="ReorderableListStyles.ItemButton"/>
+		public GUIStyle ItemButtonStyle {
+			get { return _itemButtonStyle; }
+			set { _itemButtonStyle = value; }
 		}
 
 		#endregion
@@ -614,7 +614,7 @@ namespace Rotorz.ReorderableList {
 		public ReorderableListControl() {
 			_containerStyle = ReorderableListStyles.Container;
 			_footerButtonStyle = ReorderableListStyles.FooterButton;
-			_removeButtonStyle = ReorderableListStyles.RemoveButton;
+			_itemButtonStyle = ReorderableListStyles.ItemButton;
 		}
 
 		/// <summary>
@@ -705,7 +705,7 @@ namespace Rotorz.ReorderableList {
 			var iconNormal = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_Remove_Normal);
 			var iconActive = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_Remove_Active);
 
-			return GUIHelper.IconButton(position, visible, iconNormal, iconActive, RemoveButtonStyle);
+			return GUIHelper.IconButton(position, visible, iconNormal, iconActive, ItemButtonStyle);
 		}
 
 		private static bool s_TrackingCancelBlockContext;
@@ -792,7 +792,7 @@ namespace Rotorz.ReorderableList {
 
 			// Make space for remove button?
 			if (HasRemoveButtons)
-				itemContentPosition.width -= RemoveButtonStyle.fixedWidth;
+				itemContentPosition.width -= 27;
 
 			try {
 				s_CurrentItemIndex.Push(itemIndex);
@@ -829,7 +829,7 @@ namespace Rotorz.ReorderableList {
 				// Draw remove button?
 				if (HasRemoveButtons && adaptor.CanRemove(itemIndex)) {
 					s_RemoveButtonPosition = position;
-					s_RemoveButtonPosition.width = RemoveButtonStyle.fixedWidth;
+					s_RemoveButtonPosition.width = 27;
 					s_RemoveButtonPosition.x = itemContentPosition.xMax + 2;
 					s_RemoveButtonPosition.height -= 2;
 
@@ -1262,7 +1262,7 @@ namespace Rotorz.ReorderableList {
 		private void FixStyles() {
 			ContainerStyle = ContainerStyle ?? ReorderableListStyles.Container;
 			FooterButtonStyle = FooterButtonStyle ?? ReorderableListStyles.FooterButton;
-			RemoveButtonStyle = RemoveButtonStyle ?? ReorderableListStyles.RemoveButton;
+			ItemButtonStyle = ItemButtonStyle ?? ReorderableListStyles.ItemButton;
 
 			if (s_RightAlignedLabelStyle == null) {
 				s_RightAlignedLabelStyle = new GUIStyle(GUI.skin.label);
