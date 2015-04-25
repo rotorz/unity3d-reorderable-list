@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root.
 
 using System;
-using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -111,17 +110,6 @@ namespace Rotorz.ReorderableList.Internal {
 
 		public static bool IconButton(Rect position, Texture2D iconNormal, Texture2D iconActive, GUIStyle style) {
 			return IconButton(position, true, iconNormal, iconActive, style);
-		}
-
-		public static Type[] GetDerivedTypes(Type baseType) {
-			return AppDomain.CurrentDomain.GetAssemblies()
-				.SelectMany(assembly => assembly.GetTypes())
-				.Where(type => type.IsSubclassOf(baseType))
-				.ToArray();
-		}
-
-		public static Type[] GetDerivedTypes<T>() {
-			return GetDerivedTypes(typeof(T));
 		}
 
 	}
