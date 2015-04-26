@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Rotorz.Common.ReorderableList {
+namespace Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Interface for building an <see cref="IElementAdderMenu"/>.
