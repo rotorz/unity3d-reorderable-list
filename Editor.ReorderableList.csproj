@@ -42,6 +42,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Editor\Element Adder Menu\ElementAdderMeta.cs" />
+    <Compile Include="Editor\Element Adder Menu\IElementAdderMenuCommand.cs" />
+    <Compile Include="Editor\Element Adder Menu\ElementAdderMenuCommandAttribute.cs" />
+    <Compile Include="Editor\Element Adder Menu\GenericElementAdderMenuBuilder.cs" />
+    <Compile Include="Editor\Element Adder Menu\GenericElementAdderMenu.cs" />
+    <Compile Include="Editor\Element Adder Menu\ElementAdderMenuBuilder.cs" />
+    <Compile Include="Editor\Element Adder Menu\IElementAdderMenu.cs" />
+    <Compile Include="Editor\Element Adder Menu\IElementAdderMenuBuilder.cs" />
+    <Compile Include="Editor\Element Adder Menu\IElementAdder.cs" />
     <Compile Include="Editor\GenericListAdaptor.cs" />
     <Compile Include="Editor\Internal\GUIHelper.cs" />
     <Compile Include="Editor\Internal\ReorderableListResources.cs" />
