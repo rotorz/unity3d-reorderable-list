@@ -22,6 +22,8 @@ Features
 - Disable drag and/or removal on per-item basis.
 - Styles can be overridden on per-list basis if desired.
 - Subclass list control to override context menu.
+- Add drop-down to add menu (or instead of add menu).
+- Helper functionality to build element adder menus.
 - User guide (Asset Path/Support/User Guide.pdf).
 - API reference documentation (Asset Path/Support/API Reference.chm).
 
