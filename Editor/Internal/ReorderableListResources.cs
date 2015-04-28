@@ -23,6 +23,7 @@ namespace Rotorz.ReorderableList.Internal {
 		Button2_Active,
 		TitleBackground,
 		ContainerBackground,
+		Container2Background,
 		GrabHandle,
 	}
 
@@ -61,6 +62,7 @@ namespace Rotorz.ReorderableList.Internal {
 			"iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAMAAADzjKfhAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA9QTFRFFBQUDAwMEhISCAgI////ylxLRQAAAAV0Uk5T/////wD7tg5TAAAAIklEQVR42mJgYQABIMnMyMjIDGQyMjExMWKhofJQ9QABBgAGkAA7phepsAAAAABJRU5ErkJggg==",
 			"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAECAYAAABGM/VAAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAEFJREFUeNpi/P//P0NxcfF/BgRgZP78+fN/VVVVhpCQEAZjY2OGs2fPNrCApBwdHRkePHgAVwoWnDVrFgMyAAgwAAt4E1dCq1obAAAAAElFTkSuQmCC",
 			"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAECAMAAABx7QVyAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA9QTFRFcnJy8vLy4eHh////09PTUJgpiwAAAAR0Uk5T////AEAqqfQAAAAcSURBVHjaYmBmYGAAYkYWRiCDiZEJzGNgBggwAAEvABj7bqrvAAAAAElFTkSuQmCC",
+			"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAECAMAAABx7QVyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURVVVVd7e3gzDkNgAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAAAE0lEQVQYV2OAAkZGRjjJwMDAAAAAYAAHhMGwXAAAAABJRU5ErkJggg==",
 			"iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAMAAACgjTZZAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAlQTFRF8vLycXFx////oj3M6wAAAAN0Uk5T//8A18oNQQAAABdJREFUeNpiYIADRhhgYIIBBiyyAAEGAANcACXcGr7GAAAAAElFTkSuQmCC",
 		};
 		/// <summary>
@@ -85,6 +87,7 @@ namespace Rotorz.ReorderableList.Internal {
 			"iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAMAAADzjKfhAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA9QTFRFFBQUDAwMEhISCAgI////ylxLRQAAAAV0Uk5T/////wD7tg5TAAAAIklEQVR42mJgYQABIMnMyMjIDGQyMjExMWKhofJQ9QABBgAGkAA7phepsAAAAABJRU5ErkJggg==",
 			"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAECAYAAABGM/VAAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADtJREFUeNpi/P//P4OKisp/Bii4c+cOIwtIQE9Pj+HLly9gQRCfBcQACbx69QqmmAEseO/ePQZkABBgAD04FXsmmijSAAAAAElFTkSuQmCC",
 			"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAECAYAAABGM/VAAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAD1JREFUeNpi/P//P4OKisp/Bii4c+cOIwtIwMXFheHFixcMEhISYAVMINm3b9+CBUA0CDCiazc0NGQECDAAdH0YelA27kgAAAAASUVORK5CYII=",
+			"iVBORw0KGgoAAAANSUhEUgAAAAUAAAAECAYAAABGM/VAAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAAAHElEQVQYV2P4//+/FDoGC967d48XhvELouL/UgDQNTstk3tzsQAAAABJRU5ErkJggg==",
 			"iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAYAAACXU8ZrAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACRJREFUeNpizM3N/c9AADAqKysTVMTi5eXFSFAREFPHOoAAAwBCfwcAO8g48QAAAABJRU5ErkJggg==",
 		};
 
@@ -102,16 +105,26 @@ namespace Rotorz.ReorderableList.Internal {
 		#region Generated Resources
 
 		public static Texture2D texItemSplitter { get; private set; }
+		public static Texture2D texHighlightColor { get; private set; }
 
 		/// <summary>
 		/// Generate special textures.
 		/// </summary>
 		private static void GenerateSpecialTextures() {
-			var splitterColor = EditorGUIUtility.isProSkin
-				? new Color(1f, 1f, 1f, 0.14f)
-				: new Color(0.59f, 0.59f, 0.59f, 0.55f)
-				;
+			Color splitterColor;
+			Color highlightColor;
+
+			if (EditorGUIUtility.isProSkin) {
+				splitterColor = new Color(1f, 1f, 1f, 0.14f);
+				highlightColor = new Color32(62, 95, 150, 255);
+			}
+			else {
+				splitterColor = new Color(0.59f, 0.59f, 0.59f, 0.55f);
+				highlightColor = new Color32(62, 125, 231, 255);
+			}
+
 			texItemSplitter = CreatePixelTexture("(Generated) Item Splitter", splitterColor);
+			texHighlightColor = CreatePixelTexture("(Generated) Highlight Color", highlightColor);
 		}
 
 		/// <summary>

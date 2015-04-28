@@ -30,8 +30,7 @@ namespace Rotorz.ReorderableList {
 			Container.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.ContainerBackground);
 
 			Container2 = new GUIStyle(Container);
-			Container2.normal = GUI.skin.box.normal;
-			Container2.border = GUI.skin.box.border;
+			Container2.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.Container2Background);
 
 			FooterButton = new GUIStyle();
 			FooterButton.fixedHeight = 16;
@@ -56,9 +55,8 @@ namespace Rotorz.ReorderableList {
 			ItemButton.imagePosition = ImagePosition.ImageOnly;
 			ItemButton.alignment = TextAnchor.MiddleCenter;
 
-			var highlightLabelStyle = GUI.skin.FindStyle("Hi Label");
 			SelectedItem = new GUIStyle();
-			SelectedItem.normal.background = highlightLabelStyle.onActive.background;
+			SelectedItem.normal.background = ReorderableListResources.texHighlightColor;
 			SelectedItem.normal.textColor = Color.white;
 			SelectedItem.fontSize = 12;
 		}
