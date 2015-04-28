@@ -219,7 +219,6 @@ namespace Rotorz.ReorderableList {
 	/// <summary>
 	/// Base class for custom reorderable list control.
 	/// </summary>
-	[Serializable]
 	public class ReorderableListControl {
 
 		/// <summary>
