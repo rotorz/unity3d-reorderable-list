@@ -763,7 +763,8 @@ namespace Rotorz.ReorderableList {
 		// Micro-optimisation to avoid repeated construction.
 		private static Rect s_RemoveButtonPosition;
 		
-		private void DrawListItem(EventType eventType, Rect position, IReorderableListAdaptor adaptor, int itemIndex) {
+		private void DrawListItem(Rect position, IReorderableListAdaptor adaptor, int itemIndex) {
+			bool repainting = Event.current.type == EventType.Repaint;
 			bool visible = (position.y < _visibleRect.yMax && position.yMax > _visibleRect.y);
 			bool draggable = _allowReordering && adaptor.CanDrag(itemIndex);
 
@@ -783,7 +784,7 @@ namespace Rotorz.ReorderableList {
 			if (_indexLabelWidth != 0) {
 				itemContentPosition.width -= _indexLabelWidth;
 
-				if (eventType == EventType.Repaint && visible)
+				if (repainting && visible)
 					s_RightAlignedLabelStyle.Draw(new Rect(itemContentPosition.x, position.y, _indexLabelWidth, position.height - 4), itemIndex + ":", false, false, false, false);
 
 				itemContentPosition.x += _indexLabelWidth;
@@ -797,7 +798,7 @@ namespace Rotorz.ReorderableList {
 				s_CurrentItemIndex.Push(itemIndex);
 				EditorGUI.BeginChangeCheck();
 
-				if (eventType == EventType.Repaint && visible) {
+				if (repainting && visible) {
 					// Draw background of list item.
 					var backgroundPosition = new Rect(position.x, position.y, position.width, position.height - 1);
 					adaptor.DrawItemBackground(backgroundPosition, itemIndex);
@@ -837,9 +838,11 @@ namespace Rotorz.ReorderableList {
 				}
 
 				// Check for context click?
-				if (eventType == EventType.ContextClick && position.Contains(Event.current.mousePosition) && (Flags & ReorderableListFlags.DisableContextMenu) == 0) {
-					ShowContextMenu(_controlID, itemIndex, adaptor);
-					Event.current.Use();
+				if ((Flags & ReorderableListFlags.DisableContextMenu) == 0) {
+					if (Event.current.GetTypeForControl(_controlID) == EventType.ContextClick && position.Contains(Event.current.mousePosition)) {
+						ShowContextMenu(_controlID, itemIndex, adaptor);
+						Event.current.Use();
+					}
 				}
 			}
 			finally {
@@ -847,8 +850,8 @@ namespace Rotorz.ReorderableList {
 			}
 		}
 
-		private void DrawFloatingListItem(EventType eventType, IReorderableListAdaptor adaptor, float targetSlotPosition) {
-			if (eventType == EventType.Repaint) {
+		private void DrawFloatingListItem(IReorderableListAdaptor adaptor, float targetSlotPosition) {
+			if (Event.current.type == EventType.Repaint) {
 				Color restoreColor = GUI.color;
 
 				// Fill background of target area.
@@ -890,7 +893,7 @@ namespace Rotorz.ReorderableList {
 				GUI.color = restoreColor;
 			}
 
-			DrawListItem(eventType, s_DragItemPosition, adaptor, s_AnchorIndex);
+			DrawListItem(s_DragItemPosition, adaptor, s_AnchorIndex);
 		}
 
 		/// <summary>
@@ -1034,7 +1037,7 @@ namespace Rotorz.ReorderableList {
 				}
 
 				// Draw list item.
-				DrawListItem(eventType, itemPosition, adaptor, i);
+				DrawListItem(itemPosition, adaptor, i);
 
 				// Did list count change (i.e. item removed)?
 				if (adaptor.Count < count) {
@@ -1090,7 +1093,7 @@ namespace Rotorz.ReorderableList {
 					Event.current.Use();
 				}
 
-				DrawFloatingListItem(eventType, adaptor, targetSlotPosition);
+				DrawFloatingListItem(adaptor, targetSlotPosition);
 /* DEBUG
 				if (eventType == EventType.Repaint) {
 					GUI.color = Color.blue;
