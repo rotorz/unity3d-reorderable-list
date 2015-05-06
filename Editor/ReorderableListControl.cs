@@ -764,9 +764,9 @@ namespace Rotorz.ReorderableList {
 		private static Rect s_RemoveButtonPosition;
 		
 		private void DrawListItem(Rect position, IReorderableListAdaptor adaptor, int itemIndex) {
-			bool repainting = Event.current.type == EventType.Repaint;
-			bool visible = (position.y < _visibleRect.yMax && position.yMax > _visibleRect.y);
-			bool draggable = _allowReordering && adaptor.CanDrag(itemIndex);
+			bool isRepainting = Event.current.type == EventType.Repaint;
+			bool isVisible = (position.y < _visibleRect.yMax && position.yMax > _visibleRect.y);
+			bool isDraggable = _allowReordering && adaptor.CanDrag(itemIndex);
 
 			Rect itemContentPosition = position;
 			itemContentPosition.x = position.x + 2;
@@ -775,7 +775,7 @@ namespace Rotorz.ReorderableList {
 			itemContentPosition.height = position.height - 4;
 
 			// Make space for grab handle?
-			if (draggable) {
+			if (isDraggable) {
 				itemContentPosition.x += 20;
 				itemContentPosition.width -= 20;
 			}
@@ -784,7 +784,7 @@ namespace Rotorz.ReorderableList {
 			if (_indexLabelWidth != 0) {
 				itemContentPosition.width -= _indexLabelWidth;
 
-				if (repainting && visible)
+				if (isRepainting && isVisible)
 					s_RightAlignedLabelStyle.Draw(new Rect(itemContentPosition.x, position.y, _indexLabelWidth, position.height - 4), itemIndex + ":", false, false, false, false);
 
 				itemContentPosition.x += _indexLabelWidth;
@@ -798,13 +798,13 @@ namespace Rotorz.ReorderableList {
 				s_CurrentItemIndex.Push(itemIndex);
 				EditorGUI.BeginChangeCheck();
 
-				if (repainting && visible) {
+				if (isRepainting && isVisible) {
 					// Draw background of list item.
 					var backgroundPosition = new Rect(position.x, position.y, position.width, position.height - 1);
 					adaptor.DrawItemBackground(backgroundPosition, itemIndex);
 
 					// Draw grab handle?
-					if (draggable) {
+					if (isDraggable) {
 						var texturePosition = new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5);
 						GUIHelper.DrawTexture(texturePosition, ReorderableListResources.GetTexture(ReorderableListTexture.GrabHandle));
 					}
@@ -833,7 +833,7 @@ namespace Rotorz.ReorderableList {
 					s_RemoveButtonPosition.x = itemContentPosition.xMax + 2;
 					s_RemoveButtonPosition.height -= 2;
 
-					if (DoRemoveButton(s_RemoveButtonPosition, visible))
+					if (DoRemoveButton(s_RemoveButtonPosition, isVisible))
 						RemoveItem(adaptor, itemIndex);
 				}
 
