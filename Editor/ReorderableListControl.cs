@@ -659,17 +659,18 @@ namespace Rotorz.ReorderableList {
 			_controlID = controlID;
 			_visibleRect = GUIHelper.VisibleRect();
 
-			if ((Flags & ReorderableListFlags.ShowIndices) != 0) {
-				int digitCount = Mathf.Max(2, Mathf.CeilToInt(Mathf.Log10((float)adaptor.Count)));
-				_indexLabelWidth = digitCount * 8 + 8;
-			}
-			else {
+			if ((Flags & ReorderableListFlags.ShowIndices) != 0)
+				_indexLabelWidth = CountDigits(adaptor.Count) * 8 + 8;
+			else
 				_indexLabelWidth = 0;
-			}
 
 			_tracking = IsTrackingControl(controlID);
 
 			_allowReordering = (Flags & ReorderableListFlags.DisableReordering) == 0;
+		}
+
+		private static int CountDigits(int number) {
+			return Mathf.Max(2, Mathf.CeilToInt(Mathf.Log10((float)number)));
 		}
 
 		#endregion
