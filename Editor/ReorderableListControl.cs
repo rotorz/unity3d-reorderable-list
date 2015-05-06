@@ -840,7 +840,7 @@ namespace Rotorz.ReorderableList {
 				// Check for context click?
 				if ((Flags & ReorderableListFlags.DisableContextMenu) == 0) {
 					if (Event.current.GetTypeForControl(_controlID) == EventType.ContextClick && position.Contains(Event.current.mousePosition)) {
-						ShowContextMenu(_controlID, itemIndex, adaptor);
+						ShowContextMenu(itemIndex, adaptor);
 						Event.current.Use();
 					}
 				}
@@ -900,11 +900,10 @@ namespace Rotorz.ReorderableList {
 		/// Draw list container and items.
 		/// </summary>
 		/// <param name="position">Position of list control in GUI.</param>
-		/// <param name="controlID">Unique ID of list control.</param>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
-		private void DrawListContainerAndItems(Rect position, int controlID, IReorderableListAdaptor adaptor) {
+		private void DrawListContainerAndItems(Rect position, IReorderableListAdaptor adaptor) {
 			// Get local copy of event information for efficiency.
-			EventType eventType = Event.current.GetTypeForControl(controlID);
+			EventType eventType = Event.current.GetTypeForControl(_controlID);
 			Vector2 mousePosition = Event.current.mousePosition;
 			if (Event.current.isMouse)
 				s_MousePosition = GUIUtility.GUIToScreenPoint(mousePosition);
@@ -936,7 +935,7 @@ namespace Rotorz.ReorderableList {
 					break;
 
 				case EventType.MouseUp:
-					if (controlID == GUIUtility.hotControl) {
+					if (_controlID == GUIUtility.hotControl) {
 						// Allow user code to change control over reordering during drag.
 						if (!s_TrackingCancelBlockContext && _allowReordering)
 							AcceptReorderDrag(adaptor);
@@ -954,7 +953,7 @@ namespace Rotorz.ReorderableList {
 					break;
 
 				case EventType.ExecuteCommand:
-					if (s_ContextControlID == controlID) {
+					if (s_ContextControlID == _controlID) {
 						int itemIndex = s_ContextItemIndex;
 						try {
 							DoCommand(s_ContextCommandName, itemIndex, adaptor);
@@ -1059,7 +1058,7 @@ namespace Rotorz.ReorderableList {
 								if (_allowReordering && adaptor.CanDrag(i) && Event.current.button == 0) {
 									s_DragItemPosition = itemPosition;
 
-									BeginTrackingReorderDrag(controlID, i);
+									BeginTrackingReorderDrag(_controlID, i);
 									s_AnchorMouseOffset = itemPosition.y - mousePosition.y;
 									s_TargetIndex = i;
 
@@ -1081,7 +1080,7 @@ namespace Rotorz.ReorderableList {
 			}
 
 			// Item which is being dragged should be shown on top of other controls!
-			if (IsTrackingControl(controlID)) {
+			if (IsTrackingControl(_controlID)) {
 				lastMidPoint = position.yMax - lastHeight / 2f;
 
 				if (eventType == EventType.MouseDrag) {
@@ -1110,15 +1109,14 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Checks to see if list control needs to be automatically focused.
 		/// </summary>
-		/// <param name="controlID">Unique ID of list control.</param>
-		private void CheckForAutoFocusControl(int controlID) {
+		private void CheckForAutoFocusControl() {
 			if (Event.current.type == EventType.Used)
 				return;
 
 			// Automatically focus control!
-			if (s_AutoFocusControlID == controlID) {
+			if (s_AutoFocusControlID == _controlID) {
 				s_AutoFocusControlID = 0;
-				GUIHelper.FocusTextInControl("AutoFocus_" + controlID + "_" + s_AutoFocusIndex);
+				GUIHelper.FocusTextInControl("AutoFocus_" + _controlID + "_" + s_AutoFocusIndex);
 				s_AutoFocusIndex = -1;
 			}
 		}
@@ -1127,9 +1125,8 @@ namespace Rotorz.ReorderableList {
 		/// Draw additional controls below list control and highlight drop target.
 		/// </summary>
 		/// <param name="position">Position of list control in GUI.</param>
-		/// <param name="controlID">Unique ID of list control.</param>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
-		private void DrawFooterControls(Rect position, int controlID, IReorderableListAdaptor adaptor) {
+		private void DrawFooterControls(Rect position, IReorderableListAdaptor adaptor) {
 			if (HasFooterButtons) {
 				Rect buttonPosition = new Rect(position.xMax - 30, position.yMax - 1, 30, FooterButtonStyle.fixedHeight);
 
@@ -1182,22 +1179,21 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Do layout version of list field.
 		/// </summary>
-		/// <param name="controlID">Unique ID of list control.</param>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <returns>
 		/// Position of list container area in GUI (excludes footer area).
 		/// </returns>
-		private Rect DrawLayoutListField(int controlID, IReorderableListAdaptor adaptor) {
+		private Rect DrawLayoutListField(IReorderableListAdaptor adaptor) {
 			float totalHeight;
 
 			// Calculate position of list field using layout engine.
 			if (Event.current.type == EventType.Layout) {
 				totalHeight = CalculateListHeight(adaptor);
-				s_ContainerHeightCache[controlID] = totalHeight;
+				s_ContainerHeightCache[_controlID] = totalHeight;
 			}
 			else {
-				totalHeight = s_ContainerHeightCache.ContainsKey(controlID)
-					? s_ContainerHeightCache[controlID]
+				totalHeight = s_ContainerHeightCache.ContainsKey(_controlID)
+					? s_ContainerHeightCache[_controlID]
 					: 0;
 			}
 
@@ -1208,9 +1204,9 @@ namespace Rotorz.ReorderableList {
 				position.height -= FooterButtonStyle.fixedHeight;
 
 			// Draw list as normal.
-			DrawListContainerAndItems(position, controlID, adaptor);
+			DrawListContainerAndItems(position, adaptor);
 
-			CheckForAutoFocusControl(controlID);
+			CheckForAutoFocusControl();
 
 			return position;
 		}
@@ -1286,11 +1282,11 @@ namespace Rotorz.ReorderableList {
 			Rect position;
 
 			if (adaptor.Count > 0)
-				position = DrawLayoutListField(controlID, adaptor);
+				position = DrawLayoutListField(adaptor);
 			else
 				position = DrawLayoutEmptyList(drawEmpty);
 
-			DrawFooterControls(position, controlID, adaptor);
+			DrawFooterControls(position, adaptor);
 		}
 
 		/// <inheritdoc cref="Draw(int, IReorderableListAdaptor, DrawEmpty)"/>
@@ -1321,14 +1317,14 @@ namespace Rotorz.ReorderableList {
 				position.height -= FooterButtonStyle.fixedHeight;
 
 			if (adaptor.Count > 0) {
-				DrawListContainerAndItems(position, controlID, adaptor);
-				CheckForAutoFocusControl(controlID);
+				DrawListContainerAndItems(position, adaptor);
+				CheckForAutoFocusControl();
 			}
 			else {
 				DrawEmptyListControl(position, drawEmpty);
 			}
 
-			DrawFooterControls(position, controlID, adaptor);
+			DrawFooterControls(position, adaptor);
 		}
 
 		/// <summary>
@@ -1388,10 +1384,10 @@ namespace Rotorz.ReorderableList {
 		// Command name is assigned by default context menu handler.
 		private static string s_ContextCommandName;
 
-		private void ShowContextMenu(int controlID, int itemIndex, IReorderableListAdaptor adaptor) {
+		private void ShowContextMenu(int itemIndex, IReorderableListAdaptor adaptor) {
 			GenericMenu menu = new GenericMenu();
 
-			s_ContextControlID = controlID;
+			s_ContextControlID = _controlID;
 			s_ContextItemIndex = itemIndex;
 
 			AddItemsToMenu(menu, itemIndex, adaptor);
