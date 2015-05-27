@@ -35,6 +35,13 @@ namespace Rotorz.ReorderableList {
 			get { return ReorderableListControl.CurrentItemIndex; }
 		}
 
+		/// <summary>
+		/// Gets the total position of the list item that is currently being drawn.
+		/// </summary>
+		public static Rect CurrentItemTotalPosition {
+			get { return ReorderableListControl.CurrentItemTotalPosition; }
+		}
+
 		#region Basic Item Drawers
 
 		/// <summary>

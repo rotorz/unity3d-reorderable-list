@@ -144,8 +144,8 @@ namespace Rotorz.ReorderableList {
 		private static GUIStyle s_RightAlignedLabelStyle;
 
 		static ReorderableListControl() {
-			s_CurrentItemIndex = new Stack<int>();
-			s_CurrentItemIndex.Push(-1);
+			s_CurrentItemIndex = new Stack<ItemInfo>();
+			s_CurrentItemIndex.Push(new ItemInfo(-1, default(Rect)));
 
 			if (EditorGUIUtility.isProSkin) {
 				AnchorBackgroundColor = new Color(85f / 255f, 85f / 255f, 85f / 255f, 0.85f);
@@ -215,10 +215,20 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		private static int s_AutoFocusIndex = -1;
 
+		private struct ItemInfo {
+			public int Index;
+			public Rect Position;
+
+			public ItemInfo(int index, Rect position) {
+				Index = index;
+				Position = position;
+			}
+		}
+
 		/// <summary>
 		/// Zero-based index of list item which is currently being drawn.
 		/// </summary>
-		private static Stack<int> s_CurrentItemIndex;
+		private static Stack<ItemInfo> s_CurrentItemIndex;
 
 		/// <summary>
 		/// Gets the zero-based index of the list item that is currently being drawn;
@@ -228,7 +238,14 @@ namespace Rotorz.ReorderableList {
 		/// <para>Use <see cref="ReorderableListGUI.CurrentItemIndex"/> instead.</para>
 		/// </remarks>
 		internal static int CurrentItemIndex {
-			get { return s_CurrentItemIndex.Peek(); }
+			get { return s_CurrentItemIndex.Peek().Index; }
+		}
+
+		/// <summary>
+		/// Gets the total position of the list item that is currently being drawn.
+		/// </summary>
+		public static Rect CurrentItemTotalPosition {
+			get { return s_CurrentItemIndex.Peek().Position; }
 		}
 
 		#region Properties
@@ -588,7 +605,7 @@ namespace Rotorz.ReorderableList {
 				itemContentPosition.width -= 27;
 
 			try {
-				s_CurrentItemIndex.Push(itemIndex);
+				s_CurrentItemIndex.Push(new ItemInfo(itemIndex, position));
 				EditorGUI.BeginChangeCheck();
 
 				if (isRepainting && isVisible) {
