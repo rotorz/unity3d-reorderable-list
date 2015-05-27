@@ -221,7 +221,7 @@ namespace Rotorz.ReorderableList {
 		private static Stack<int> s_CurrentItemIndex;
 
 		/// <summary>
-		/// Gets zero-based index of list item which is currently being drawn;
+		/// Gets the zero-based index of the list item that is currently being drawn;
 		/// or a value of -1 if no item is currently being drawn.
 		/// </summary>
 		/// <remarks>

@@ -19,7 +19,7 @@ namespace Rotorz.ReorderableList {
 		public const float DefaultItemHeight = 18;
 
 		/// <summary>
-		/// Gets or sets zero-based index of last item which was changed. A value of -1
+		/// Gets or sets the zero-based index of the last item that was changed. A value of -1
 		/// indicates that no item was changed by list.
 		/// </summary>
 		/// <remarks>
@@ -28,7 +28,7 @@ namespace Rotorz.ReorderableList {
 		public static int IndexOfChangedItem { get; internal set; }
 
 		/// <summary>
-		/// Gets zero-based index of list item which is currently being drawn;
+		/// Gets the zero-based index of the list item that is currently being drawn;
 		/// or a value of -1 if no item is currently being drawn.
 		/// </summary>
 		public static int CurrentItemIndex {
