@@ -8,6 +8,7 @@ namespace Rotorz.ReorderableList {
 	/// <summary>
 	/// Adaptor allowing reorderable list control to interface with list data.
 	/// </summary>
+	/// <see cref="IReorderableListDropTarget"/>
 	public interface IReorderableListAdaptor {
 
 		/// <summary>
