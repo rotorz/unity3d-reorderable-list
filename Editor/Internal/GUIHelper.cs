@@ -27,6 +27,14 @@ namespace Rotorz.ReorderableList.Internal {
 				miFocusTextInControl = typeof(GUI).GetMethod("FocusControl", BindingFlags.Static | BindingFlags.Public);
 
 			FocusTextInControl = (Action<string>)Delegate.CreateDelegate(typeof(Action<string>), miFocusTextInControl);
+
+			s_SeparatorColor = EditorGUIUtility.isProSkin
+				? new Color(0.11f, 0.11f, 0.11f)
+				: new Color(0.5f, 0.5f, 0.5f);
+
+			s_SeparatorStyle = new GUIStyle();
+			s_SeparatorStyle.normal.background = EditorGUIUtility.whiteTexture;
+			s_SeparatorStyle.stretchWidth = true;
 		}
 
 		/// <summary>
@@ -110,6 +118,22 @@ namespace Rotorz.ReorderableList.Internal {
 
 		public static bool IconButton(Rect position, Texture2D iconNormal, Texture2D iconActive, GUIStyle style) {
 			return IconButton(position, true, iconNormal, iconActive, style);
+		}
+
+		private static readonly Color s_SeparatorColor;
+		private static readonly GUIStyle s_SeparatorStyle;
+
+		public static void Separator(Rect position, Color color) {
+			if (Event.current.type == EventType.Repaint) {
+				Color restoreColor = GUI.color;
+				GUI.color = s_SeparatorColor;
+				s_SeparatorStyle.Draw(position, false, false, false, false);
+				GUI.color = restoreColor;
+			}
+		}
+
+		public static void Separator(Rect position) {
+			Separator(position, s_SeparatorColor);
 		}
 
 	}
