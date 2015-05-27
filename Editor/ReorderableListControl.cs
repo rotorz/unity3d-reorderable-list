@@ -145,7 +145,7 @@ namespace Rotorz.ReorderableList {
 
 		static ReorderableListControl() {
 			s_CurrentItemIndex = new Stack<ItemInfo>();
-			s_CurrentItemIndex.Push(new ItemInfo(-1, default(Rect)));
+			s_CurrentItemIndex.Push(new ItemInfo(default(Rect), -1, default(Rect)));
 
 			if (EditorGUIUtility.isProSkin) {
 				AnchorBackgroundColor = new Color(85f / 255f, 85f / 255f, 85f / 255f, 0.85f);
@@ -216,12 +216,14 @@ namespace Rotorz.ReorderableList {
 		private static int s_AutoFocusIndex = -1;
 
 		private struct ItemInfo {
-			public int Index;
-			public Rect Position;
+			public Rect ListPosition;
+			public int ItemIndex;
+			public Rect ItemPosition;
 
-			public ItemInfo(int index, Rect position) {
-				Index = index;
-				Position = position;
+			public ItemInfo(Rect listPosition, int itemIndex, Rect itemPosition) {
+				ListPosition = listPosition;
+				ItemIndex = itemIndex;
+				ItemPosition = itemPosition;
 			}
 		}
 
@@ -231,6 +233,13 @@ namespace Rotorz.ReorderableList {
 		private static Stack<ItemInfo> s_CurrentItemIndex;
 
 		/// <summary>
+		/// Gets the position of the list control that is currently being drawn.
+		/// </summary>
+		public static Rect CurrentListPosition {
+			get { return s_CurrentItemIndex.Peek().ListPosition; }
+		}
+
+		/// <summary>
 		/// Gets the zero-based index of the list item that is currently being drawn;
 		/// or a value of -1 if no item is currently being drawn.
 		/// </summary>
@@ -238,14 +247,14 @@ namespace Rotorz.ReorderableList {
 		/// <para>Use <see cref="ReorderableListGUI.CurrentItemIndex"/> instead.</para>
 		/// </remarks>
 		internal static int CurrentItemIndex {
-			get { return s_CurrentItemIndex.Peek().Index; }
+			get { return s_CurrentItemIndex.Peek().ItemIndex; }
 		}
 
 		/// <summary>
 		/// Gets the total position of the list item that is currently being drawn.
 		/// </summary>
 		public static Rect CurrentItemTotalPosition {
-			get { return s_CurrentItemIndex.Peek().Position; }
+			get { return s_CurrentItemIndex.Peek().ItemPosition; }
 		}
 
 		#region Properties
@@ -443,6 +452,10 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		private int _controlID;
 		/// <summary>
+		/// Position of control in GUI.
+		/// </summary>
+		private Rect _position;
+		/// <summary>
 		/// Visible rectangle of control.
 		/// </summary>
 		private Rect _visibleRect;
@@ -605,7 +618,7 @@ namespace Rotorz.ReorderableList {
 				itemContentPosition.width -= 27;
 
 			try {
-				s_CurrentItemIndex.Push(new ItemInfo(itemIndex, position));
+				s_CurrentItemIndex.Push(new ItemInfo(_position, itemIndex, position));
 				EditorGUI.BeginChangeCheck();
 
 				if (isRepainting && isVisible) {
@@ -717,6 +730,9 @@ namespace Rotorz.ReorderableList {
 			Vector2 mousePosition = Event.current.mousePosition;
 			if (Event.current.isMouse)
 				s_MousePosition = GUIUtility.GUIToScreenPoint(mousePosition);
+
+			// Store position of list control itself.
+			_position = position;
 
 			int newTargetIndex = s_TargetIndex;
 			
