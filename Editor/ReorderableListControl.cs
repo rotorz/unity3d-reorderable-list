@@ -804,6 +804,9 @@ namespace Rotorz.ReorderableList {
 			Rect itemPosition = new Rect(position.x + 2, firstItemY, position.width - 4, 0);
 			float targetSlotPosition = position.yMax - s_DragItemPosition.height - 1;
 
+			int dropInsertionIndex = 0;
+			float dropInsertionPosition = itemPosition.yMax;
+
 			float lastMidPoint = 0f;
 			float lastHeight = 0f;
 
@@ -811,6 +814,8 @@ namespace Rotorz.ReorderableList {
 			for (int i = 0; i < count; ++i) {
 				itemPosition.y = itemPosition.yMax;
 				itemPosition.height = 0;
+
+				lastMidPoint = itemPosition.y - lastHeight / 2f;
 
 				if (_tracking) {
 					// Does this represent the target index?
@@ -824,12 +829,22 @@ namespace Rotorz.ReorderableList {
 					if (i == s_AnchorIndex)
 						continue;
 
-					lastMidPoint = itemPosition.y - lastHeight / 2f;
+					// Update position for current item.
+					itemPosition.height = adaptor.GetItemHeight(i) + 4;
+					lastHeight = itemPosition.height;
 				}
+				else {
+					// Update position for current item.
+					itemPosition.height = adaptor.GetItemHeight(i) + 4;
+					lastHeight = itemPosition.height;
 
-				// Update position for current item.
-				itemPosition.height = adaptor.GetItemHeight(i) + 4;
-				lastHeight = itemPosition.height;
+					// Does this represent the drop insertion index?
+					float midpoint = itemPosition.y + itemPosition.height / 2f;
+					if (mousePosition.y > lastMidPoint && mousePosition.y <= midpoint) {
+						dropInsertionIndex = i;
+						dropInsertionPosition = itemPosition.y;
+					}
+				}
 
 				if (_tracking && eventType == EventType.MouseDrag) {
 					float midpoint = itemPosition.y + itemPosition.height / 2f;
@@ -905,10 +920,10 @@ namespace Rotorz.ReorderableList {
 				}
 			}
 
+			lastMidPoint = position.yMax - lastHeight / 2f;
+
 			// Item which is being dragged should be shown on top of other controls!
 			if (IsTrackingControl(_controlID)) {
-				lastMidPoint = position.yMax - lastHeight / 2f;
-
 				if (eventType == EventType.MouseDrag) {
 					if (s_DragItemPosition.yMax >= lastMidPoint)
 						newTargetIndex = count;
@@ -927,9 +942,25 @@ namespace Rotorz.ReorderableList {
 				}
 //*/
 			}
-			
+			else {
+				if (mousePosition.y >= lastMidPoint) {
+					dropInsertionIndex = count;
+					dropInsertionPosition = itemPosition.yMax;
+				}
+
+				var dropTarget = adaptor as IReorderableListDropTarget;
+				if (dropTarget != null && dropTarget.CanDropInsert(dropInsertionIndex)) {
+					DrawDropIndicator(new Rect(position.x, dropInsertionPosition - 1, position.width, 3));
+					dropTarget.ProcessDropInsertOperation(dropInsertionIndex);
+				}
+			}
+
 			// Fake control to catch input focus if auto focus was not possible.
 			GUIUtility.GetControlID(FocusType.Keyboard);
+		}
+
+		private void DrawDropIndicator(Rect position) {
+			GUIHelper.Separator(position);
 		}
 
 		/// <summary>
