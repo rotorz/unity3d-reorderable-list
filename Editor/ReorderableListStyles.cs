@@ -92,6 +92,13 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		public static GUIStyle SelectedItem { get; private set; }
 
+		/// <summary>
+		/// Gets color for the horizontal lines that appear between list items.
+		/// </summary>
+		public static Color HorizontalLineColor {
+			get { return EditorGUIUtility.isProSkin ? new Color(1f, 1f, 1f, 0.14f) : new Color(0.59f, 0.59f, 0.59f, 0.55f); }
+		}
+
 	}
 
 }

@@ -104,26 +104,21 @@ namespace Rotorz.ReorderableList.Internal {
 
 		#region Generated Resources
 
-		public static Texture2D texItemSplitter { get; private set; }
 		public static Texture2D texHighlightColor { get; private set; }
 
 		/// <summary>
 		/// Generate special textures.
 		/// </summary>
 		private static void GenerateSpecialTextures() {
-			Color splitterColor;
 			Color highlightColor;
 
 			if (EditorGUIUtility.isProSkin) {
-				splitterColor = new Color(1f, 1f, 1f, 0.14f);
 				highlightColor = new Color32(62, 95, 150, 255);
 			}
 			else {
-				splitterColor = new Color(0.59f, 0.59f, 0.59f, 0.55f);
 				highlightColor = new Color32(62, 125, 231, 255);
 			}
 
-			texItemSplitter = CreatePixelTexture("(Generated) Item Splitter", splitterColor);
 			texHighlightColor = CreatePixelTexture("(Generated) Highlight Color", highlightColor);
 		}
 

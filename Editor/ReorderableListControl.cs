@@ -328,6 +328,16 @@ namespace Rotorz.ReorderableList {
 			set { _itemButtonStyle = value; }
 		}
 
+		private Color _horizontalLineColor;
+
+		/// <summary>
+		/// Gets or sets the color of the horizontal lines that appear between list items.
+		/// </summary>
+		public Color HorizontalLineColor {
+			get { return _horizontalLineColor; }
+			set { _horizontalLineColor = value; }
+		}
+
 		#endregion
 
 		#region Events
@@ -434,7 +444,9 @@ namespace Rotorz.ReorderableList {
 			_containerStyle = ReorderableListStyles.Container;
 			_footerButtonStyle = ReorderableListStyles.FooterButton;
 			_itemButtonStyle = ReorderableListStyles.ItemButton;
-		}
+
+			_horizontalLineColor = ReorderableListStyles.HorizontalLineColor;
+        }
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ReorderableListControl"/>.
@@ -634,10 +646,10 @@ namespace Rotorz.ReorderableList {
 						GUIHelper.DrawTexture(texturePosition, ReorderableListResources.GetTexture(ReorderableListTexture.GrabHandle));
 					}
 
-					// Draw splitter between list items.
+					// Draw horizontal line between list items.
 					if (itemIndex != 0 && (!_tracking || itemIndex != s_AnchorIndex)) {
-						var texturePosition = new Rect(position.x, position.y - 1, position.width, 1);
-						GUIHelper.DrawTexture(texturePosition, ReorderableListResources.texItemSplitter);
+						var horizontalLinePosition = new Rect(position.x, position.y - 1, position.width, 1);
+						GUIHelper.Separator(horizontalLinePosition, HorizontalLineColor);
 					}
 				}
 
@@ -684,7 +696,7 @@ namespace Rotorz.ReorderableList {
 				targetPosition.y = targetSlotPosition - 1;
 				targetPosition.height = 1;
 
-				GUIHelper.DrawTexture(targetPosition, ReorderableListResources.texItemSplitter);
+				GUIHelper.Separator(targetPosition, HorizontalLineColor);
 
 				--targetPosition.x;
 				++targetPosition.y;
