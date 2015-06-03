@@ -329,6 +329,8 @@ namespace Rotorz.ReorderableList {
 		}
 
 		private Color _horizontalLineColor;
+		private bool _horizontalLineAtStart = false;
+		private bool _horizontalLineAtEnd = false;
 
 		/// <summary>
 		/// Gets or sets the color of the horizontal lines that appear between list items.
@@ -336,6 +338,32 @@ namespace Rotorz.ReorderableList {
 		public Color HorizontalLineColor {
 			get { return _horizontalLineColor; }
 			set { _horizontalLineColor = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets a boolean value indicating whether a horizontal line should be
+		/// shown above the first list item at the start of the list control.
+		/// </summary>
+		/// <remarks>
+		/// <para>Horizontal line is not drawn for an empty list regardless of the value
+		/// of this property.</para>
+		/// </remarks>
+		public bool HorizontalLineAtStart {
+			get { return _horizontalLineAtStart; }
+			set { _horizontalLineAtStart = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets a boolean value indicating whether a horizontal line should be
+		/// shown below the last list item at the end of the list control.
+		/// </summary>
+		/// <remarks>
+		/// <para>Horizontal line is not drawn for an empty list regardless of the value
+		/// of this property.</para>
+		/// </remarks>
+		public bool HorizontalLineAtEnd {
+			get { return _horizontalLineAtEnd; }
+			set { _horizontalLineAtEnd = value; }
 		}
 
 		#endregion
@@ -647,9 +675,15 @@ namespace Rotorz.ReorderableList {
 					}
 
 					// Draw horizontal line between list items.
-					if (itemIndex != 0 && (!_tracking || itemIndex != s_AnchorIndex)) {
-						var horizontalLinePosition = new Rect(position.x, position.y - 1, position.width, 1);
-						GUIHelper.Separator(horizontalLinePosition, HorizontalLineColor);
+					if (!_tracking || itemIndex != s_AnchorIndex) {
+						if (itemIndex != 0 || HorizontalLineAtStart) {
+							var horizontalLinePosition = new Rect(position.x, position.y - 1, position.width, 1);
+							GUIHelper.Separator(horizontalLinePosition, HorizontalLineColor);
+						}
+						if (HorizontalLineAtEnd && itemIndex == adaptor.Count - 1) {
+							var horizontalLinePosition = new Rect(position.x, position.yMax, position.width, 1);
+							GUIHelper.Separator(horizontalLinePosition, HorizontalLineColor);
+						}
 					}
 				}
 
