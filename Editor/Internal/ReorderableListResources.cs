@@ -110,16 +110,7 @@ namespace Rotorz.ReorderableList.Internal {
 		/// Generate special textures.
 		/// </summary>
 		private static void GenerateSpecialTextures() {
-			Color highlightColor;
-
-			if (EditorGUIUtility.isProSkin) {
-				highlightColor = new Color32(62, 95, 150, 255);
-			}
-			else {
-				highlightColor = new Color32(62, 125, 231, 255);
-			}
-
-			texHighlightColor = CreatePixelTexture("(Generated) Highlight Color", highlightColor);
+			texHighlightColor = CreatePixelTexture("(Generated) Highlight Color", ReorderableListStyles.SelectionBackgroundColor);
 		}
 
 		/// <summary>

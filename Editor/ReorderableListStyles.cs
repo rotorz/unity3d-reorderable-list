@@ -99,6 +99,13 @@ namespace Rotorz.ReorderableList {
 			get { return EditorGUIUtility.isProSkin ? new Color(1f, 1f, 1f, 0.14f) : new Color(0.59f, 0.59f, 0.59f, 0.55f); }
 		}
 
+		/// <summary>
+		/// Gets color of background for a selected list item.
+		/// </summary>
+		public static Color SelectionBackgroundColor {
+			get { return EditorGUIUtility.isProSkin ? new Color32(62, 95, 150, 255) : new Color32(62, 125, 231, 255); }
+		}
+
 	}
 
 }
