@@ -681,7 +681,7 @@ namespace Rotorz.ReorderableList {
 							GUIHelper.Separator(horizontalLinePosition, HorizontalLineColor);
 						}
 						if (HorizontalLineAtEnd && itemIndex == adaptor.Count - 1) {
-							var horizontalLinePosition = new Rect(position.x, position.yMax, position.width, 1);
+							var horizontalLinePosition = new Rect(position.x, position.yMax - 1, position.width, 1);
 							GUIHelper.Separator(horizontalLinePosition, HorizontalLineColor);
 						}
 					}
