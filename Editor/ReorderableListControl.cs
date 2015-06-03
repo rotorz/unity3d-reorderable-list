@@ -265,7 +265,6 @@ namespace Rotorz.ReorderableList {
 
 		#region Properties
 
-		[SerializeField]
 		private ReorderableListFlags _flags;
 
 		/// <summary>
@@ -300,11 +299,8 @@ namespace Rotorz.ReorderableList {
 			get { return (_flags & ReorderableListFlags.HideRemoveButtons) == 0; }
 		}
 
-		[SerializeField]
 		private GUIStyle _containerStyle;
-		[SerializeField]
 		private GUIStyle _footerButtonStyle;
-		[SerializeField]
 		private GUIStyle _itemButtonStyle;
 
 		/// <summary>
