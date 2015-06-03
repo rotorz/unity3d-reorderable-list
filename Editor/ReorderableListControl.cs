@@ -1009,7 +1009,7 @@ namespace Rotorz.ReorderableList {
 					var dropTarget = adaptor as IReorderableListDropTarget;
 					if (dropTarget != null && dropTarget.CanDropInsert(dropInsertionIndex)) {
 						++s_DropTargetNestedCounter;
-                        DrawDropIndicator(new Rect(position.x, dropInsertionPosition - 1, position.width, 3));
+                        DrawDropIndicator(new Rect(position.x, dropInsertionPosition - 2, position.width, 3));
 						dropTarget.ProcessDropInsertOperation(dropInsertionIndex);
 					}
 				}
