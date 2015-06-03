@@ -725,12 +725,19 @@ namespace Rotorz.ReorderableList {
 			DrawListItem(s_DragItemPosition, adaptor, s_AnchorIndex);
 		}
 
+		// Counter is incremented whenever a reorderable list control reacts as a drop
+		// target allowing parent reorderable list controls to suppress any reaction that
+		// they might otherwise have.
+		private static int s_DropTargetNestedCounter = 0;
+
 		/// <summary>
 		/// Draw list container and items.
 		/// </summary>
 		/// <param name="position">Position of list control in GUI.</param>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		private void DrawListContainerAndItems(Rect position, IReorderableListAdaptor adaptor) {
+			int initialDropTargetNestedCounterValue = s_DropTargetNestedCounter;
+
 			// Get local copy of event information for efficiency.
 			EventType eventType = Event.current.GetTypeForControl(_controlID);
 			Vector2 mousePosition = Event.current.mousePosition;
@@ -949,15 +956,20 @@ namespace Rotorz.ReorderableList {
 //*/
 			}
 			else {
-				if (mousePosition.y >= lastMidPoint) {
-					dropInsertionIndex = count;
-					dropInsertionPosition = itemPosition.yMax;
-				}
+				// Cannot react to drop insertion if a nested reorderable list control
+				// has already reacted!
+				if (s_DropTargetNestedCounter == initialDropTargetNestedCounterValue) {
+					if (mousePosition.y >= lastMidPoint) {
+						dropInsertionIndex = count;
+						dropInsertionPosition = itemPosition.yMax;
+					}
 
-				var dropTarget = adaptor as IReorderableListDropTarget;
-				if (dropTarget != null && dropTarget.CanDropInsert(dropInsertionIndex)) {
-					DrawDropIndicator(new Rect(position.x, dropInsertionPosition - 1, position.width, 3));
-					dropTarget.ProcessDropInsertOperation(dropInsertionIndex);
+					var dropTarget = adaptor as IReorderableListDropTarget;
+					if (dropTarget != null && dropTarget.CanDropInsert(dropInsertionIndex)) {
+						++s_DropTargetNestedCounter;
+                        DrawDropIndicator(new Rect(position.x, dropInsertionPosition - 1, position.width, 3));
+						dropTarget.ProcessDropInsertOperation(dropInsertionIndex);
+					}
 				}
 			}
 
