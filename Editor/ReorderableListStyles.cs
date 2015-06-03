@@ -26,7 +26,7 @@ namespace Rotorz.ReorderableList {
 			Container = new GUIStyle();
 			Container.border = new RectOffset(2, 2, 1, 2);
 			Container.margin = new RectOffset(5, 5, 5, 5);
-			Container.padding = new RectOffset(1, 1, 2, 2);
+			Container.padding = new RectOffset(2, 2, 2, 2);
 			Container.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.ContainerBackground);
 
 			Container2 = new GUIStyle(Container);

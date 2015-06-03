@@ -856,7 +856,7 @@ namespace Rotorz.ReorderableList {
 			ReorderableListGUI.IndexOfChangedItem = -1;
 
 			// Draw list items!
-			Rect itemPosition = new Rect(position.x + 2, firstItemY, position.width - 4, 0);
+			Rect itemPosition = new Rect(position.x + ContainerStyle.padding.left, firstItemY, position.width - ContainerStyle.padding.horizontal, 0);
 			float targetSlotPosition = position.yMax - s_DragItemPosition.height - 1;
 
 			int dropInsertionIndex = 0;
