@@ -117,6 +117,14 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <inheritdoc/>
+		public virtual void BeginGUI() {
+		}
+
+		/// <inheritdoc/>
+		public virtual void EndGUI() {
+		}
+
+		/// <inheritdoc/>
 		public virtual void DrawItemBackground(Rect position, int index) {
 		}
 

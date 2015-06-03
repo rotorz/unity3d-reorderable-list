@@ -1123,7 +1123,9 @@ namespace Rotorz.ReorderableList {
 			s_CurrentListPositionStack.Push(position);
 			try {
 				// Draw list as normal.
+				adaptor.BeginGUI();
 				DrawListContainerAndItems(position, adaptor);
+				adaptor.EndGUI();
 			}
 			finally {
 				s_CurrentListPositionStack.Pop();
@@ -1241,13 +1243,18 @@ namespace Rotorz.ReorderableList {
 
 			s_CurrentListPositionStack.Push(position);
 			try {
+				adaptor.BeginGUI();
+
 				if (adaptor.Count > 0) {
 					DrawListContainerAndItems(position, adaptor);
 					CheckForAutoFocusControl();
 				}
 				else {
+					ReorderableListGUI.IndexOfChangedItem = -1;
 					DrawEmptyListControl(position, drawEmpty);
 				}
+
+				adaptor.EndGUI();
 			}
 			finally {
 				s_CurrentListPositionStack.Pop();

@@ -80,6 +80,23 @@ namespace Rotorz.ReorderableList {
 		void Clear();
 
 		/// <summary>
+		/// Occurs before any list items are drawn.
+		/// </summary>
+		/// <remarks>
+		/// <para>This method is only used to handle GUI repaint events.</para>
+		/// </remarks>
+		/// <see cref="EndGUI()"/>
+		void BeginGUI();
+		/// <summary>
+		/// Occurs after all list items have been drawn.
+		/// </summary>
+		/// <remarks>
+		/// <para>This method is only used to handle GUI repaint events.</para>
+		/// </remarks>
+		/// <see cref="BeginGUI()"/>
+		void EndGUI();
+
+		/// <summary>
 		/// Draws background of a list item.
 		/// </summary>
 		/// <remarks>
