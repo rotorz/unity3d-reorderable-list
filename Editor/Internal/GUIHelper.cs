@@ -126,7 +126,7 @@ namespace Rotorz.ReorderableList.Internal {
 		public static void Separator(Rect position, Color color) {
 			if (Event.current.type == EventType.Repaint) {
 				Color restoreColor = GUI.color;
-				GUI.color = s_SeparatorColor;
+				GUI.color = color;
 				s_SeparatorStyle.Draw(position, false, false, false, false);
 				GUI.color = restoreColor;
 			}
