@@ -144,8 +144,11 @@ namespace Rotorz.ReorderableList {
 		private static GUIStyle s_RightAlignedLabelStyle;
 
 		static ReorderableListControl() {
-			s_CurrentItemIndex = new Stack<ItemInfo>();
-			s_CurrentItemIndex.Push(new ItemInfo(default(Rect), -1, default(Rect)));
+			s_CurrentListPositionStack = new Stack<Rect>();
+			s_CurrentListPositionStack.Push(default(Rect));
+
+			s_CurrentItemStack = new Stack<ItemInfo>();
+			s_CurrentItemStack.Push(new ItemInfo(-1, default(Rect)));
 
 			if (EditorGUIUtility.isProSkin) {
 				AnchorBackgroundColor = new Color(85f / 255f, 85f / 255f, 85f / 255f, 0.85f);
@@ -216,27 +219,30 @@ namespace Rotorz.ReorderableList {
 		private static int s_AutoFocusIndex = -1;
 
 		private struct ItemInfo {
-			public Rect ListPosition;
 			public int ItemIndex;
 			public Rect ItemPosition;
 
-			public ItemInfo(Rect listPosition, int itemIndex, Rect itemPosition) {
-				ListPosition = listPosition;
+			public ItemInfo(int itemIndex, Rect itemPosition) {
 				ItemIndex = itemIndex;
 				ItemPosition = itemPosition;
 			}
 		}
 
 		/// <summary>
-		/// Zero-based index of list item which is currently being drawn.
+		/// Represents the current stack of nested reorderable list control positions.
 		/// </summary>
-		private static Stack<ItemInfo> s_CurrentItemIndex;
+		private static Stack<Rect> s_CurrentListPositionStack;
+
+		/// <summary>
+		/// Represents the current stack of nested reorderable list items.
+		/// </summary>
+		private static Stack<ItemInfo> s_CurrentItemStack;
 
 		/// <summary>
 		/// Gets the position of the list control that is currently being drawn.
 		/// </summary>
 		public static Rect CurrentListPosition {
-			get { return s_CurrentItemIndex.Peek().ListPosition; }
+			get { return s_CurrentListPositionStack.Peek(); }
 		}
 
 		/// <summary>
@@ -247,14 +253,14 @@ namespace Rotorz.ReorderableList {
 		/// <para>Use <see cref="ReorderableListGUI.CurrentItemIndex"/> instead.</para>
 		/// </remarks>
 		internal static int CurrentItemIndex {
-			get { return s_CurrentItemIndex.Peek().ItemIndex; }
+			get { return s_CurrentItemStack.Peek().ItemIndex; }
 		}
 
 		/// <summary>
 		/// Gets the total position of the list item that is currently being drawn.
 		/// </summary>
 		public static Rect CurrentItemTotalPosition {
-			get { return s_CurrentItemIndex.Peek().ItemPosition; }
+			get { return s_CurrentItemStack.Peek().ItemPosition; }
 		}
 
 		#region Properties
@@ -618,7 +624,7 @@ namespace Rotorz.ReorderableList {
 				itemContentPosition.width -= 27;
 
 			try {
-				s_CurrentItemIndex.Push(new ItemInfo(_position, itemIndex, position));
+                s_CurrentItemStack.Push(new ItemInfo(itemIndex, position));
 				EditorGUI.BeginChangeCheck();
 
 				if (isRepainting && isVisible) {
@@ -669,7 +675,7 @@ namespace Rotorz.ReorderableList {
 				}
 			}
 			finally {
-				s_CurrentItemIndex.Pop();
+				s_CurrentItemStack.Pop();
 			}
 		}
 
@@ -1060,8 +1066,14 @@ namespace Rotorz.ReorderableList {
 			if (HasFooterButtons)
 				position.height -= FooterButtonStyle.fixedHeight;
 
-			// Draw list as normal.
-			DrawListContainerAndItems(position, adaptor);
+			s_CurrentListPositionStack.Push(position);
+			try {
+				// Draw list as normal.
+				DrawListContainerAndItems(position, adaptor);
+			}
+			finally {
+				s_CurrentListPositionStack.Pop();
+            }
 
 			CheckForAutoFocusControl();
 
@@ -1173,12 +1185,18 @@ namespace Rotorz.ReorderableList {
 			if (HasFooterButtons)
 				position.height -= FooterButtonStyle.fixedHeight;
 
-			if (adaptor.Count > 0) {
-				DrawListContainerAndItems(position, adaptor);
-				CheckForAutoFocusControl();
+			s_CurrentListPositionStack.Push(position);
+			try {
+				if (adaptor.Count > 0) {
+					DrawListContainerAndItems(position, adaptor);
+					CheckForAutoFocusControl();
+				}
+				else {
+					DrawEmptyListControl(position, drawEmpty);
+				}
 			}
-			else {
-				DrawEmptyListControl(position, drawEmpty);
+			finally {
+				s_CurrentListPositionStack.Pop();
 			}
 
 			DrawFooterControls(position, adaptor);
