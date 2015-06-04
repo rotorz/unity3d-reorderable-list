@@ -36,6 +36,11 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets the position of the list control that is currently being drawn.
 		/// </summary>
+		/// <remarks>
+		/// <para>The value of this property should be ignored for <see cref="EventType.Layout"/>
+		/// type events when using reorderable list controls with automatic layout.</para>
+		/// </remarks>
+		/// <see cref="CurrentItemTotalPosition"/>
 		public static Rect CurrentListPosition {
 			get { return ReorderableListControl.CurrentListPosition; }
 		}
@@ -51,6 +56,12 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Gets the total position of the list item that is currently being drawn.
 		/// </summary>
+		/// <remarks>
+		/// <para>The value of this property should be ignored for <see cref="EventType.Layout"/>
+		/// type events when using reorderable list controls with automatic layout.</para>
+		/// </remarks>
+		/// <see cref="CurrentItemIndex"/>
+		/// <see cref="CurrentListPosition"/>
 		public static Rect CurrentItemTotalPosition {
 			get { return ReorderableListControl.CurrentItemTotalPosition; }
 		}
