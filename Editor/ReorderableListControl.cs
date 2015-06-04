@@ -144,8 +144,8 @@ namespace Rotorz.ReorderableList {
 		private static GUIStyle s_RightAlignedLabelStyle;
 
 		static ReorderableListControl() {
-			s_CurrentListPositionStack = new Stack<Rect>();
-			s_CurrentListPositionStack.Push(default(Rect));
+			s_CurrentListStack = new Stack<ListInfo>();
+			s_CurrentListStack.Push(default(ListInfo));
 
 			s_CurrentItemStack = new Stack<ItemInfo>();
 			s_CurrentItemStack.Push(new ItemInfo(-1, default(Rect)));
@@ -218,6 +218,16 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		private static int s_AutoFocusIndex = -1;
 
+		private struct ListInfo {
+			public int ControlID;
+			public Rect Position;
+
+			public ListInfo(int controlID, Rect position) {
+				ControlID = controlID;
+				Position = position;
+			}
+		}
+
 		private struct ItemInfo {
 			public int ItemIndex;
 			public Rect ItemPosition;
@@ -231,7 +241,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Represents the current stack of nested reorderable list control positions.
 		/// </summary>
-		private static Stack<Rect> s_CurrentListPositionStack;
+		private static Stack<ListInfo> s_CurrentListStack;
 
 		/// <summary>
 		/// Represents the current stack of nested reorderable list items.
@@ -239,10 +249,17 @@ namespace Rotorz.ReorderableList {
 		private static Stack<ItemInfo> s_CurrentItemStack;
 
 		/// <summary>
+		/// Gets the control ID of the list that is currently being drawn.
+		/// </summary>
+		public static int CurrentListControlID {
+			get { return s_CurrentListStack.Peek().ControlID; }
+		}
+
+		/// <summary>
 		/// Gets the position of the list control that is currently being drawn.
 		/// </summary>
 		public static Rect CurrentListPosition {
-			get { return s_CurrentListPositionStack.Peek(); }
+			get { return s_CurrentListStack.Peek().Position; }
 		}
 
 		/// <summary>
@@ -1120,7 +1137,7 @@ namespace Rotorz.ReorderableList {
 			if (HasFooterButtons)
 				position.height -= FooterButtonStyle.fixedHeight;
 
-			s_CurrentListPositionStack.Push(position);
+			s_CurrentListStack.Push(new ListInfo(_controlID, position));
 			try {
 				// Draw list as normal.
 				adaptor.BeginGUI();
@@ -1128,7 +1145,7 @@ namespace Rotorz.ReorderableList {
 				adaptor.EndGUI();
 			}
 			finally {
-				s_CurrentListPositionStack.Pop();
+				s_CurrentListStack.Pop();
             }
 
 			CheckForAutoFocusControl();
@@ -1241,7 +1258,7 @@ namespace Rotorz.ReorderableList {
 			if (HasFooterButtons)
 				position.height -= FooterButtonStyle.fixedHeight;
 
-			s_CurrentListPositionStack.Push(position);
+			s_CurrentListStack.Push(new ListInfo(_controlID, position));
 			try {
 				adaptor.BeginGUI();
 
@@ -1257,7 +1274,7 @@ namespace Rotorz.ReorderableList {
 				adaptor.EndGUI();
 			}
 			finally {
-				s_CurrentListPositionStack.Pop();
+				s_CurrentListStack.Pop();
 			}
 
 			DrawFooterControls(position, adaptor);

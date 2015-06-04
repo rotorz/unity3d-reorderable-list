@@ -27,6 +27,13 @@ namespace Rotorz.ReorderableList {
 		public static int IndexOfChangedItem { get; internal set; }
 
 		/// <summary>
+		/// Gets the control ID of the list that is currently being drawn.
+		/// </summary>
+		public static int CurrentListControlID {
+			get { return ReorderableListControl.CurrentListControlID; }
+		}
+
+		/// <summary>
 		/// Gets the position of the list control that is currently being drawn.
 		/// </summary>
 		public static Rect CurrentListPosition {
