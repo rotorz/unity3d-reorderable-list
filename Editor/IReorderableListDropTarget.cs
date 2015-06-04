@@ -36,8 +36,11 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		/// <remarks>
 		/// <para>This method is always called whilst drawing an editor GUI.</para>
+		/// <para>This method is only called when <see cref="CanDropInsert(int)"/>
+		/// returns a value of <c>true</c>.</para>
 		/// </remarks>
 		/// <param name="insertionIndex">Zero-based index of insertion.</param>
+		/// <see cref="ReorderableListGUI.CurrentListControlID"/>
 		/// <see cref="UnityEditor.DragAndDrop"/>
 		void ProcessDropInsertion(int insertionIndex);
 
