@@ -39,7 +39,7 @@ namespace Rotorz.ReorderableList {
 		/// </remarks>
 		/// <param name="insertionIndex">Zero-based index of insertion.</param>
 		/// <see cref="UnityEditor.DragAndDrop"/>
-		void ProcessDropInsertOperation(int insertionIndex);
+		void ProcessDropInsertion(int insertionIndex);
 
 	}
 

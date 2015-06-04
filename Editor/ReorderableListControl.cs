@@ -1010,7 +1010,7 @@ namespace Rotorz.ReorderableList {
 					if (dropTarget != null && dropTarget.CanDropInsert(dropInsertionIndex)) {
 						++s_DropTargetNestedCounter;
                         DrawDropIndicator(new Rect(position.x, dropInsertionPosition - 2, position.width, 3));
-						dropTarget.ProcessDropInsertOperation(dropInsertionIndex);
+						dropTarget.ProcessDropInsertion(dropInsertionIndex);
 					}
 				}
 			}
