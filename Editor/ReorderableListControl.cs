@@ -1275,11 +1275,10 @@ namespace Rotorz.ReorderableList {
 			try {
 				adaptor.BeginGUI();
 
-				if (adaptor.Count > 0) {
-					DrawListContainerAndItems(position, adaptor);
-					CheckForAutoFocusControl();
-				}
-				else {
+				DrawListContainerAndItems(position, adaptor);
+				CheckForAutoFocusControl();
+
+				if (adaptor.Count == 0) {
 					ReorderableListGUI.IndexOfChangedItem = -1;
 					DrawEmptyListControl(position, drawEmpty);
 				}
