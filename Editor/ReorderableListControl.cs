@@ -1156,7 +1156,7 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		private static Dictionary<int, float> s_ContainerHeightCache = new Dictionary<int, float>();
 
-		private Rect GetListRectWithAutoLayout(IReorderableListAdaptor adaptor) {
+		private Rect GetListRectWithAutoLayout(IReorderableListAdaptor adaptor, float padding) {
 			float totalHeight;
 
 			// Calculate position of list field using layout engine.
@@ -1170,6 +1170,8 @@ namespace Rotorz.ReorderableList {
 					: 0;
 			}
 
+			totalHeight += padding;
+
 			return GUILayoutUtility.GetRect(GUIContent.none, ContainerStyle, GUILayout.Height(totalHeight));
 		}
 
@@ -1177,11 +1179,12 @@ namespace Rotorz.ReorderableList {
 		/// Do layout version of list field.
 		/// </summary>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
+		/// <param name="padding">Padding in pixels.</param>
 		/// <returns>
 		/// Position of list container area in GUI (excludes footer area).
 		/// </returns>
-		private Rect DrawLayoutListField(IReorderableListAdaptor adaptor) {
-			Rect position = GetListRectWithAutoLayout(adaptor);
+		private Rect DrawLayoutListField(IReorderableListAdaptor adaptor, float padding) {
+			Rect position = GetListRectWithAutoLayout(adaptor, padding);
 
 			// Make room for footer buttons?
 			if (HasFooterButtons)
@@ -1218,7 +1221,7 @@ namespace Rotorz.ReorderableList {
 				if (drawEmpty != null)
 					drawEmpty();
 				else
-					GUILayout.Space(5);
+					Debug.LogError("Unexpected call to 'DrawLayoutEmptyList'");
 
 				s_CurrentListStack.Push(new ListInfo(_controlID, position));
 				try {
@@ -1282,9 +1285,13 @@ namespace Rotorz.ReorderableList {
 			FixStyles();
 			PrepareState(controlID, adaptor);
 
-			Rect position = adaptor.Count > 0
-				? DrawLayoutListField(adaptor)
-				: DrawLayoutEmptyList(adaptor, drawEmpty);
+			Rect position;
+			if (adaptor.Count > 0)
+				position = DrawLayoutListField(adaptor, 0f);
+			else if (drawEmpty == null)
+				position = DrawLayoutListField(adaptor, 5f);
+			else
+				position = DrawLayoutEmptyList(adaptor, drawEmpty);
 
 			DrawFooterControls(position, adaptor);
 		}
