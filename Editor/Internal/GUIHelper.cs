@@ -71,13 +71,14 @@ namespace Rotorz.ReorderableList.Internal {
 
 		internal static bool IconButton(Rect position, bool visible, Texture2D iconNormal, Texture2D iconActive, GUIStyle style) {
 			int controlID = GUIUtility.GetControlID(FocusType.Passive);
-			Vector2 mousePosition = Event.current.mousePosition;
+
+			position.height += 1;
 
 			switch (Event.current.GetTypeForControl(controlID)) {
 				case EventType.MouseDown:
 					// Do not allow button to be pressed using right mouse button since
 					// context menu should be shown instead!
-					if (GUI.enabled && Event.current.button != 1 && position.Contains(mousePosition)) {
+					if (GUI.enabled && Event.current.button != 1 && position.Contains(Event.current.mousePosition)) {
 						GUIUtility.hotControl = controlID;
 						GUIUtility.keyboardControl = 0;
 						Event.current.Use();
@@ -93,7 +94,7 @@ namespace Rotorz.ReorderableList.Internal {
 					if (GUIUtility.hotControl == controlID) {
 						GUIUtility.hotControl = 0;
 
-						if (position.Contains(mousePosition)) {
+						if (position.Contains(Event.current.mousePosition)) {
 							Event.current.Use();
 							return true;
 						}
@@ -108,7 +109,8 @@ namespace Rotorz.ReorderableList.Internal {
 					if (visible) {
 						bool isActive = GUIUtility.hotControl == controlID && position.Contains(Event.current.mousePosition);
 						s_TempIconContent.image = isActive ? iconActive : iconNormal;
-						style.Draw(position, s_TempIconContent, controlID);
+						position.height -= 1;
+                        style.Draw(position, s_TempIconContent, isActive, isActive, false, false);
 					}
 					break;
 			}

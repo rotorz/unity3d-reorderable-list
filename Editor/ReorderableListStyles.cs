@@ -54,6 +54,9 @@ namespace Rotorz.ReorderableList {
 			ItemButton.active.background = ReorderableListResources.CreatePixelTexture("Dark Pixel (List GUI)", new Color32(18, 18, 18, 255));
 			ItemButton.imagePosition = ImagePosition.ImageOnly;
 			ItemButton.alignment = TextAnchor.MiddleCenter;
+			ItemButton.overflow = new RectOffset(0, 0, -1, 0);
+			ItemButton.padding = new RectOffset(0, 0, 1, 0);
+			ItemButton.contentOffset = new Vector2(0, -1f);
 
 			SelectedItem = new GUIStyle();
 			SelectedItem.normal.background = ReorderableListResources.texHighlightColor;

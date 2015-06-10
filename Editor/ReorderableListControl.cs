@@ -747,7 +747,7 @@ namespace Rotorz.ReorderableList {
 					s_RemoveButtonPosition = position;
 					s_RemoveButtonPosition.width = 27;
 					s_RemoveButtonPosition.x = itemContentPosition.xMax + 2;
-					s_RemoveButtonPosition.height -= 2;
+					s_RemoveButtonPosition.y -= 1;
 
 					if (DoRemoveButton(s_RemoveButtonPosition, isVisible))
 						RemoveItem(adaptor, itemIndex);
