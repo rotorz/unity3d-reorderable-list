@@ -543,6 +543,19 @@ namespace Rotorz.ReorderableList {
 		private bool _allowReordering;
 
 		/// <summary>
+		/// A boolean value indicating whether drop insertion is allowed.
+		/// </summary>
+		private bool _allowDropInsertion;
+		/// <summary>
+		/// Zero-based index for drop insertion when applicable; othewise, a value of -1.
+		/// </summary>
+		private int _insertionIndex;
+		/// <summary>
+		/// Position of drop insertion on Y-axis in GUI space.
+		/// </summary>
+		private float _insertionPosition;
+
+		/// <summary>
 		/// Prepare initial state for list control.
 		/// </summary>
 		/// <param name="controlID">Unique ID of list control.</param>
@@ -559,7 +572,11 @@ namespace Rotorz.ReorderableList {
 			_tracking = IsTrackingControl(controlID);
 
 			_allowReordering = (Flags & ReorderableListFlags.DisableReordering) == 0;
-		}
+
+			// The value of this field is reset each time the control is drawn and may
+			// be invalidated when list items are drawn.
+			_allowDropInsertion = true;
+        }
 
 		private static int CountDigits(int number) {
 			return Mathf.Max(2, Mathf.CeilToInt(Mathf.Log10((float)number)));
@@ -887,8 +904,8 @@ namespace Rotorz.ReorderableList {
 			Rect itemPosition = new Rect(position.x + ContainerStyle.padding.left, firstItemY, position.width - ContainerStyle.padding.horizontal, 0);
 			float targetSlotPosition = position.yMax - s_DragItemPosition.height - 1;
 
-			int dropInsertionIndex = 0;
-			float dropInsertionPosition = itemPosition.yMax;
+			_insertionIndex = 0;
+			_insertionPosition = itemPosition.yMax;
 
 			float lastMidPoint = 0f;
 			float lastHeight = 0f;
@@ -924,8 +941,8 @@ namespace Rotorz.ReorderableList {
 					// Does this represent the drop insertion index?
 					float midpoint = itemPosition.y + itemPosition.height / 2f;
 					if (mousePosition.y > lastMidPoint && mousePosition.y <= midpoint) {
-						dropInsertionIndex = i;
-						dropInsertionPosition = itemPosition.y;
+						_insertionIndex = i;
+						_insertionPosition = itemPosition.y;
 					}
 				}
 
@@ -1005,6 +1022,10 @@ namespace Rotorz.ReorderableList {
 
 			lastMidPoint = position.yMax - lastHeight / 2f;
 
+			// Assume that drop insertion is not allowed at this time; we can change our
+			// mind a little further down ;)
+			_allowDropInsertion = false;
+
 			// Item which is being dragged should be shown on top of other controls!
 			if (IsTrackingControl(_controlID)) {
 				if (eventType == EventType.MouseDrag) {
@@ -1026,30 +1047,42 @@ namespace Rotorz.ReorderableList {
 //*/
 			}
 			else {
-				// Cannot react to drop insertion if a nested reorderable list control
-				// has already reacted!
+				// Cannot react to drop insertion if a nested drop target has already reacted!
 				if (s_DropTargetNestedCounter == initialDropTargetNestedCounterValue) {
-					if (mousePosition.y >= lastMidPoint) {
-						dropInsertionIndex = count;
-						dropInsertionPosition = itemPosition.yMax;
+					if (Event.current.mousePosition.y >= lastMidPoint) {
+						_insertionIndex = adaptor.Count;
+						_insertionPosition = itemPosition.yMax;
 					}
-
-					var dropTarget = adaptor as IReorderableListDropTarget;
-					if (dropTarget != null && dropTarget.CanDropInsert(dropInsertionIndex)) {
-						++s_DropTargetNestedCounter;
-						dropTarget.ProcessDropInsertion(dropInsertionIndex);
-
-						if (DragAndDrop.activeControlID == _controlID)
-							DrawDropIndicator(new Rect(position.x, dropInsertionPosition - 2, position.width, 3));
-					}
-				}
+					_allowDropInsertion = true;
+                }
 			}
 
 			// Fake control to catch input focus if auto focus was not possible.
 			GUIUtility.GetControlID(FocusType.Keyboard);
 		}
 
-		private void DrawDropIndicator(Rect position) {
+		private void HandleDropInsertion(Rect position, IReorderableListAdaptor adaptor) {
+			var target = adaptor as IReorderableListDropTarget;
+            if (target == null || !_allowDropInsertion)
+				return;
+			
+			if (target.CanDropInsert(_insertionIndex)) {
+				++s_DropTargetNestedCounter;
+				target.ProcessDropInsertion(_insertionIndex);
+
+				if (DragAndDrop.activeControlID == _controlID && Event.current.type == EventType.Repaint)
+					DrawDropIndicator(new Rect(position.x, _insertionPosition - 2, position.width, 3));
+			}
+		}
+
+		/// <summary>
+		/// Draws drop insertion indicator.
+		/// </summary>
+		/// <remarks>
+		/// <para>This method is only ever called during repaint events.</para>
+		/// </remarks>
+		/// <param name="position">Position if the drop indicator.</param>
+		protected virtual void DrawDropIndicator(Rect position) {
 			GUIHelper.Separator(position);
 		}
 
@@ -1123,14 +1156,7 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		private static Dictionary<int, float> s_ContainerHeightCache = new Dictionary<int, float>();
 
-		/// <summary>
-		/// Do layout version of list field.
-		/// </summary>
-		/// <param name="adaptor">Reorderable list adaptor.</param>
-		/// <returns>
-		/// Position of list container area in GUI (excludes footer area).
-		/// </returns>
-		private Rect DrawLayoutListField(IReorderableListAdaptor adaptor) {
+		private Rect GetListRectWithAutoLayout(IReorderableListAdaptor adaptor) {
 			float totalHeight;
 
 			// Calculate position of list field using layout engine.
@@ -1144,7 +1170,18 @@ namespace Rotorz.ReorderableList {
 					: 0;
 			}
 
-			Rect position = GUILayoutUtility.GetRect(GUIContent.none, ContainerStyle, GUILayout.Height(totalHeight));
+			return GUILayoutUtility.GetRect(GUIContent.none, ContainerStyle, GUILayout.Height(totalHeight));
+		}
+
+		/// <summary>
+		/// Do layout version of list field.
+		/// </summary>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		/// <returns>
+		/// Position of list container area in GUI (excludes footer area).
+		/// </returns>
+		private Rect DrawLayoutListField(IReorderableListAdaptor adaptor) {
+			Rect position = GetListRectWithAutoLayout(adaptor);
 
 			// Make room for footer buttons?
 			if (HasFooterButtons)
@@ -1155,6 +1192,7 @@ namespace Rotorz.ReorderableList {
 				// Draw list as normal.
 				adaptor.BeginGUI();
 				DrawListContainerAndItems(position, adaptor);
+				HandleDropInsertion(position, adaptor);
 				adaptor.EndGUI();
 			}
 			finally {
@@ -1169,17 +1207,30 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Draw content for empty list (layout version).
 		/// </summary>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="drawEmpty">Callback to draw empty content.</param>
 		/// <returns>
 		/// Position of list container area in GUI (excludes footer area).
 		/// </returns>
-		private Rect DrawLayoutEmptyList(DrawEmpty drawEmpty) {
-			Rect r = EditorGUILayout.BeginVertical(ContainerStyle);
+		private Rect DrawLayoutEmptyList(IReorderableListAdaptor adaptor, DrawEmpty drawEmpty) {
+			Rect position = EditorGUILayout.BeginVertical(ContainerStyle);
 			{
 				if (drawEmpty != null)
 					drawEmpty();
 				else
 					GUILayout.Space(5);
+
+				s_CurrentListStack.Push(new ListInfo(_controlID, position));
+				try {
+					adaptor.BeginGUI();
+					_insertionIndex = 0;
+					_insertionPosition = position.y + 2;
+					HandleDropInsertion(position, adaptor);
+					adaptor.EndGUI();
+				}
+				finally {
+					s_CurrentListStack.Pop();
+				}
 			}
 			EditorGUILayout.EndVertical();
 
@@ -1187,7 +1238,7 @@ namespace Rotorz.ReorderableList {
 			if (HasFooterButtons)
 				GUILayoutUtility.GetRect(0, FooterButtonStyle.fixedHeight - 1);
 
-			return r;
+			return position;
 		}
 
 		/// <summary>
@@ -1234,12 +1285,9 @@ namespace Rotorz.ReorderableList {
 			FixStyles();
 			PrepareState(controlID, adaptor);
 
-			Rect position;
-
-			if (adaptor.Count > 0)
-				position = DrawLayoutListField(adaptor);
-			else
-				position = DrawLayoutEmptyList(drawEmpty);
+			Rect position = adaptor.Count > 0
+				? DrawLayoutListField(adaptor)
+				: DrawLayoutEmptyList(adaptor, drawEmpty);
 
 			DrawFooterControls(position, adaptor);
 		}
@@ -1276,6 +1324,7 @@ namespace Rotorz.ReorderableList {
 				adaptor.BeginGUI();
 
 				DrawListContainerAndItems(position, adaptor);
+				HandleDropInsertion(position, adaptor);
 				CheckForAutoFocusControl();
 
 				if (adaptor.Count == 0) {
