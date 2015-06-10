@@ -1251,10 +1251,7 @@ namespace Rotorz.ReorderableList {
 				ContainerStyle.Draw(position, GUIContent.none, false, false, false, false);
 
 			// Take padding into consideration when drawing empty content.
-			position.x += ContainerStyle.padding.left;
-			position.y += ContainerStyle.padding.top;
-			position.width -= ContainerStyle.padding.horizontal;
-			position.height -= ContainerStyle.padding.vertical;
+			position = ContainerStyle.padding.Remove(position);
 
 			if (drawEmpty != null)
 				drawEmpty(position);
