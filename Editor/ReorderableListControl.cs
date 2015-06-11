@@ -1068,7 +1068,27 @@ namespace Rotorz.ReorderableList {
 			
 			if (target.CanDropInsert(_insertionIndex)) {
 				++s_DropTargetNestedCounter;
-				target.ProcessDropInsertion(_insertionIndex);
+
+				switch (Event.current.type) {
+					case EventType.DragUpdated:
+						DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+						DragAndDrop.activeControlID = _controlID;
+						target.ProcessDropInsertion(_insertionIndex);
+						Event.current.Use();
+						break;
+
+					case EventType.DragPerform:
+						target.ProcessDropInsertion(_insertionIndex);
+
+						DragAndDrop.AcceptDrag();
+						DragAndDrop.activeControlID = 0;
+						Event.current.Use();
+						break;
+
+					default:
+						target.ProcessDropInsertion(_insertionIndex);
+						break;
+				}
 
 				if (DragAndDrop.activeControlID == _controlID && Event.current.type == EventType.Repaint)
 					DrawDropIndicator(new Rect(position.x, _insertionPosition - 2, position.width, 3));
