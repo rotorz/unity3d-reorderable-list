@@ -589,6 +589,9 @@ namespace Rotorz.ReorderableList {
 		// Keep track of previously known mouse position (in screen space).
 		private static Vector2 s_MousePosition;
 
+		// Indicates whether a "MouseDrag" event should be simulated on the next Layout/Repaint.
+		private static int s_SimulateMouseDragControlID;
+
 		/// <summary>
 		/// Indicate that first control of list item should be automatically focused
 		/// if possible.
@@ -837,24 +840,27 @@ namespace Rotorz.ReorderableList {
 			// Maximum position of dragged item.
 			float dragItemMaxY = (position.yMax - ContainerStyle.padding.bottom) - s_DragItemPosition.height + 1;
 
+			bool isMouseDragEvent = eventType == EventType.MouseDrag;
+			if (s_SimulateMouseDragControlID == _controlID && eventType == EventType.Repaint) {
+				s_SimulateMouseDragControlID = 0;
+				isMouseDragEvent = true;
+			}
+			if (isMouseDragEvent && _tracking) {
+				// Reset target index and adjust when looping through list items.
+				if (mousePosition.y < firstItemY)
+					newTargetIndex = 0;
+				else if (mousePosition.y >= position.yMax)
+					newTargetIndex = adaptor.Count;
+
+				s_DragItemPosition.y = Mathf.Clamp(mousePosition.y + s_AnchorMouseOffset, firstItemY, dragItemMaxY);
+			}
+
 			switch (eventType) {
-				case EventType.MouseDown:
+                case EventType.MouseDown:
 					if (_tracking) {
 						// Cancel drag when other mouse button is pressed.
 						s_TrackingCancelBlockContext = true;
 						Event.current.Use();
-					}
-					break;
-
-				case EventType.MouseDrag:
-					if (_tracking) {
-						// Reset target index and adjust when looping through list items.
-						if (mousePosition.y < firstItemY)
-							newTargetIndex = 0;
-						else if (mousePosition.y >= position.yMax)
-							newTargetIndex = adaptor.Count;
-
-						s_DragItemPosition.y = Mathf.Clamp(mousePosition.y + s_AnchorMouseOffset, firstItemY, dragItemMaxY);
 					}
 					break;
 
@@ -944,7 +950,7 @@ namespace Rotorz.ReorderableList {
 					}
 				}
 
-				if (_tracking && eventType == EventType.MouseDrag) {
+				if (_tracking && isMouseDragEvent) {
 					float midpoint = itemPosition.y + itemPosition.height / 2f;
 
 					if (s_TargetIndex < i) {
@@ -1031,13 +1037,16 @@ namespace Rotorz.ReorderableList {
 
 			// Item which is being dragged should be shown on top of other controls!
 			if (IsTrackingControl(_controlID)) {
-				if (eventType == EventType.MouseDrag) {
+				if (isMouseDragEvent) {
 					if (s_DragItemPosition.yMax >= lastMidPoint)
 						newTargetIndex = count;
 
-					// Force repaint to occur so that dragging rectangle is visible.
 					s_TargetIndex = newTargetIndex;
-					Event.current.Use();
+
+					// Force repaint to occur so that dragging rectangle is visible.
+					// But only if this is a real MouseDrag event!!
+					if (eventType == EventType.MouseDrag)
+						Event.current.Use();
 				}
 
 				DrawFloatingListItem(adaptor, targetSlotPosition);
@@ -1062,6 +1071,40 @@ namespace Rotorz.ReorderableList {
 
 			// Fake control to catch input focus if auto focus was not possible.
 			GUIUtility.GetControlID(FocusType.Keyboard);
+
+			if (isMouseDragEvent && (Flags & ReorderableListFlags.DisableAutoScroll) == 0 && IsTrackingControl(_controlID))
+				AutoScrollTowardsMouse();
+		}
+
+		private static bool ContainsRect(Rect a, Rect b) {
+			return a.Contains(new Vector2(b.xMin, b.yMin)) && a.Contains(new Vector2(b.xMax, b.yMax));
+		}
+
+		private void AutoScrollTowardsMouse() {
+			const float triggerPaddingInPixels = 8f;
+			const float maximumRangeInPixels = 4f;
+
+			Rect visiblePosition = GUIHelper.VisibleRect();
+			Vector2 mousePosition = Event.current.mousePosition;
+			Rect mouseRect = new Rect(mousePosition.x - triggerPaddingInPixels, mousePosition.y - triggerPaddingInPixels, triggerPaddingInPixels * 2, triggerPaddingInPixels * 2);
+
+			if (!ContainsRect(visiblePosition, mouseRect)) {
+				if (mousePosition.y < visiblePosition.center.y)
+					mousePosition = new Vector2(mouseRect.xMin, mouseRect.yMin);
+				else
+					mousePosition = new Vector2(mouseRect.xMax, mouseRect.yMax);
+
+				mousePosition.x = Mathf.Max(mousePosition.x - maximumRangeInPixels, mouseRect.xMax);
+				mousePosition.y = Mathf.Min(mousePosition.y + maximumRangeInPixels, mouseRect.yMax);
+				GUI.ScrollTo(new Rect(mousePosition.x, mousePosition.y, 1, 1));
+
+				s_MousePosition = GUIUtility.ScreenToGUIPoint(mousePosition);
+				s_SimulateMouseDragControlID = _controlID;
+
+				var focusedWindow = EditorWindow.focusedWindow;
+				if (focusedWindow != null)
+					focusedWindow.Repaint();
+			}
 		}
 
 		private void HandleDropInsertion(Rect position, IReorderableListAdaptor adaptor) {
