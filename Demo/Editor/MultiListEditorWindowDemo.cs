@@ -16,8 +16,8 @@ public class MultiListEditorWindowDemo : EditorWindow {
 
 		// Static reference to the list adaptor of the selected item.
 		private static ExampleListAdaptor s_SelectedList;
-		// Static index limits selection to one item in one list.
-		private static int s_SelectedIndex = -1;
+		// Static reference limits selection to one item in one list.
+		private static string s_SelectedItem;
 		// Position in GUI where mouse button was anchored before dragging occurred.
 		private static Vector2 s_MouseDownPosition;
 
@@ -42,7 +42,7 @@ public class MultiListEditorWindowDemo : EditorWindow {
         }
 
 		public override void DrawItemBackground(Rect position, int index) {
-			if (this == s_SelectedList && index == s_SelectedIndex) {
+			if (this == s_SelectedList && List[index] == s_SelectedItem) {
 				Color restoreColor = GUI.color;
 				GUI.color = ReorderableListStyles.SelectionBackgroundColor;
 				GUI.DrawTexture(position, EditorGUIUtility.whiteTexture);
@@ -57,16 +57,23 @@ public class MultiListEditorWindowDemo : EditorWindow {
 
 			switch (Event.current.GetTypeForControl(controlID)) {
 				case EventType.MouseDown:
+					Rect totalItemPosition = ReorderableListGUI.CurrentItemTotalPosition;
+					if (totalItemPosition.Contains(Event.current.mousePosition)) {
+						// Select this list item.
+						s_SelectedList = this;
+						s_SelectedItem = shoppingItem;
+					}
+
 					// Calculate rectangle of draggable area of the list item.
 					// This example excludes the grab handle at the left.
-					Rect draggableRect = ReorderableListGUI.CurrentItemTotalPosition;
+					Rect draggableRect = totalItemPosition;
 					draggableRect.x = position.x;
 					draggableRect.width = position.width;
 
 					if (Event.current.button == 0 && draggableRect.Contains(Event.current.mousePosition)) {
 						// Select this list item.
 						s_SelectedList = this;
-						s_SelectedIndex = index;
+						s_SelectedItem = shoppingItem;
 
 						// Lock onto this control whilst left mouse button is held so
 						// that we can start a drag-and-drop operation when user drags.
@@ -123,20 +130,17 @@ public class MultiListEditorWindowDemo : EditorWindow {
             if (Event.current.type == EventType.DragPerform) {
 				var draggedItem = DragAndDrop.GetGenericData(DraggedItem.TypeName) as DraggedItem;
 
-				// Ensure that the item remains selected at its new location!
-				s_SelectedList = this;
-				s_SelectedIndex = insertionIndex;
-
 				// Are we just reordering within the same list?
 				if (draggedItem.SourceListAdaptor == this) {
 					Move(draggedItem.Index, insertionIndex);
-					if (insertionIndex > draggedItem.Index)
-						--s_SelectedIndex;
                 }
 				else {
 					// Nope, we are moving the item!
 					List.Insert(insertionIndex, draggedItem.ShoppingItem);
 					draggedItem.SourceListAdaptor.Remove(draggedItem.Index);
+
+					// Ensure that the item remains selected at its new location!
+					s_SelectedList = this;
 				}
 			}
 		}
