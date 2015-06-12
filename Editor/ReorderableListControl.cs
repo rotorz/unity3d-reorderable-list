@@ -838,6 +838,8 @@ namespace Rotorz.ReorderableList {
 			
 			// Position of first item in list.
 			float firstItemY = position.y + ContainerStyle.padding.top;
+			// Maximum position of dragged item.
+			float dragItemMaxY = (position.yMax - ContainerStyle.padding.bottom) - s_DragItemPosition.height + 1;
 
 			switch (eventType) {
 				case EventType.MouseDown:
@@ -856,7 +858,7 @@ namespace Rotorz.ReorderableList {
 						else if (mousePosition.y >= position.yMax)
 							newTargetIndex = adaptor.Count;
 
-						s_DragItemPosition.y = Mathf.Clamp(mousePosition.y + s_AnchorMouseOffset, firstItemY, position.yMax - s_DragItemPosition.height - 1);
+						s_DragItemPosition.y = Mathf.Clamp(mousePosition.y + s_AnchorMouseOffset, firstItemY, dragItemMaxY);
 					}
 					break;
 
@@ -902,7 +904,7 @@ namespace Rotorz.ReorderableList {
 
 			// Draw list items!
 			Rect itemPosition = new Rect(position.x + ContainerStyle.padding.left, firstItemY, position.width - ContainerStyle.padding.horizontal, 0);
-			float targetSlotPosition = position.yMax - s_DragItemPosition.height - 1;
+			float targetSlotPosition = dragItemMaxY;
 
 			_insertionIndex = 0;
 			_insertionPosition = itemPosition.yMax;
