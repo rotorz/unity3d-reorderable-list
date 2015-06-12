@@ -1098,7 +1098,7 @@ namespace Rotorz.ReorderableList {
 				mousePosition.y = Mathf.Min(mousePosition.y + maximumRangeInPixels, mouseRect.yMax);
 				GUI.ScrollTo(new Rect(mousePosition.x, mousePosition.y, 1, 1));
 
-				s_MousePosition = GUIUtility.ScreenToGUIPoint(mousePosition);
+				s_MousePosition = GUIUtility.GUIToScreenPoint(mousePosition);
 				s_SimulateMouseDragControlID = _controlID;
 
 				var focusedWindow = EditorWindow.focusedWindow;
