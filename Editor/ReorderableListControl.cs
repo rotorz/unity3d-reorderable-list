@@ -725,10 +725,6 @@ namespace Rotorz.ReorderableList {
 							var horizontalLinePosition = new Rect(position.x, position.y - 1, position.width, 1);
 							GUIHelper.Separator(horizontalLinePosition, HorizontalLineColor);
 						}
-						if (HorizontalLineAtEnd && itemIndex == adaptor.Count - 1) {
-							var horizontalLinePosition = new Rect(position.x, position.yMax - 1, position.width, 1);
-							GUIHelper.Separator(horizontalLinePosition, HorizontalLineColor);
-						}
 					}
 				}
 
@@ -1020,6 +1016,11 @@ namespace Rotorz.ReorderableList {
 //*/
 					}
 				}
+			}
+
+			if (HorizontalLineAtEnd) {
+				var horizontalLinePosition = new Rect(itemPosition.x, position.yMax - ContainerStyle.padding.vertical, itemPosition.width, 1);
+				GUIHelper.Separator(horizontalLinePosition, HorizontalLineColor);
 			}
 
 			lastMidPoint = position.yMax - lastHeight / 2f;
