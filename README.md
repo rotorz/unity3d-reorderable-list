@@ -15,6 +15,7 @@ Features
 --------
 
 - Drag and drop reordering!
+- Automatically scrolls if inside a scroll view whilst reordering.
 - Easily customized using flags.
 - Adaptors for `IList<T>` and `SerializedProperty`.
 - Subscribe to add/remove item events.
