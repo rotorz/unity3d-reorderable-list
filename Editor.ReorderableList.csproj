@@ -35,10 +35,10 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="UnityEditor">
-      <HintPath>..\..\rotorz-tile-system\master\Libraries\Unity 4\UnityEditor.dll</HintPath>
+      <HintPath>..\..\rotorz-tile-system\Libraries\Unity 4\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\rotorz-tile-system\master\Libraries\Unity 4\UnityEngine.dll</HintPath>
+      <HintPath>..\..\rotorz-tile-system\Libraries\Unity 4\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
