@@ -196,6 +196,18 @@ namespace Rotorz.ReorderableList {
 						element.objectReferenceValue = null;
 					break;
 			}
+
+			ResetChildPropertyValues(element);
+        }
+
+		private void ResetChildPropertyValues(SerializedProperty element) {
+			if (!element.hasChildren)
+				return;
+
+			var childProperty = element.Copy();
+			int elementPropertyDepth = element.depth;
+			while (childProperty.Next(true) && childProperty.depth > elementPropertyDepth)
+				ResetValue(childProperty);
 		}
 
 		#endregion
