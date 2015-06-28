@@ -225,8 +225,12 @@ namespace Rotorz.ReorderableList {
 
 			var childProperty = element.Copy();
 			int elementPropertyDepth = element.depth;
-			while (childProperty.Next(true) && childProperty.depth > elementPropertyDepth)
+			bool enterChildren = true;
+
+			while (childProperty.Next(enterChildren) && childProperty.depth > elementPropertyDepth) {
+				enterChildren = false;
 				ResetValue(childProperty);
+			}
 		}
 
 		#endregion
