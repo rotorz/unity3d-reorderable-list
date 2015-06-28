@@ -162,38 +162,57 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		/// <param name="element">Serializd property for array element.</param>
 		private void ResetValue(SerializedProperty element) {
-			switch (element.type) {
-				case "string":
-					element.stringValue = "";
-					break;
-				case "Vector2f":
-					element.vector2Value = Vector2.zero;
-					break;
-				case "Vector3f":
-					element.vector3Value = Vector3.zero;
-					break;
-				case "Rectf":
-					element.rectValue = new Rect();
-					break;
-				case "Quaternionf":
-					element.quaternionValue = Quaternion.identity;
-					break;
-				case "int":
+			switch (element.propertyType) {
+				case SerializedPropertyType.Integer:
 					element.intValue = 0;
 					break;
-				case "float":
-					element.floatValue = 0f;
-					break;
-				case "UInt8":
+				case SerializedPropertyType.Boolean:
 					element.boolValue = false;
 					break;
-				case "ColorRGBA":
+				case SerializedPropertyType.Float:
+					element.floatValue = 0f;
+					break;
+				case SerializedPropertyType.String:
+					element.stringValue = "";
+					break;
+				case SerializedPropertyType.Color:
 					element.colorValue = Color.black;
 					break;
-
-				default:
-					if (element.type.StartsWith("PPtr"))
-						element.objectReferenceValue = null;
+				case SerializedPropertyType.ObjectReference:
+					element.objectReferenceValue = null;
+					break;
+				case SerializedPropertyType.LayerMask:
+					element.intValue = 0;
+					break;
+				case SerializedPropertyType.Enum:
+					element.enumValueIndex = 0;
+					break;
+				case SerializedPropertyType.Vector2:
+					element.vector2Value = default(Vector2);
+					break;
+				case SerializedPropertyType.Vector3:
+					element.vector3Value = default(Vector3);
+					break;
+				case SerializedPropertyType.Vector4:
+					element.vector4Value = default(Vector4);
+					break;
+				case SerializedPropertyType.Rect:
+					element.rectValue = default(Rect);
+					break;
+				case SerializedPropertyType.ArraySize:
+					element.intValue = 0;
+					break;
+				case SerializedPropertyType.Character:
+					element.intValue = 0;
+					break;
+				case SerializedPropertyType.AnimationCurve:
+					element.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+					break;
+				case SerializedPropertyType.Bounds:
+					element.boundsValue = default(Bounds);
+					break;
+				case SerializedPropertyType.Gradient:
+					//!TODO: Amend when Unity add a public API for setting the gradient.
 					break;
 			}
 
