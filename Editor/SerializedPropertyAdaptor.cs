@@ -217,7 +217,7 @@ namespace Rotorz.ReorderableList {
 			}
 
 			ResetChildPropertyValues(element);
-        }
+		}
 
 		private void ResetChildPropertyValues(SerializedProperty element) {
 			if (!element.hasChildren)
