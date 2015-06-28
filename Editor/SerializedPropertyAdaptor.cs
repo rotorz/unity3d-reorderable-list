@@ -160,7 +160,7 @@ namespace Rotorz.ReorderableList {
 		/// <summary>
 		/// Reset value of array element.
 		/// </summary>
-		/// <param name="element">Serializd property for array element.</param>
+		/// <param name="element">Serialized property for array element.</param>
 		private void ResetValue(SerializedProperty element) {
 			switch (element.propertyType) {
 				case SerializedPropertyType.Integer:
