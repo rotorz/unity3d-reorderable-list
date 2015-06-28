@@ -522,10 +522,6 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		private int _controlID;
 		/// <summary>
-		/// Position of control in GUI.
-		/// </summary>
-		private Rect _position;
-		/// <summary>
 		/// Visible rectangle of control.
 		/// </summary>
 		private Rect _visibleRect;
@@ -585,9 +581,6 @@ namespace Rotorz.ReorderableList {
 		#endregion
 
 		#region Event Handling
-
-		// Keep track of previously known mouse position (in screen space).
-		private static Vector2 s_MousePosition;
 
 		// Indicates whether a "MouseDrag" event should be simulated on the next Layout/Repaint.
 		private static int s_SimulateMouseDragControlID;
@@ -827,11 +820,6 @@ namespace Rotorz.ReorderableList {
 			// Get local copy of event information for efficiency.
 			EventType eventType = Event.current.GetTypeForControl(_controlID);
 			Vector2 mousePosition = Event.current.mousePosition;
-			if (Event.current.isMouse)
-				s_MousePosition = GUIUtility.GUIToScreenPoint(mousePosition);
-
-			// Store position of list control itself.
-			_position = position;
 
 			int newTargetIndex = s_TargetIndex;
 			
@@ -1098,7 +1086,6 @@ namespace Rotorz.ReorderableList {
 				mousePosition.y = Mathf.Min(mousePosition.y + maximumRangeInPixels, mouseRect.yMax);
 				GUI.ScrollTo(new Rect(mousePosition.x, mousePosition.y, 1, 1));
 
-				s_MousePosition = GUIUtility.GUIToScreenPoint(mousePosition);
 				s_SimulateMouseDragControlID = _controlID;
 
 				var focusedWindow = EditorWindow.focusedWindow;

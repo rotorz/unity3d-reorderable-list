@@ -56,7 +56,6 @@ namespace Rotorz.ReorderableList {
 
 			commandTypes = new List<Type>();
 
-			var genericCommandInterfaceType = typeof(IElementAdderMenuCommand<>);
 			foreach (var commandType in GetMenuCommandTypes<TContext>()) {
 				var attributes = (ElementAdderMenuCommandAttribute[])Attribute.GetCustomAttributes(commandType, typeof(ElementAdderMenuCommandAttribute));
 				if (!attributes.Any(a => a.ContractType == contractType))
