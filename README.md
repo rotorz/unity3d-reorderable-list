@@ -37,7 +37,7 @@ contains a compiled class library (DLL). This can be used by C# and UnityScript
 developers. Minimal version of package does not include demonstration assets or
 zip archive of image source resources.
 
-- [Download RotorzReorderableList_v0.3.2 Package (requires Unity 4.3.4+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.3.2.unitypackage>)
+- [Download RotorzReorderableList_v0.4.0 Package (requires Unity 4.5.5+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.4.0.unitypackage>)
 
 If you would prefer to use the non-compiled source code version in your project,
 copy the contents of this repository somewhere into your project.
