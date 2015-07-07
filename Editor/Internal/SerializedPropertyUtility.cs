@@ -91,6 +91,85 @@ namespace Rotorz.ReorderableList {
 			}
 		}
 
+		/// <summary>
+		/// Copies value of <paramref name="sourceProperty"/> into <pararef name="destProperty"/>.
+		/// </summary>
+		/// <param name="destProperty">Destination property.</param>
+		/// <param name="sourceProperty">Source property.</param>
+		public static void CopyPropertyValue(SerializedProperty destProperty, SerializedProperty sourceProperty) {
+			if (destProperty == null)
+				throw new ArgumentNullException("destProperty");
+			if (sourceProperty == null)
+				throw new ArgumentNullException("sourceProperty");
+
+			sourceProperty = sourceProperty.Copy();
+			destProperty = destProperty.Copy();
+
+			CopyPropertyValueSingular(destProperty, sourceProperty);
+
+			if (sourceProperty.hasChildren) {
+				int elementPropertyDepth = sourceProperty.depth;
+				while (sourceProperty.Next(true) && destProperty.Next(true) && sourceProperty.depth > elementPropertyDepth)
+					CopyPropertyValueSingular(destProperty, sourceProperty);
+			}
+		}
+
+		private static void CopyPropertyValueSingular(SerializedProperty destProperty, SerializedProperty sourceProperty) {
+			switch (destProperty.propertyType) {
+				case SerializedPropertyType.Integer:
+					destProperty.intValue = sourceProperty.intValue;
+					break;
+				case SerializedPropertyType.Boolean:
+					destProperty.boolValue = sourceProperty.boolValue;
+					break;
+				case SerializedPropertyType.Float:
+					destProperty.floatValue = sourceProperty.floatValue;
+					break;
+				case SerializedPropertyType.String:
+					destProperty.stringValue = sourceProperty.stringValue;
+					break;
+				case SerializedPropertyType.Color:
+					destProperty.colorValue = sourceProperty.colorValue;
+					break;
+				case SerializedPropertyType.ObjectReference:
+					destProperty.objectReferenceValue = sourceProperty.objectReferenceValue;
+					break;
+				case SerializedPropertyType.LayerMask:
+					destProperty.intValue = sourceProperty.intValue;
+					break;
+				case SerializedPropertyType.Enum:
+					destProperty.enumValueIndex = sourceProperty.enumValueIndex;
+					break;
+				case SerializedPropertyType.Vector2:
+					destProperty.vector2Value = sourceProperty.vector2Value;
+					break;
+				case SerializedPropertyType.Vector3:
+					destProperty.vector3Value = sourceProperty.vector3Value;
+					break;
+				case SerializedPropertyType.Vector4:
+					destProperty.vector4Value = sourceProperty.vector4Value;
+					break;
+				case SerializedPropertyType.Rect:
+					destProperty.rectValue = sourceProperty.rectValue;
+					break;
+				case SerializedPropertyType.ArraySize:
+					destProperty.intValue = sourceProperty.intValue;
+					break;
+				case SerializedPropertyType.Character:
+					destProperty.intValue = sourceProperty.intValue;
+					break;
+				case SerializedPropertyType.AnimationCurve:
+					destProperty.animationCurveValue = sourceProperty.animationCurveValue;
+					break;
+				case SerializedPropertyType.Bounds:
+					destProperty.boundsValue = sourceProperty.boundsValue;
+					break;
+				case SerializedPropertyType.Gradient:
+					//!TODO: Amend when Unity add a public API for setting the gradient.
+					break;
+			}
+		}
+
 	}
 
 }
