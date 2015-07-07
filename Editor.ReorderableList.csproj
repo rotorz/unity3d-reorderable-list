@@ -54,6 +54,7 @@
     <Compile Include="Editor\GenericListAdaptor.cs" />
     <Compile Include="Editor\Internal\GUIHelper.cs" />
     <Compile Include="Editor\Internal\ReorderableListResources.cs" />
+    <Compile Include="Editor\Internal\SerializedPropertyUtility.cs" />
     <Compile Include="Editor\IReorderableListDropTarget.cs" />
     <Compile Include="Editor\IReorderableListAdaptor.cs" />
     <Compile Include="Editor\ReorderableListEvents.cs" />

@@ -95,12 +95,12 @@ namespace Rotorz.ReorderableList {
 		public void Add() {
 			int newIndex = _arrayProperty.arraySize;
 			++_arrayProperty.arraySize;
-			ResetValue(_arrayProperty.GetArrayElementAtIndex(newIndex));
+			SerializedPropertyUtility.ResetValue(_arrayProperty.GetArrayElementAtIndex(newIndex));
 		}
 		/// <inheritdoc/>
 		public void Insert(int index) {
 			_arrayProperty.InsertArrayElementAtIndex(index);
-			ResetValue(_arrayProperty.GetArrayElementAtIndex(index));
+			SerializedPropertyUtility.ResetValue(_arrayProperty.GetArrayElementAtIndex(index));
 		}
 		/// <inheritdoc/>
 		public void Duplicate(int index) {
@@ -151,86 +151,6 @@ namespace Rotorz.ReorderableList {
 				? FixedItemHeight
 				: EditorGUI.GetPropertyHeight(this[index], GUIContent.none, false)
 				;
-		}
-
-		#endregion
-
-		#region Methods
-
-		/// <summary>
-		/// Reset value of array element.
-		/// </summary>
-		/// <param name="element">Serialized property for array element.</param>
-		private void ResetValue(SerializedProperty element) {
-			switch (element.propertyType) {
-				case SerializedPropertyType.Integer:
-					element.intValue = 0;
-					break;
-				case SerializedPropertyType.Boolean:
-					element.boolValue = false;
-					break;
-				case SerializedPropertyType.Float:
-					element.floatValue = 0f;
-					break;
-				case SerializedPropertyType.String:
-					element.stringValue = "";
-					break;
-				case SerializedPropertyType.Color:
-					element.colorValue = Color.black;
-					break;
-				case SerializedPropertyType.ObjectReference:
-					element.objectReferenceValue = null;
-					break;
-				case SerializedPropertyType.LayerMask:
-					element.intValue = 0;
-					break;
-				case SerializedPropertyType.Enum:
-					element.enumValueIndex = 0;
-					break;
-				case SerializedPropertyType.Vector2:
-					element.vector2Value = default(Vector2);
-					break;
-				case SerializedPropertyType.Vector3:
-					element.vector3Value = default(Vector3);
-					break;
-				case SerializedPropertyType.Vector4:
-					element.vector4Value = default(Vector4);
-					break;
-				case SerializedPropertyType.Rect:
-					element.rectValue = default(Rect);
-					break;
-				case SerializedPropertyType.ArraySize:
-					element.intValue = 0;
-					break;
-				case SerializedPropertyType.Character:
-					element.intValue = 0;
-					break;
-				case SerializedPropertyType.AnimationCurve:
-					element.animationCurveValue = AnimationCurve.Linear(0f, 0f, 1f, 1f);
-					break;
-				case SerializedPropertyType.Bounds:
-					element.boundsValue = default(Bounds);
-					break;
-				case SerializedPropertyType.Gradient:
-					//!TODO: Amend when Unity add a public API for setting the gradient.
-					break;
-			}
-
-			ResetChildPropertyValues(element);
-		}
-
-		private void ResetChildPropertyValues(SerializedProperty element) {
-			if (!element.hasChildren)
-				return;
-
-			var childProperty = element.Copy();
-			int elementPropertyDepth = element.depth;
-			bool enterChildren = true;
-
-			while (childProperty.Next(enterChildren) && childProperty.depth > elementPropertyDepth) {
-				enterChildren = false;
-				ResetValue(childProperty);
-			}
 		}
 
 		#endregion
