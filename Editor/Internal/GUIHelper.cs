@@ -69,7 +69,7 @@ namespace Rotorz.ReorderableList.Internal {
 
 		private static GUIContent s_TempIconContent = new GUIContent();
 
-		internal static bool IconButton(Rect position, bool visible, Texture2D iconNormal, Texture2D iconActive, GUIStyle style) {
+		public static bool IconButton(Rect position, bool visible, Texture2D iconNormal, Texture2D iconActive, GUIStyle style) {
 			int controlID = GUIUtility.GetControlID(FocusType.Passive);
 
 			position.height += 1;
