@@ -34,8 +34,7 @@ Installing scripts
 
 This control can be added to your project by importing the Unity package which
 contains a compiled class library (DLL). This can be used by C# and UnityScript
-developers. Minimal version of package does not include demonstration assets or
-zip archive of image source resources.
+developers.
 
 - [Download RotorzReorderableList_v0.4.0 Package (requires Unity 4.5.5+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.4.0.unitypackage>)
 
