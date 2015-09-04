@@ -68,9 +68,10 @@ namespace Rotorz.ReorderableList.Internal {
 		}
 
 		private static GUIContent s_TempIconContent = new GUIContent();
+		private static readonly int s_IconButtonHint = "_ReorderableIconButton_".GetHashCode();
 
 		public static bool IconButton(Rect position, bool visible, Texture2D iconNormal, Texture2D iconActive, GUIStyle style) {
-			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			int controlID = GUIUtility.GetControlID(s_IconButtonHint, FocusType.Passive);
 			bool result = false;
 
 			position.height += 1;

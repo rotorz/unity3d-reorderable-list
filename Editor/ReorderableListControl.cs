@@ -164,6 +164,12 @@ namespace Rotorz.ReorderableList {
 
 		#region Utility
 
+		private static readonly int s_ReorderableListControlHint = "_ReorderableListControl_".GetHashCode();
+
+		private static int GetReorderableListControlID() {
+			return GUIUtility.GetControlID(s_ReorderableListControlHint, FocusType.Passive);
+		}
+
 		/// <summary>
 		/// Generate and draw control from state object.
 		/// </summary>
@@ -171,7 +177,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawEmpty">Delegate for drawing empty list.</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		public static void DrawControlFromState(IReorderableListAdaptor adaptor, DrawEmpty drawEmpty, ReorderableListFlags flags) {
-			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			int controlID = GetReorderableListControlID();
 
 			var control = GUIUtility.GetStateObject(typeof(ReorderableListControl), controlID) as ReorderableListControl;
 			control.Flags = flags;
@@ -186,7 +192,7 @@ namespace Rotorz.ReorderableList {
 		/// <param name="drawEmpty">Delegate for drawing empty list.</param>
 		/// <param name="flags">Optional flags to pass into list field.</param>
 		public static void DrawControlFromState(Rect position, IReorderableListAdaptor adaptor, DrawEmptyAbsolute drawEmpty, ReorderableListFlags flags) {
-			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			int controlID = GetReorderableListControlID();
 
 			var control = GUIUtility.GetStateObject(typeof(ReorderableListControl), controlID) as ReorderableListControl;
 			control.Flags = flags;
@@ -1351,13 +1357,13 @@ namespace Rotorz.ReorderableList {
 
 		/// <inheritdoc cref="Draw(int, IReorderableListAdaptor, DrawEmpty)"/>
 		public void Draw(IReorderableListAdaptor adaptor, DrawEmpty drawEmpty) {
-			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			int controlID = GetReorderableListControlID();
 			Draw(controlID, adaptor, drawEmpty);
 		}
 
 		/// <inheritdoc cref="Draw(int, IReorderableListAdaptor, DrawEmpty)"/>
 		public void Draw(IReorderableListAdaptor adaptor) {
-			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			int controlID = GetReorderableListControlID();
 			Draw(controlID, adaptor, null);
 		}
 
@@ -1405,13 +1411,13 @@ namespace Rotorz.ReorderableList {
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="drawEmpty">Delegate for drawing empty list.</param>
 		public void Draw(Rect position, IReorderableListAdaptor adaptor, DrawEmptyAbsolute drawEmpty) {
-			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			int controlID = GetReorderableListControlID();
 			Draw(position, controlID, adaptor, drawEmpty);
 		}
 
 		/// <inheritdoc cref="Draw(Rect, IReorderableListAdaptor, DrawEmptyAbsolute)"/>
 		public void Draw(Rect position, IReorderableListAdaptor adaptor) {
-			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			int controlID = GetReorderableListControlID();
 			Draw(position, controlID, adaptor, null);
 		}
 
