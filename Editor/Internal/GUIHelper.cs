@@ -71,6 +71,7 @@ namespace Rotorz.ReorderableList.Internal {
 
 		public static bool IconButton(Rect position, bool visible, Texture2D iconNormal, Texture2D iconActive, GUIStyle style) {
 			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			bool result = false;
 
 			position.height += 1;
 
@@ -93,15 +94,8 @@ namespace Rotorz.ReorderableList.Internal {
 				case EventType.MouseUp:
 					if (GUIUtility.hotControl == controlID) {
 						GUIUtility.hotControl = 0;
-
-						if (position.Contains(Event.current.mousePosition)) {
-							Event.current.Use();
-							return true;
-						}
-						else {
-							Event.current.Use();
-							return false;
-						}
+						result = position.Contains(Event.current.mousePosition);
+						Event.current.Use();
 					}
 					break;
 
@@ -115,7 +109,7 @@ namespace Rotorz.ReorderableList.Internal {
 					break;
 			}
 
-			return false;
+			return result;
 		}
 
 		public static bool IconButton(Rect position, Texture2D iconNormal, Texture2D iconActive, GUIStyle style) {
