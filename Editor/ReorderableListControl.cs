@@ -962,18 +962,6 @@ namespace Rotorz.ReorderableList {
 						newTargetIndex = i + 1;*/
 				}
 
-				// The following may break use of tab key to navigate through controls :/
-				if ((Flags & ReorderableListFlags.DisableClipping) == 0) {
-					// Clip list item? Performance boost!
-					if (itemPosition.yMax < _visibleRect.y - itemPosition.height) {
-						// Let's try and trick Unity into maintaining tab key support...
-						GUIUtility.GetControlID(FocusType.Keyboard, itemPosition);
-						continue;
-					}
-					if (itemPosition.y > _visibleRect.yMax + itemPosition.height)
-						break;
-				}
-
 				// Draw list item.
 				DrawListItem(itemPosition, adaptor, i);
 

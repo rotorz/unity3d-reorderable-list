@@ -45,13 +45,8 @@ namespace Rotorz.ReorderableList {
 		/// Show zero-based index of array elements.
 		/// </summary>
 		ShowIndices				= 0x0040,
-		/// <summary>
-		/// Do not attempt to clip items which are out of view.
-		/// </summary>
-		/// <remarks>
-		/// <para>Clipping helps to boost performance, though may lead to issues on
-		/// some interfaces.</para>
-		/// </remarks>
+		/// <exclude/>
+		[Obsolete("This flag is redundant because the clipping optimization was removed.")]
 		DisableClipping			= 0x0080,
 		/// <summary>
 		/// Do not attempt to automatically scroll when list is inside a scroll view and
