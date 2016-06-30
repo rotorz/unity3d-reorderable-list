@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Rotorz Limited")]
 [assembly: AssemblyProduct("Editor.ReorderableList")]
-[assembly: AssemblyCopyright("©2013-2015 Rotorz Limited. All rights reserved.")]
+[assembly: AssemblyCopyright("©2013-2016 Rotorz Limited. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("0.0.0.0")]
-[assembly: AssemblyFileVersion("0.4.3.0")]
+[assembly: AssemblyFileVersion("0.4.4.0")]
