@@ -339,10 +339,18 @@ namespace Rotorz.ReorderableList {
 			get { return (_flags & ReorderableListFlags.HideRemoveButtons) == 0; }
 		}
 
+		private float _verticalSpacing = 10f;
 		private GUIStyle _containerStyle;
 		private GUIStyle _footerButtonStyle;
 		private GUIStyle _itemButtonStyle;
 
+		/// <summary>
+		/// Gets or sets the vertical spacing below the reorderable list control.
+		/// </summary>
+		public float VerticalSpacing {
+			get { return _verticalSpacing; }
+			set { _verticalSpacing = value; }
+		}
 		/// <summary>
 		/// Gets or sets style used to draw background of list control.
 		/// </summary>
@@ -1288,6 +1296,9 @@ namespace Rotorz.ReorderableList {
 			if (HasFooterControls)
 				position.height -= FooterButtonStyle.fixedHeight;
 
+			// Make room for vertical spacing below footer buttons.
+			position.height -= VerticalSpacing;
+
 			s_CurrentListStack.Push(new ListInfo(_controlID, position));
 			try {
 				// Draw list as normal.
@@ -1420,6 +1431,9 @@ namespace Rotorz.ReorderableList {
 			// Allow for footer area.
 			if (HasFooterControls)
 				position.height -= FooterButtonStyle.fixedHeight;
+
+			// Make room for vertical spacing below footer buttons.
+			position.height -= VerticalSpacing;
 
 			s_CurrentListStack.Push(new ListInfo(_controlID, position));
 			try {
@@ -1710,7 +1724,7 @@ namespace Rotorz.ReorderableList {
 		public float CalculateListHeight(IReorderableListAdaptor adaptor) {
 			FixStyles();
 
-			float totalHeight = ContainerStyle.padding.vertical - 1;
+			float totalHeight = ContainerStyle.padding.vertical - 1 + VerticalSpacing;
 
 			// Take list items into consideration.
 			int count = adaptor.Count;
@@ -1737,7 +1751,7 @@ namespace Rotorz.ReorderableList {
 		public float CalculateListHeight(int itemCount, float itemHeight) {
 			FixStyles();
 
-			float totalHeight = ContainerStyle.padding.vertical - 1;
+			float totalHeight = ContainerStyle.padding.vertical - 1 + VerticalSpacing;
 
 			// Take list items into consideration.
 			totalHeight += (itemHeight + 4) * itemCount;

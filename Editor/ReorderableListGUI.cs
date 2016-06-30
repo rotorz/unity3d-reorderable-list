@@ -149,7 +149,6 @@ namespace Rotorz.ReorderableList {
 		/// <param name="title">Content for title control.</param>
 		public static void Title(GUIContent title) {
 			Rect position = GUILayoutUtility.GetRect(title, ReorderableListStyles.Title);
-			position.height += 6;
 			Title(position, title);
 		}
 

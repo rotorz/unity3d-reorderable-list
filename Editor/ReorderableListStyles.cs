@@ -14,9 +14,9 @@ namespace Rotorz.ReorderableList {
 
 		static ReorderableListStyles() {
 			Title = new GUIStyle();
-			Title.border = new RectOffset(2, 2, 2, 1);
+			Title.border = new RectOffset(2, 2, 2, 0);
 			Title.margin = new RectOffset(5, 5, 5, 0);
-			Title.padding = new RectOffset(5, 5, 0, 0);
+			Title.padding = new RectOffset(5, 5, 3, 2);
 			Title.alignment = TextAnchor.MiddleLeft;
 			Title.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.TitleBackground);
 			Title.normal.textColor = EditorGUIUtility.isProSkin
@@ -25,7 +25,7 @@ namespace Rotorz.ReorderableList {
 
 			Container = new GUIStyle();
 			Container.border = new RectOffset(2, 2, 2, 2);
-			Container.margin = new RectOffset(5, 5, 5, 5);
+			Container.margin = new RectOffset(5, 5, 0, 0);
 			Container.padding = new RectOffset(2, 2, 2, 2);
 			Container.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.ContainerBackground);
 
