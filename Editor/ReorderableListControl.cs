@@ -1189,7 +1189,7 @@ namespace Rotorz.ReorderableList {
 						16f
 					);
 
-					DrawSizeControl(sizeFieldPosition, adaptor);
+					DrawSizeFooterControl(sizeFieldPosition, adaptor);
 				}
 
 				if (HasAddButton) {
@@ -1229,30 +1229,11 @@ namespace Rotorz.ReorderableList {
 			}
 		}
 
-		private void DrawSizeControl(Rect position, IReorderableListAdaptor adaptor) {
+		private void DrawSizeFooterControl(Rect position, IReorderableListAdaptor adaptor) {
 			float restoreLabelWidth = EditorGUIUtility.labelWidth;
 			EditorGUIUtility.labelWidth = 60f;
 
-			int sizeControlID = GUIUtility.GetControlID(FocusType.Passive);
-			string sizeControlName = "ReorderableListControl.Size." + sizeControlID;
-			GUI.SetNextControlName(sizeControlName);
-
-			if (GUI.GetNameOfFocusedControl() == sizeControlName) {
-				if (Event.current.rawType == EventType.KeyDown) {
-					switch (Event.current.keyCode) {
-						case KeyCode.Return:
-						case KeyCode.KeypadEnter:
-							ResizeList(adaptor, _newSizeInput);
-							Event.current.Use();
-							break;
-					}
-				}
-				_newSizeInput = EditorGUI.IntField(position, "Size", _newSizeInput);
-			}
-			else {
-				EditorGUI.IntField(position, "Size", adaptor.Count);
-				_newSizeInput = adaptor.Count;
-			}
+			DrawSizeField(position, adaptor);
 
 			EditorGUIUtility.labelWidth = restoreLabelWidth;
 		}
@@ -1472,6 +1453,98 @@ namespace Rotorz.ReorderableList {
 		public void Draw(Rect position, IReorderableListAdaptor adaptor) {
 			int controlID = GetReorderableListControlID();
 			Draw(position, controlID, adaptor, null);
+		}
+
+		#endregion
+
+		#region Size Field
+
+		private static readonly GUIContent s_Temp = new GUIContent();
+		private static readonly GUIContent s_SizePrefixLabel = new GUIContent("Size");
+
+		/// <summary>
+		/// Draw list size field with absolute positioning and a custom prefix label.
+		/// </summary>
+		/// <remarks>
+		/// <para>Specify a value of <c>GUIContent.none</c> for argument <paramref name="label"/>
+		/// to omit prefix label from the drawn control.</para>
+		/// </remarks>
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="label">Prefix label for the control.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(Rect position, GUIContent label, IReorderableListAdaptor adaptor) {
+			int sizeControlID = GUIUtility.GetControlID(FocusType.Passive);
+			string sizeControlName = "ReorderableListControl.Size." + sizeControlID;
+			GUI.SetNextControlName(sizeControlName);
+
+			if (GUI.GetNameOfFocusedControl() == sizeControlName) {
+				if (Event.current.rawType == EventType.KeyDown) {
+					switch (Event.current.keyCode) {
+						case KeyCode.Return:
+						case KeyCode.KeypadEnter:
+							ResizeList(adaptor, _newSizeInput);
+							Event.current.Use();
+							break;
+					}
+				}
+				_newSizeInput = EditorGUI.IntField(position, label, _newSizeInput);
+			}
+			else {
+				EditorGUI.IntField(position, label, adaptor.Count);
+				_newSizeInput = adaptor.Count;
+			}
+		}
+
+		/// <summary>
+		/// Draw list size field with absolute positioning and a custom prefix label.
+		/// </summary>
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="label">Prefix label for the control.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(Rect position, string label, IReorderableListAdaptor adaptor) {
+			s_Temp.text = label;
+			DrawSizeField(position, s_Temp, adaptor);
+		}
+
+		/// <summary>
+		/// Draw list size field with absolute positioning with the default prefix label.
+		/// </summary>
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(Rect position, IReorderableListAdaptor adaptor) {
+			DrawSizeField(position, s_SizePrefixLabel, adaptor);
+		}
+
+		/// <summary>
+		/// Draw list size field with automatic layout and a custom prefix label.
+		/// </summary>
+		/// <remarks>
+		/// <para>Specify a value of <c>GUIContent.none</c> for argument <paramref name="label"/>
+		/// to omit prefix label from the drawn control.</para>
+		/// </remarks>
+		/// <param name="label">Prefix label for the control.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(GUIContent label, IReorderableListAdaptor adaptor) {
+			Rect position = GUILayoutUtility.GetRect(0, EditorGUIUtility.singleLineHeight);
+			DrawSizeField(position, label, adaptor);
+		}
+
+		/// <summary>
+		/// Draw list size field with automatic layout and a custom prefix label.
+		/// </summary>
+		/// <param name="label">Prefix label for the control.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(string label, IReorderableListAdaptor adaptor) {
+			s_Temp.text = label;
+			DrawSizeField(s_Temp, adaptor);
+		}
+
+		/// <summary>
+		/// Draw list size field with automatic layout and the default prefix label.
+		/// </summary>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(IReorderableListAdaptor adaptor) {
+			DrawSizeField(s_SizePrefixLabel, adaptor);
 		}
 
 		#endregion
