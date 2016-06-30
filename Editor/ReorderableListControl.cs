@@ -310,10 +310,16 @@ namespace Rotorz.ReorderableList {
 		}
 
 		/// <summary>
-		/// Gets a value indicating whether one or more footer buttons are shown.
+		/// Gets a value indicating whether any footer controls are shown.
 		/// </summary>
-		private bool HasFooterButtons {
-			get { return HasAddButton || HasAddMenuButton; }
+		private bool HasFooterControls {
+			get { return HasSizeField || HasAddButton || HasAddMenuButton; }
+		}
+		/// <summary>
+		/// Gets a value indicating whether the size field is shown.
+		/// </summary>
+		private bool HasSizeField {
+			get { return (_flags & ReorderableListFlags.ShowSizeField) != 0; }
 		}
 		/// <summary>
 		/// Gets a value indicating whether add button is shown.
@@ -556,6 +562,11 @@ namespace Rotorz.ReorderableList {
 		/// Position of drop insertion on Y-axis in GUI space.
 		/// </summary>
 		private float _insertionPosition;
+
+		/// <summary>
+		/// New size input value.
+		/// </summary>
+		private int _newSizeInput;
 
 		/// <summary>
 		/// Prepare initial state for list control.
@@ -1154,12 +1165,24 @@ namespace Rotorz.ReorderableList {
 		/// <param name="position">Position of list control in GUI.</param>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		private void DrawFooterControls(Rect position, IReorderableListAdaptor adaptor) {
-			if (HasFooterButtons) {
+			if (HasFooterControls) {
 				Rect buttonPosition = new Rect(position.xMax - 30, position.yMax - 1, 30, FooterButtonStyle.fixedHeight);
 
 				Rect menuButtonPosition = buttonPosition;
 				var menuIconNormal = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_AddMenu_Normal);
 				var menuIconActive = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_AddMenu_Active);
+
+				if (HasSizeField) {
+					// Draw size field.
+					Rect sizeFieldPosition = new Rect(
+						position.x,
+						position.yMax + 1,
+						Mathf.Max(150f, position.width / 3f),
+						16f
+					);
+
+					DrawSizeControl(sizeFieldPosition, adaptor);
+				}
 
 				if (HasAddButton) {
 					// Draw add menu drop-down button.
@@ -1198,6 +1221,34 @@ namespace Rotorz.ReorderableList {
 			}
 		}
 
+		private void DrawSizeControl(Rect position, IReorderableListAdaptor adaptor) {
+			float restoreLabelWidth = EditorGUIUtility.labelWidth;
+			EditorGUIUtility.labelWidth = 60f;
+
+			int sizeControlID = GUIUtility.GetControlID(FocusType.Passive);
+			string sizeControlName = "ReorderableListControl.Size." + sizeControlID;
+			GUI.SetNextControlName(sizeControlName);
+
+			if (GUI.GetNameOfFocusedControl() == sizeControlName) {
+				if (Event.current.rawType == EventType.KeyDown) {
+					switch (Event.current.keyCode) {
+						case KeyCode.Return:
+						case KeyCode.KeypadEnter:
+							ResizeList(adaptor, _newSizeInput);
+							Event.current.Use();
+							break;
+					}
+				}
+				_newSizeInput = EditorGUI.IntField(position, "Size", _newSizeInput);
+			}
+			else {
+				EditorGUI.IntField(position, "Size", adaptor.Count);
+				_newSizeInput = adaptor.Count;
+			}
+
+			EditorGUIUtility.labelWidth = restoreLabelWidth;
+		}
+
 		/// <summary>
 		/// Cache of container heights mapped by control ID.
 		/// </summary>
@@ -1234,7 +1285,7 @@ namespace Rotorz.ReorderableList {
 			Rect position = GetListRectWithAutoLayout(adaptor, padding);
 
 			// Make room for footer buttons?
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				position.height -= FooterButtonStyle.fixedHeight;
 
 			s_CurrentListStack.Push(new ListInfo(_controlID, position));
@@ -1285,7 +1336,7 @@ namespace Rotorz.ReorderableList {
 			EditorGUILayout.EndVertical();
 
 			// Allow room for footer buttons?
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				GUILayoutUtility.GetRect(0, FooterButtonStyle.fixedHeight - 1);
 
 			return position;
@@ -1367,7 +1418,7 @@ namespace Rotorz.ReorderableList {
 			PrepareState(controlID, adaptor);
 
 			// Allow for footer area.
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				position.height -= FooterButtonStyle.fixedHeight;
 
 			s_CurrentListStack.Push(new ListInfo(_controlID, position));
@@ -1669,7 +1720,7 @@ namespace Rotorz.ReorderableList {
 			totalHeight += 4 * count;
 
 			// Add height of footer buttons.
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				totalHeight += FooterButtonStyle.fixedHeight;
 
 			return totalHeight;
@@ -1692,7 +1743,7 @@ namespace Rotorz.ReorderableList {
 			totalHeight += (itemHeight + 4) * itemCount;
 
 			// Add height of footer buttons.
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				totalHeight += FooterButtonStyle.fixedHeight;
 
 			return totalHeight;
@@ -1825,6 +1876,28 @@ namespace Rotorz.ReorderableList {
 			ReorderableListGUI.IndexOfChangedItem = -1;
 
 			return true;
+		}
+
+		/// <summary>
+		/// Set count of items in list by adding or removing items.
+		/// </summary>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		/// <param name="newCount">New count of items.</param>
+		protected void ResizeList(IReorderableListAdaptor adaptor, int newCount) {
+			if (newCount < 0) {
+				// Do nothing when new count is negative.
+				return;
+			}
+
+			int removeCount = Mathf.Max(0, adaptor.Count - newCount);
+			int addCount = Mathf.Max(0, newCount - adaptor.Count);
+
+			while (removeCount-- > 0) {
+				adaptor.Remove(adaptor.Count - 1);
+			}
+			while (addCount-- > 0) {
+				adaptor.Add();
+			}
 		}
 
 		#endregion

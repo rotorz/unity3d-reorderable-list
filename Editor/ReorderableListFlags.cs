@@ -53,6 +53,10 @@ namespace Rotorz.ReorderableList {
 		/// the mouse pointer is dragged outside of the visible portion of the list.
 		/// </summary>
 		DisableAutoScroll = 0x0100,
+		/// <summary>
+		/// Show "Size" field at base of list control.
+		/// </summary>
+		ShowSizeField = 0x0200,
 	}
 
 }
