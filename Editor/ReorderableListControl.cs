@@ -1897,21 +1897,27 @@ namespace Rotorz.ReorderableList {
 		/// </summary>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		/// <param name="newCount">New count of items.</param>
-		protected void ResizeList(IReorderableListAdaptor adaptor, int newCount) {
+		/// <returns>
+		/// Returns a value of <c>false</c> if operation was cancelled.
+		/// </returns>
+		protected bool ResizeList(IReorderableListAdaptor adaptor, int newCount) {
 			if (newCount < 0) {
 				// Do nothing when new count is negative.
-				return;
+				return true;
 			}
 
 			int removeCount = Mathf.Max(0, adaptor.Count - newCount);
 			int addCount = Mathf.Max(0, newCount - adaptor.Count);
 
 			while (removeCount-- > 0) {
-				adaptor.Remove(adaptor.Count - 1);
+				if (!RemoveItem(adaptor, adaptor.Count - 1))
+					return false;
 			}
 			while (addCount-- > 0) {
-				adaptor.Add();
+				AddItem(adaptor);
 			}
+
+			return true;
 		}
 
 		#endregion
