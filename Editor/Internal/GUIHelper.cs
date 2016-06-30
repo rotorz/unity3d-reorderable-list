@@ -21,7 +21,7 @@ namespace Rotorz.ReorderableList.Internal {
 				if (piVisibleRect != null)
 					VisibleRect = (Func<Rect>)Delegate.CreateDelegate(typeof(Func<Rect>), piVisibleRect.GetGetMethod());
 			}
-			
+
 			var miFocusTextInControl = typeof(EditorGUI).GetMethod("FocusTextInControl", BindingFlags.Static | BindingFlags.Public);
 			if (miFocusTextInControl == null)
 				miFocusTextInControl = typeof(GUI).GetMethod("FocusControl", BindingFlags.Static | BindingFlags.Public);
@@ -105,7 +105,7 @@ namespace Rotorz.ReorderableList.Internal {
 						bool isActive = GUIUtility.hotControl == controlID && position.Contains(Event.current.mousePosition);
 						s_TempIconContent.image = isActive ? iconActive : iconNormal;
 						position.height -= 1;
-                        style.Draw(position, s_TempIconContent, isActive, isActive, false, false);
+						style.Draw(position, s_TempIconContent, isActive, isActive, false, false);
 					}
 					break;
 			}

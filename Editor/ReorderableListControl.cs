@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Rotorz.ReorderableList {
-	
+
 	/// <summary>
 	/// Base class for custom reorderable list control.
 	/// </summary>
@@ -23,7 +23,7 @@ namespace Rotorz.ReorderableList {
 		/// <example>
 		/// <para>The following listing presents a text field for each list item:</para>
 		/// <code language="csharp"><![CDATA[
-        /// using Rotorz.ReorderableList;
+		/// using Rotorz.ReorderableList;
 		/// using System.Collections.Generic;
 		/// using UnityEditor;
 		/// using UnityEngine;
@@ -43,8 +43,8 @@ namespace Rotorz.ReorderableList {
 		///     }
 		/// }
 		/// ]]></code>
-        /// <code language="unityscript"><![CDATA[
-        /// import Rotorz.ReorderableList;
+		/// <code language="unityscript"><![CDATA[
+		/// import Rotorz.ReorderableList;
 		/// import System.Collections.Generic;
 		/// 
 		/// class ExampleWindow extends EditorWindow {
@@ -79,8 +79,8 @@ namespace Rotorz.ReorderableList {
 		/// </remarks>
 		/// <example>
 		/// <para>The following listing displays a label for empty list control:</para>
-        /// <code language="csharp"><![CDATA[
-        /// using Rotorz.ReorderableList;
+		/// <code language="csharp"><![CDATA[
+		/// using Rotorz.ReorderableList;
 		/// using System.Collections.Generic;
 		/// using UnityEditor;
 		/// using UnityEngine;
@@ -100,8 +100,8 @@ namespace Rotorz.ReorderableList {
 		///     }
 		/// }
 		/// ]]></code>
-        /// <code language="unityscript"><![CDATA[
-        /// import Rotorz.ReorderableList;
+		/// <code language="unityscript"><![CDATA[
+		/// import Rotorz.ReorderableList;
 		/// import System.Collections.Generic;
 		/// 
 		/// class ExampleWindow extends EditorWindow {
@@ -508,7 +508,7 @@ namespace Rotorz.ReorderableList {
 			_itemButtonStyle = ReorderableListStyles.ItemButton;
 
 			_horizontalLineColor = ReorderableListStyles.HorizontalLineColor;
-        }
+		}
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ReorderableListControl"/>.
@@ -578,7 +578,7 @@ namespace Rotorz.ReorderableList {
 			// The value of this field is reset each time the control is drawn and may
 			// be invalidated when list items are drawn.
 			_allowDropInsertion = true;
-        }
+		}
 
 		private static int CountDigits(int number) {
 			return Mathf.Max(2, Mathf.CeilToInt(Mathf.Log10((float)number)));
@@ -674,7 +674,7 @@ namespace Rotorz.ReorderableList {
 
 		// Micro-optimisation to avoid repeated construction.
 		private static Rect s_RemoveButtonPosition;
-		
+
 		private void DrawListItem(Rect position, IReorderableListAdaptor adaptor, int itemIndex) {
 			bool isRepainting = Event.current.type == EventType.Repaint;
 			bool isVisible = (position.y < _visibleRect.yMax && position.yMax > _visibleRect.y);
@@ -707,7 +707,7 @@ namespace Rotorz.ReorderableList {
 				itemContentPosition.width -= 27;
 
 			try {
-                s_CurrentItemStack.Push(new ItemInfo(itemIndex, position));
+				s_CurrentItemStack.Push(new ItemInfo(itemIndex, position));
 				EditorGUI.BeginChangeCheck();
 
 				if (isRepainting && isVisible) {
@@ -782,7 +782,7 @@ namespace Rotorz.ReorderableList {
 
 				GUI.color = TargetBackgroundColor;
 				GUIHelper.DrawTexture(targetPosition, EditorGUIUtility.whiteTexture);
-				
+
 				// Fill background of item which is being dragged.
 				--s_DragItemPosition.x;
 				s_DragItemPosition.width += 2;
@@ -828,7 +828,7 @@ namespace Rotorz.ReorderableList {
 			Vector2 mousePosition = Event.current.mousePosition;
 
 			int newTargetIndex = s_TargetIndex;
-			
+
 			// Position of first item in list.
 			float firstItemY = position.y + ContainerStyle.padding.top;
 			// Maximum position of dragged item.
@@ -850,7 +850,7 @@ namespace Rotorz.ReorderableList {
 			}
 
 			switch (eventType) {
-                case EventType.MouseDown:
+				case EventType.MouseDown:
 					if (_tracking) {
 						// Cancel drag when other mouse button is pressed.
 						s_TrackingCancelBlockContext = true;
@@ -973,7 +973,7 @@ namespace Rotorz.ReorderableList {
 					--i;
 					continue;
 				}
-				
+
 				// Event has already been used, skip to next item.
 				if (Event.current.type != EventType.Used) {
 					switch (eventType) {
@@ -1048,7 +1048,7 @@ namespace Rotorz.ReorderableList {
 						_insertionPosition = itemPosition.yMax;
 					}
 					_allowDropInsertion = true;
-                }
+				}
 			}
 
 			// Fake control to catch input focus if auto focus was not possible.
@@ -1090,9 +1090,9 @@ namespace Rotorz.ReorderableList {
 
 		private void HandleDropInsertion(Rect position, IReorderableListAdaptor adaptor) {
 			var target = adaptor as IReorderableListDropTarget;
-            if (target == null || !_allowDropInsertion)
+			if (target == null || !_allowDropInsertion)
 				return;
-			
+
 			if (target.CanDropInsert(_insertionIndex)) {
 				++s_DropTargetNestedCounter;
 
@@ -1147,7 +1147,7 @@ namespace Rotorz.ReorderableList {
 				s_AutoFocusIndex = -1;
 			}
 		}
-		
+
 		/// <summary>
 		/// Draw additional controls below list control and highlight drop target.
 		/// </summary>
@@ -1182,7 +1182,7 @@ namespace Rotorz.ReorderableList {
 						AddItem(adaptor);
 					}
 				}
-				
+
 				if (HasAddMenuButton) {
 					// Draw add menu drop-down button.
 					if (GUIHelper.IconButton(menuButtonPosition, true, menuIconNormal, menuIconActive, FooterButtonStyle)) {
@@ -1247,7 +1247,7 @@ namespace Rotorz.ReorderableList {
 			}
 			finally {
 				s_CurrentListStack.Pop();
-            }
+			}
 
 			CheckForAutoFocusControl();
 

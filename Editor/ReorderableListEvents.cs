@@ -6,7 +6,7 @@ using System.ComponentModel;
 using UnityEngine;
 
 namespace Rotorz.ReorderableList {
-	
+
 	/// <summary>
 	/// Arguments which are passed to <see cref="AddMenuClickedEventHandler"/>.
 	/// </summary>
@@ -39,7 +39,7 @@ namespace Rotorz.ReorderableList {
 	/// <param name="sender">Object which raised event.</param>
 	/// <param name="args">Event arguments.</param>
 	public delegate void AddMenuClickedEventHandler(object sender, AddMenuClickedEventArgs args);
-	
+
 	/// <summary>
 	/// Arguments which are passed to <see cref="ItemInsertedEventHandler"/>.
 	/// </summary>

@@ -15,7 +15,7 @@ namespace Rotorz.ReorderableList {
 	/// </remarks>
 	/// <see cref="IReorderableListAdaptor"/>
 	public interface IReorderableListDropTarget {
-		
+
 		/// <summary>
 		/// Determines whether an item is being dragged and that it can be inserted
 		/// or moved by dropping somewhere into the reorderable list control.

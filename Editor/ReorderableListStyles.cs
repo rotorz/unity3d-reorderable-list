@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Rotorz.ReorderableList {
-	
+
 	/// <summary>
 	/// Styles for the <see cref="ReorderableListControl"/>.
 	/// </summary>
