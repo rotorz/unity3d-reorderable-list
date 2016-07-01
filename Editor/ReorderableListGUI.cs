@@ -150,6 +150,7 @@ namespace Rotorz.ReorderableList {
 		public static void Title(GUIContent title) {
 			Rect position = GUILayoutUtility.GetRect(title, ReorderableListStyles.Title);
 			Title(position, title);
+			GUILayout.Space(-1);
 		}
 
 		/// <summary>
