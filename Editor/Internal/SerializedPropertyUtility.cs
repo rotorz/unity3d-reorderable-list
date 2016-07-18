@@ -74,6 +74,10 @@ namespace Rotorz.ReorderableList.Internal {
 					break;
 			}
 
+			if (property.isArray) {
+				property.arraySize = 0;
+			}
+
 			ResetChildPropertyValues(property);
 		}
 
