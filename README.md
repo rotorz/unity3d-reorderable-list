@@ -1,18 +1,24 @@
-README
-======
+# unity3d-reorderable-list
+
+[![npm version](https://badge.fury.io/js/%40rotorz%2Funity3d-reorderable-list.svg)](https://badge.fury.io/js/%40rotorz%2Funity3d-reorderable-list)
+[![Dependency Status](https://david-dm.org/rotorz/unity3d-reorderable-list.svg)](https://david-dm.org/rotorz/unity3d-reorderable-list)
+[![devDependency Status](https://david-dm.org/rotorz/unity3d-reorderable-list/dev-status.svg)](https://david-dm.org/rotorz/unity3d-reorderable-list#info=devDependencies)
 
 List control for Unity allowing editor developers to add reorderable list controls to
 their GUIs. Supports generic lists and serialized property arrays, though additional
-collection types can be supported by implementing `Rotorz.ReorderableList.IReorderableListAdaptor`.
+collection types can be supported by implementing `Rotorz.Games.Collections.IReorderableListAdaptor`.
 
-Licensed under the MIT license. See LICENSE file in the project root for full license
-information. DO NOT contribute to this project unless you accept the terms of the
-contribution agreement.
 
-![screenshot](https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/raw/master/screenshot.png)
+```sh
+$ npm install --save @rotorz/unity3d-reorderable-list
+```
 
-Features
---------
+This package is compatible with [unity3d-package-syncer](https://github.com/rotorz/unity3d-package-syncer).
+
+![screenshot](screenshot.png)
+
+
+## Features
 
 - Drag and drop reordering!
 - Automatically scrolls if inside a scroll view whilst reordering.
@@ -26,107 +32,87 @@ Features
 - Subclass list control to override context menu.
 - Add drop-down to add menu (or instead of add menu).
 - Helper functionality to build element adder menus.
-- User guide (Asset Path/Support/User Guide.pdf).
-- API reference documentation (Asset Path/Support/API Reference.chm).
 
 
-Preview (showing drop insertion feature)
-----------------------------------------
+## Preview (showing drop insertion feature)
 
-![preview](https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/raw/master/preview.gif)
+![preview](preview.gif)
 
-Installing scripts
-------------------
 
-This control can be added to your project by importing the Unity package which
-contains a compiled class library (DLL). This can be used by C# and UnityScript
-developers.
+## Installation
 
-- [Download RotorzReorderableList_v0.4.3 Package (requires Unity 4.5.5+)](<https://bitbucket.org/rotorz/reorderable-list-editor-field-for-unity/downloads/RotorzReorderableList_v0.4.3.unitypackage>)
+The **unity3d-reorderable-list** library is designed to be installed into Unity projects
+using the **npm** package manager and then synchronized into the "Assets" directory using
+the **unity3d-package-syncer** utility. For more information regarding this workflow refer
+to the [unity3d-package-syncer](https://github.com/rotorz/unity3d-package-syncer)
+repository.
 
-If you would prefer to use the non-compiled source code version in your project,
-copy the contents of this repository somewhere into your project.
+Alternatively you can download the contents of this repository and add directly into your
+project, but you would also need to download the sources of other packages that this
+package is dependant upon. Refer to the `packages.json` file to see these.
 
-**Note to UnityScript (*.js) developers:**
 
-UnityScript will not work with the source code version of this project unless
-the contents of this repository is placed at the path "Assets/Plugins/ReorderableList"
-due to compilation ordering.
+## A couple of examples!
 
-Example 1: Serialized array of strings (C#)
--------------------------------------------
+### Serialized array of strings
 
-    :::csharp
-    SerializedProperty _wishlistProperty;
-    SerializedProperty _pointsProperty;
+```csharp
+private SerializedProperty wishlistProperty;
+private SerializedProperty pointsProperty;
 
-    void OnEnable() {
-        _wishlistProperty = serializedObject.FindProperty("wishlist");
-        _pointsProperty = serializedObject.FindProperty("points");
+private void OnEnable()
+{
+    this.wishlistProperty = this.serializedObject.FindProperty("wishlist");
+    this.pointsProperty = this.serializedObject.FindProperty("points");
+}
+
+public override void OnInspectorGUI()
+{
+    this.serializedObject.Update();
+
+    ReorderableListGUI.Title("Wishlist");
+    ReorderableListGUI.ListField(this.wishlistProperty);
+
+    ReorderableListGUI.Title("Points");
+    ReorderableListGUI.ListField(this.pointsProperty, ReorderableListFlags.ShowIndices);
+
+    this.serializedObject.ApplyModifiedProperties();
+}
+```
+
+
+### List of strings
+
+```csharp
+private List<string> yourList = new List<string>();
+
+private void OnGUI()
+{
+    ReorderableListGUI.ListField(this.yourList, this.CustomListItem, this.DrawEmpty);
+}
+
+private string CustomListItem(Rect position, string itemValue)
+{
+    // Text fields do not like null values!
+    if (itemValue == null) {
+        itemValue = "";
     }
+    return EditorGUI.TextField(position, itemValue);
+}
 
-    public override void OnInspectorGUI() {
-        serializedObject.Update();
+private void DrawEmpty()
+{
+    GUILayout.Label("No items in list.", EditorStyles.miniLabel);
+}
+```
 
-        ReorderableListGUI.Title("Wishlist");
-        ReorderableListGUI.ListField(_wishlistProperty);
 
-        ReorderableListGUI.Title("Points");
-        ReorderableListGUI.ListField(_pointsProperty, ReorderableListFlags.ShowIndices);
+### More examples
 
-        serializedObject.ApplyModifiedProperties();
-    }
+Refer to the `docs/examples` directory of this repository for further examples!
 
-Example 2: List of strings (UnityScript)
-----------------------------------------
 
-    :::javascript
-    var yourList:List.<String> = new List.<String>();
-    
-    function OnGUI() {
-        ReorderableListGUI.ListField(yourList, CustomListItem, DrawEmpty);
-    }
-    
-    function CustomListItem(position:Rect, itemValue:String):String {
-        // Text fields do not like null values!
-        if (itemValue == null)
-            itemValue = '';
-        return EditorGUI.TextField(position, itemValue);
-    }
-    
-    function DrawEmpty() {
-        GUILayout.Label('No items in list.', EditorStyles.miniLabel);
-    }
-
-Refer to API reference for further examples!
-
-Submission to the Unity Asset Store
------------------------------------
-
-If you wish to include this asset as part of a package for the asset store, please
-include the latest package version as-is to avoid conflict issues in user projects.
-It is important that license and documentation files are included and remain intact.
-
-**To include a modified version within your package:**
-
-- Ensure that license and documentation files are included and remain intact. It should
-  be clear that these relate to the reorderable list field library.
-
-- Copyright and license information must remain intact in source files.
-
-- Change the namespace `Rotorz.ReorderableList` to something unique and DO NOT use the
-  name "Rotorz". For example, `YourName.ReorderableList` or `YourName.Internal.ReorderableList`.
-
-- Place files somewhere within your own asset folder to avoid causing conflicts with
-  other assets which make use of this project.
-
-Useful links
-------------
-
-- [Rotorz Website](<http://rotorz.com>)
-
-Contribution Agreement
-----------------------
+## Contribution Agreement
 
 This project is licensed under the MIT license (see LICENSE). To be in the best
 position to enforce these licenses the copyright status of this project needs to

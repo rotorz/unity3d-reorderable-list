@@ -8,5 +8,9 @@ root = true
 [*]
 end_of_line = LF
 insert_final_newline = true
-indent_style = tab
+indent_style = space
 indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{md,yaml}]
+trim_trailing_whitespace = false

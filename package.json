@@ -1,0 +1,22 @@
+{
+  "name": "@rotorz/unity3d-reorderable-list",
+  "version": "1.0.1",
+  "description": "List control for Unity allowing editor developers to add reorderable list controls to their GUIs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rotorz/unity3d-reorderable-list"
+  },
+  "author": "Rotorz Limited",
+  "license": "MIT",
+  "keywords": [
+    "unity3d",
+    "unity3d-package"
+  ],
+  "dependencies": {
+    "@rotorz/unity3d-utils": "~1.0.0"
+  }
+}

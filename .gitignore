@@ -1,13 +1,37 @@
-# OS X
-*.DS_Store
+# Derived From:
+# http://kleber-swf.com/the-definitive-gitignore-for-unity-projects/
 
-# Temp Files
-*~
+# ============= #
+# Working Files #
+# ============= #
+node_modules/
+npm-debug.log
 
-# Project
-_private
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
 bin
 obj
-*.suo
+ExportedObj/
+*.svd
 *.userprefs
 *.pidb
+*.suo
+*.user
+*.unityproj
+*.booproj
+*.pdb
+*.pdb.meta
+
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+*~
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
