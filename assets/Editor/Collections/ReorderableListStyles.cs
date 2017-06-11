@@ -12,11 +12,30 @@ namespace Rotorz.Games.Collections
     /// </summary>
     public sealed class ReorderableListStyles : EditorSingletonScriptableObject
     {
+        private static ReorderableListStyles s_Instance;
+        private static SkinInfo s_Skin;
+
+
         /// <summary>
         /// Gets the one-and-only <see cref="ReorderableListStyles"/> instance.
         /// </summary>
         public static ReorderableListStyles Instance {
-            get { return EditorSingletonUtility.GetAssetInstance<ReorderableListStyles>(); }
+            get {
+                EditorSingletonUtility.GetAssetInstance<ReorderableListStyles>(ref s_Instance);
+                return s_Instance;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current skin.
+        /// </summary>
+        public static SkinInfo Skin {
+            get {
+                if (s_Skin == null) {
+                    s_Skin = EditorGUIUtility.isProSkin ? Instance.darkSkin : Instance.lightSkin;
+                }
+                return s_Skin;
+            }
         }
 
 
@@ -24,14 +43,6 @@ namespace Rotorz.Games.Collections
         private SkinInfo darkSkin = new SkinInfo();
         [SerializeField]
         private SkinInfo lightSkin = new SkinInfo();
-
-
-        /// <summary>
-        /// Gets the current skin.
-        /// </summary>
-        public SkinInfo Skin {
-            get { return EditorGUIUtility.isProSkin ? this.darkSkin : this.lightSkin; }
-        }
 
 
         /// <inheritdoc/>
@@ -42,7 +53,7 @@ namespace Rotorz.Games.Collections
             this.Title.margin = new RectOffset(5, 5, 5, 0);
             this.Title.padding = new RectOffset(5, 5, 3, 3);
             this.Title.alignment = TextAnchor.MiddleLeft;
-            this.Title.normal.background = this.Skin.TitleBackground;
+            this.Title.normal.background = Skin.TitleBackground;
             this.Title.normal.textColor = EditorGUIUtility.isProSkin
                 ? new Color(0.8f, 0.8f, 0.8f)
                 : new Color(0.2f, 0.2f, 0.2f);
@@ -51,16 +62,16 @@ namespace Rotorz.Games.Collections
             this.Container.border = new RectOffset(2, 2, 2, 2);
             this.Container.margin = new RectOffset(5, 5, 0, 0);
             this.Container.padding = new RectOffset(2, 2, 2, 2);
-            this.Container.normal.background = this.Skin.ContainerBackground;
+            this.Container.normal.background = Skin.ContainerBackground;
 
             this.Container2 = new GUIStyle(this.Container);
-            this.Container2.normal.background = this.Skin.Container2Background;
+            this.Container2.normal.background = Skin.Container2Background;
 
             this.FooterButton = new GUIStyle();
             this.FooterButton.fixedHeight = 16;
             this.FooterButton.alignment = TextAnchor.MiddleCenter;
-            this.FooterButton.normal.background = this.Skin.Button_Normal;
-            this.FooterButton.active.background = this.Skin.Button_Active;
+            this.FooterButton.normal.background = Skin.Button_Normal;
+            this.FooterButton.active.background = Skin.Button_Active;
             this.FooterButton.border = new RectOffset(3, 3, 1, 3);
             this.FooterButton.padding = new RectOffset(2, 2, 0, 2);
             this.FooterButton.clipping = TextClipping.Overflow;
@@ -68,14 +79,14 @@ namespace Rotorz.Games.Collections
             this.FooterButton2 = new GUIStyle();
             this.FooterButton2.fixedHeight = 18;
             this.FooterButton2.alignment = TextAnchor.MiddleCenter;
-            this.FooterButton2.normal.background = this.Skin.Button2_Normal;
-            this.FooterButton2.active.background = this.Skin.Button2_Active;
+            this.FooterButton2.normal.background = Skin.Button2_Normal;
+            this.FooterButton2.active.background = Skin.Button2_Active;
             this.FooterButton2.border = new RectOffset(3, 3, 3, 3);
             this.FooterButton2.padding = new RectOffset(2, 2, 2, 2);
             this.FooterButton2.clipping = TextClipping.Overflow;
 
             this.ItemButton = new GUIStyle();
-            this.ItemButton.active.background = this.Skin.ItemBackground_Active;
+            this.ItemButton.active.background = Skin.ItemBackground_Active;
             this.ItemButton.imagePosition = ImagePosition.ImageOnly;
             this.ItemButton.alignment = TextAnchor.MiddleCenter;
             this.ItemButton.overflow = new RectOffset(0, 0, -1, 0);
@@ -83,7 +94,7 @@ namespace Rotorz.Games.Collections
             this.ItemButton.contentOffset = new Vector2(0, -1f);
 
             this.SelectedItem = new GUIStyle();
-            this.SelectedItem.normal.background = this.Skin.SelectionBackground;
+            this.SelectedItem.normal.background = Skin.SelectionBackground;
             this.SelectedItem.normal.textColor = Color.white;
             this.SelectedItem.fontSize = 12;
         }

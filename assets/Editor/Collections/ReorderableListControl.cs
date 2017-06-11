@@ -648,8 +648,8 @@ namespace Rotorz.Games.Collections
         /// </returns>
         private bool DoRemoveButton(Rect position, bool visible)
         {
-            var iconNormal = ReorderableListStyles.Instance.Skin.Icon_Remove_Normal;
-            var iconActive = ReorderableListStyles.Instance.Skin.Icon_Remove_Active;
+            var iconNormal = ReorderableListStyles.Skin.Icon_Remove_Normal;
+            var iconActive = ReorderableListStyles.Skin.Icon_Remove_Active;
 
             return ExtraEditorGUI.IconButton(position, visible, iconNormal, iconActive, this.ItemButtonStyle);
         }
@@ -761,7 +761,7 @@ namespace Rotorz.Games.Collections
                     // Draw grab handle?
                     if (isDraggable) {
                         var texturePosition = new Rect(position.x + 6, position.y + position.height / 2f - 3, 9, 5);
-                        ExtraEditorGUI.DrawTexture(texturePosition, ReorderableListStyles.Instance.Skin.GrabHandle);
+                        ExtraEditorGUI.DrawTexture(texturePosition, ReorderableListStyles.Skin.GrabHandle);
                     }
 
                     // Draw horizontal line between list items.
@@ -1230,8 +1230,8 @@ namespace Rotorz.Games.Collections
                 Rect buttonPosition = new Rect(position.xMax - 30, position.yMax - 1, 30, this.FooterButtonStyle.fixedHeight);
 
                 Rect menuButtonPosition = buttonPosition;
-                var menuIconNormal = ReorderableListStyles.Instance.Skin.Icon_AddMenu_Normal;
-                var menuIconActive = ReorderableListStyles.Instance.Skin.Icon_AddMenu_Active;
+                var menuIconNormal = ReorderableListStyles.Skin.Icon_AddMenu_Normal;
+                var menuIconActive = ReorderableListStyles.Skin.Icon_AddMenu_Active;
 
                 if (this.HasSizeField) {
                     // Draw size field.
@@ -1250,15 +1250,15 @@ namespace Rotorz.Games.Collections
                     if (this.HasAddMenuButton) {
                         menuButtonPosition.x = buttonPosition.xMax - 14;
                         menuButtonPosition.xMax = buttonPosition.xMax;
-                        menuIconNormal = ReorderableListStyles.Instance.Skin.Icon_Menu_Normal;
-                        menuIconActive = ReorderableListStyles.Instance.Skin.Icon_Menu_Active;
+                        menuIconNormal = ReorderableListStyles.Skin.Icon_Menu_Normal;
+                        menuIconActive = ReorderableListStyles.Skin.Icon_Menu_Active;
                         buttonPosition.width -= 5;
                         buttonPosition.x = menuButtonPosition.x - buttonPosition.width + 1;
                     }
 
                     // Draw add item button.
-                    var iconNormal = ReorderableListStyles.Instance.Skin.Icon_Add_Normal;
-                    var iconActive = ReorderableListStyles.Instance.Skin.Icon_Add_Active;
+                    var iconNormal = ReorderableListStyles.Skin.Icon_Add_Normal;
+                    var iconActive = ReorderableListStyles.Skin.Icon_Add_Active;
 
                     if (ExtraEditorGUI.IconButton(buttonPosition, true, iconNormal, iconActive, this.FooterButtonStyle)) {
                         // Append item to list.
@@ -1531,6 +1531,7 @@ namespace Rotorz.Games.Collections
         }
 
         #endregion
+
 
         #region Size Field
 
