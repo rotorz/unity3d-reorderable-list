@@ -19,18 +19,18 @@ namespace Rotorz.Games.Collections
     /// {
     ///     public AddFavoriteShoppingItemsCommand()
     ///     {
-    ///         Content = new GUIContent("Add Favorite Items");
+    ///         this.Content = new GUIContent("Add Favorite Items");
     ///     }
     ///
-    /// 
+    ///
     ///     public GUIContent Content { get; private set; }
     ///
-    /// 
+    ///
     ///     public bool CanExecute(IElementAdder<ShoppingList> elementAdder)
     ///     {
     ///         return true;
     ///     }
-    /// 
+    ///
     ///     public void Execute(IElementAdder<ShoppingList> elementAdder)
     ///     {
     ///         // TODO: Add favorite items to the shopping list!
