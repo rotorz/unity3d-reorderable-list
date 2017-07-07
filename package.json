@@ -17,6 +17,9 @@
     "unity3d-package"
   ],
   "dependencies": {
+    "@rotorz/dotnet-exception-utils": "~1.0.0",
+    "@rotorz/dotnet-type-utils": "~1.0.0",
+    "@rotorz/unity3d-editor-menu": "~1.0.0",
     "@rotorz/unity3d-utils": "~1.0.0"
   }
 }
