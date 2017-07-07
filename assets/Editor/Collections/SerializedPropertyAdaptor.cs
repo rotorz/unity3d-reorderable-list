@@ -40,9 +40,8 @@ namespace Rotorz.Games.Collections
         /// <param name="fixedItemHeight">Non-zero height overrides property drawer height calculation.</param>
         public SerializedPropertyAdaptor(SerializedProperty arrayProperty, float fixedItemHeight)
         {
-            if (arrayProperty == null) {
-                throw new ArgumentNullException("Array property was null.");
-            }
+            ExceptionUtility.CheckArgumentNotNull(arrayProperty, "arrayProperty");
+
             if (!arrayProperty.isArray) {
                 throw new InvalidOperationException("Specified serialized propery is not an array.");
             }
