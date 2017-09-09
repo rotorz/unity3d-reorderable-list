@@ -17,3 +17,6 @@ trim_trailing_whitespace = false
 
 [*.{js,json,yaml,html,css,styl}]
 indent_size = 2
+
+[Makefile]
+indent_style = tab

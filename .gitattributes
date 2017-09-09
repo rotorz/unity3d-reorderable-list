@@ -25,6 +25,7 @@
 *.md               text
 *.mel              text
 *.php              text
+*.po               text
 *.shader           text
 *.txt              text
 *.TXT              text
@@ -101,6 +102,7 @@ WHATSNEW*          text
 *.keystore         binary
 *.mask             binary
 *.mb               binary
+*.mo               binary
 *.mp3              binary
 *.mp4              binary
 *.mpg              binary
