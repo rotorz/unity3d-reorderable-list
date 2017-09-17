@@ -1,6 +1,4 @@
-﻿# Subscribing to item inserted and removing events
-
-This example demonstrates how to subscribe to events by creating a local instance of the
+﻿This example demonstrates how to subscribe to events by creating a local instance of the
 list control. It is also necessary to instantiate the appropriate list adaptor which can
 be cached alongside list control instance.
         

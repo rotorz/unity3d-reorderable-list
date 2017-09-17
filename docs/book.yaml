@@ -1,0 +1,45 @@
+title: User Guide for 'rotorz/unity3d-reorderable-list'
+author: Rotorz Limited
+
+
+sourceBaseUrl: https://github.com/rotorz/unity3d-reorderable-list/blob/master/docs/
+
+tocRootTopic: ./topics/Home.md
+tocDepth: 2
+
+
+assetDirectoryNames:
+  - img
+
+
+special:
+  - source: ./special/_Footer.md
+  - source: ./special/_Sidebar.md
+
+
+topics:
+  - source: ./topics/Home.md
+    topics:
+      - source: ./topics/Control-Interface.md
+
+      - source: ./topics/Examples.md
+        tocExcludeChildren: true
+        topics:
+          - source: ./topics/Serialized-property-inside-custom-inspector.md
+          - source: ./topics/Generic-list-inside-editor-window.md
+          - source: ./topics/Serialized-property-inside-editor-window.md
+          - source: ./topics/Customize-appearance-of-list-field.md
+          - source: ./topics/Detect-changes-within-list-field.md
+          - source: ./topics/Custom-list-adaptor.md
+          - source: ./topics/Customize-context-menu.md
+          - source: ./topics/Subscribing-to-item-inserted-and-removing-events.md
+          - source: ./topics/Item-selection-with-a-custom-adaptor.md
+          - source: ./topics/Adding-the-drop-down-add-menu.md
+          - source: ./topics/Populating-the-drop-down-add-menu-with-types.md
+
+      - source: ./topics/Frequently-Asked-Questions.md
+
+  - source: ./topics/Table-of-Contents.md
+
+
+referenceTable: []

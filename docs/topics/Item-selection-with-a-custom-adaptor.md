@@ -1,9 +1,7 @@
-﻿# Item selection with a custom adaptor
-
-Item selection can be added to a reorderable list control by creating a custom reorderable
+﻿Item selection can be added to a reorderable list control by creating a custom reorderable
 list adaptor. Selection state can be efficiently represented using a hash set collection.
 
-![](img/selectable-items.png)
+![](../img/selectable-items.png)
         
 ```csharp
 using Rotorz.Games.Collections;

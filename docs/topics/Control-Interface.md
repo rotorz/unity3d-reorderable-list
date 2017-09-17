@@ -1,10 +1,8 @@
-# Control Interface
-
 The reorderable list field interface is intentionally simple with an optional title above.
 Support is provided for absolute positioning (`GUI`) and also for automatic layout
 (`GUILayout`).
 
-![List and title field interface with default flags.](img/user-interface.png)
+![List and title field interface with default flags.](../img/user-interface.png)
 
 
 - **Title** - Can be optionally added using `ReorderableListGUI.Title` accepting either a

@@ -1,6 +1,4 @@
-﻿# Customize context menu
-
-This example demonstrates how to add to, or even replace entirely, the list field's
+﻿This example demonstrates how to add to, or even replace entirely, the list field's
 context menu.
         
 First we need to implement a subclass of `ReorderableListControl` so that we can override

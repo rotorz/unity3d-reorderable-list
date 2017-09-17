@@ -1,6 +1,4 @@
-﻿# Populating the drop-down add menu with types
-
-Utility functionality is provided to assist when building menus that contain a number of
+﻿Utility functionality is provided to assist when building menus that contain a number of
 addable element types that implement some interface or base type; this is referred to as
 the element contract type.
 

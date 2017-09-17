@@ -4,6 +4,8 @@
   "description": "List control for Unity allowing editor developers to add reorderable list controls to their GUIs.",
   "main": "index.js",
   "scripts": {
+    "clean-wiki-output": "github-wiki-from-markdown-book clean",
+    "build-wiki-output": "github-wiki-from-markdown-book build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,5 +23,8 @@
     "@rotorz/dotnet-type-utils": "~1.0.0",
     "@rotorz/unity3d-editor-menu": "~1.0.0",
     "@rotorz/unity3d-utils": "~1.0.0"
+  },
+  "devDependencies": {
+    "github-wiki-from-markdown-book": "^1.0.0"
   }
 }

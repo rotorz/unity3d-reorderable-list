@@ -1,6 +1,4 @@
-﻿# Serialized property inside editor window
-
-The serialized property version of this field can also be used in editor windows. This
+﻿The serialized property version of this field can also be used in editor windows. This
 allows you to take advantage of the automatic undo and redo capabilities which Unity
 provides.
 
@@ -17,7 +15,7 @@ public class SomeBehaviour : MonoBehaviour
 }
 ```
 
-Before we can interact with the wishlist property we must create an instance of [SerializedObject](http://docs.unity3d.com/Documentation/ScriptReference/SerializedObject.html).
+Before we can interact with the wishlist property we must create an instance of [SerializedObject].
 This is done each time the user selection changes.
         
 ```csharp
@@ -67,3 +65,7 @@ public class ArrayPropertyWindow : EditorWindow
     }
 }
 ```
+
+
+
+[SerializedObject]: http://docs.unity3d.com/Documentation/ScriptReference/SerializedObject.html

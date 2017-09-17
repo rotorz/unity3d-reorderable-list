@@ -1,14 +1,12 @@
-﻿# Customize appearance of list field
-
-Style of list container, add button and remove buttons can be customized by providing
+﻿Style of list container, add button and remove buttons can be customized by providing
 custom styles. This example demonstrates a custom inspector with custom styles which are
 based upon the default styles.
 
-
-**Tip** - Another option is to subclass `ReorderableListControl` and initialise custom
-styles there instead. A subclass can override other behaviour such as providing custom
-context menu items.
-
+>
+> **Tip** - Another option is to subclass `ReorderableListControl` and initialise custom
+> styles there instead. A subclass can override other behaviour such as providing custom
+> context menu items.
+>
 
 ```csharp
 using Rotorz.Games.Collections;

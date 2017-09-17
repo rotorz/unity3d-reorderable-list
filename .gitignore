@@ -6,6 +6,7 @@
 # ============= #
 node_modules/
 npm-debug.log
+/temp/
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #

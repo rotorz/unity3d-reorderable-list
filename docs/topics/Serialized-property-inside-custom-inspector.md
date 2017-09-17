@@ -1,6 +1,4 @@
-﻿# Serialized property inside custom inspector
-
-Reorderable list fields can be added to custom inspector interfaces with automatic support
+﻿Reorderable list fields can be added to custom inspector interfaces with automatic support
 for undo/redo when using serialized properties. Serialized properties support native
 arrays as well as generic lists.
         
@@ -16,10 +14,10 @@ public class SomeBehaviour : MonoBehaviour
 }
 ```
 
-Custom inspectors can be implemented by extending the [Editor Class](http://docs.unity3d.com/Documentation/ScriptReference/Editor.html).
-The serialized property for our "wishlist" field can then be accessed via the serialize
-object representation of `SomeBehaviour`. We can override the method [OnInspectorGUI](http://docs.unity3d.com/Documentation/ScriptReference/Editor.OnInspectorGUI.html)
-to present the reorderable list.
+Custom inspectors can be implemented by extending the [Editor Class]. The serialized
+property for our "wishlist" field can then be accessed via the serialize object
+representation of `SomeBehaviour`. We can override the method [OnInspectorGUI] to present
+the reorderable list.
 
 ```csharp
 using Rotorz.Games.Collections;
@@ -47,3 +45,8 @@ public class SomeBehaviourEditor : Editor
     }
 }
 ```
+
+
+
+[Editor Class]: http://docs.unity3d.com/Documentation/ScriptReference/Editor.html
+[OnInspectorGUI]: http://docs.unity3d.com/Documentation/ScriptReference/Editor.OnInspectorGUI.html

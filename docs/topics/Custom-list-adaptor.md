@@ -1,10 +1,8 @@
-﻿# Custom list adaptor
-
-This example demonstrates how to implement a custom list adaptor which can contain caption
+﻿This example demonstrates how to implement a custom list adaptor which can contain caption
 items which cannot be dragged or removed. List items can however be dragged around the
 stationary caption items.
 
-![](img/custom-list-adaptor.png)
+![](../img/custom-list-adaptor.png)
 
 Since in this example we are working with a straightforward list of strings it makes sense
 to subclass `Rotorz.Games.Collections.GenericListAdaptor<T>`.

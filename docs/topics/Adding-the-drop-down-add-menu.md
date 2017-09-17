@@ -1,10 +1,8 @@
-﻿# Adding the drop-down add menu
-
-The drop-down add menu button is automatically displayed when there is at least one
+﻿The drop-down add menu button is automatically displayed when there is at least one
 subscriber to the `ReorderableListControl.AddMenuClicked` event. The presentation of the
 button varies depending upon whether the regular add button is also shown.
 
-![](img/drop-down-add-menu.png)
+![](../img/drop-down-add-menu.png)
 
 The drop-down add button is a general purpose button with no default behavior which can be
 used to display a menu or a drop-down window.

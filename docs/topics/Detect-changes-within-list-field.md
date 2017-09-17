@@ -1,14 +1,11 @@
-﻿# Detect changes within list field
-
-The reorderable list field watches for changes surrounding individual items allowing you
+﻿The reorderable list field watches for changes surrounding individual items allowing you
 to pinpoint the item which was actually modified. Any changes made outside of list item
 drawers are considered changes made by the list control itself.
         
-The property [GUI.changed](http://docs.unity3d.com/Documentation/ScriptReference/GUI-changed.html)
-is set to `true` if changes are made using the list control. If a list item drawer reports
-changes then the property `ReorderableListGUI.indexOfChangedItem` is set to the zero-based
-index of that item. A value of `-1` indicates that changes were reported by the list
-control itself.
+The property [GUI.changed] is set to `true` if changes are made using the list control. If
+a list item drawer reports changes then the property `ReorderableListGUI.indexOfChangedItem`
+is set to the zero-based index of that item. A value of `-1` indicates that changes were
+reported by the list control itself.
 
 ```csharp
 // Begin checking for changes to `GUI.changed`.
@@ -28,3 +25,7 @@ if (EditorGUI.EndChangeCheck()) {
     }
 }
 ```
+
+
+
+[GUI.changed]: http://docs.unity3d.com/Documentation/ScriptReference/GUI-changed.html
