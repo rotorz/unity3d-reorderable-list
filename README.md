@@ -1,16 +1,12 @@
 # unity3d-reorderable-list
 
-[![npm version](https://badge.fury.io/js/%40rotorz%2Funity3d-reorderable-list.svg)](https://badge.fury.io/js/%40rotorz%2Funity3d-reorderable-list)
-[![Dependency Status](https://david-dm.org/rotorz/unity3d-reorderable-list.svg)](https://david-dm.org/rotorz/unity3d-reorderable-list)
-[![devDependency Status](https://david-dm.org/rotorz/unity3d-reorderable-list/dev-status.svg)](https://david-dm.org/rotorz/unity3d-reorderable-list#info=devDependencies)
-
 List control for Unity allowing editor developers to add reorderable list controls to
 their GUIs. Supports generic lists and serialized property arrays, though additional
 collection types can be supported by implementing `Rotorz.Games.Collections.IReorderableListAdaptor`.
 
 
 ```sh
-$ npm install --save @rotorz/unity3d-reorderable-list
+$ npm install --save rotorz/unity3d-reorderable-list
 ```
 
 This package is compatible with [unity3d-package-syncer](https://github.com/rotorz/unity3d-package-syncer).
