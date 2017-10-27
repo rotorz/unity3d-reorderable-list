@@ -30,7 +30,7 @@ the same principle can also be applied to a collection type.
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ExampleGraph : ScriptableObject
+public class ExampleGraph : ScriptableObject
 {
     [SerializeField]
     private List<ExampleNode> nodes = new List<ExampleNode>();
