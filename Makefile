@@ -32,7 +32,7 @@ build-wiki: install-npm
 	git clone $(WIKI_REPOSITORY_URL) temp/wiki
 
 	# Clean previous build of documentation.
-	npm run clean-wiki-output -- --output=temp/wiki
+	npm run clean-wiki-output -- --input="$(DOCS_BOOK_YAML_PATH)" --output=temp/wiki
 	# Build documentation.
 	npm run build-wiki-output -- --input="$(DOCS_BOOK_YAML_PATH)" --output=temp/wiki
 
