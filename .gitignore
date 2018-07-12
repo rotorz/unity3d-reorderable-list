@@ -8,9 +8,19 @@ node_modules/
 npm-debug.log
 /temp/
 
+# ===================== #
+# Working Files - Unity #
+# ===================== #
+/Library/
+/Packages/
+/ProjectSettings/
+/*.csproj
+/*.sln
+
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
+/.vs/
 bin
 obj
 ExportedObj/
