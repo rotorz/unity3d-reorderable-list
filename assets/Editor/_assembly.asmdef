@@ -6,5 +6,11 @@
         "rotorz.dotnet-type-utils",
         "rotorz.unity3d-editor-menu.editor",
         "rotorz.unity3d-utils.editor"
-    ]
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
 }
