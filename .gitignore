@@ -15,6 +15,8 @@ npm-debug.log
 /Library/
 /Packages/
 /ProjectSettings/
+/assets/Plugins/
+/assets/Plugins.meta
 /*.csproj
 /*.sln
 
